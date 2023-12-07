@@ -1,13 +1,17 @@
 from django.http import JsonResponse
 from datetime import datetime
+from project.models import Managers
 
 def index(request):
-    current_time = datetime.now().strftime("%-I:%S %p")
-    current_date = datetime.now().strftime("%A %m %-Y")
+    manager = Managers.objects.first()
+
+    if manager:
+        manager_name = manager.name + ' ' + manager.surname
+    else:
+        manager_name = "Brak danych o managerze"
 
     data = {
-        'time': current_time,
-        'date': current_date,
+        'manager_name': manager_name,
     }
 
     return JsonResponse(data)

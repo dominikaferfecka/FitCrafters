@@ -2,19 +2,18 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
-  const [currentTime, setCurrentTime] = useState(0);
-  const [currentDate, setCurrentDate] = useState(0);
+  const [managerName, setManagerName] = useState("");
+
   useEffect(() => {
-  fetch(' http://127.0.0.1:8000/').then(res => res.json()).then(data => {
-      setCurrentTime(data.time);
-      setCurrentDate(data.date)
+    fetch('http://127.0.0.1:8000/').then(res => res.json()).then(data => {
+      setManagerName(data.manager_name);
     });
   }, []);
+
   return (
     <div className="App">
       <header className="App-header">
-      <p>The date is {currentDate} and the time is {currentTime}.</p> <br/>
-
+        <p>The manager's name is {managerName}.</p> <br/>
       </header>
     </div>
   );

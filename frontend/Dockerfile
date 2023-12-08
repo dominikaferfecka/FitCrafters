@@ -5,6 +5,7 @@ WORKDIR /frontend
 COPY . .
 
 RUN npm install
+RUN npm install bootstrap@latest
 
 EXPOSE 3000
 

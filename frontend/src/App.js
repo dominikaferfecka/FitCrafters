@@ -1,8 +1,13 @@
-import Navbar from "./components/Navbar"
+import  MenuBar from "./components/MenuBar"
 import './App.css';
+import Carousel from "./components/CarouselFrontPage";
 
 function App() {
-  return <Navbar />;
+
+  return <> 
+  <MenuBar />
+  <Carousel />
+  </>;
 }
 
 export default App;

@@ -5,7 +5,7 @@ WORKDIR /frontend
 COPY . .
 
 RUN npm install
-RUN npm install bootstrap@latest
+RUN npm install react-bootstrap bootstrap
 
 EXPOSE 3000
 

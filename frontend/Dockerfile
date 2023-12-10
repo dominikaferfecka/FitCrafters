@@ -6,6 +6,8 @@ COPY . .
 
 RUN npm install
 RUN npm install react-bootstrap bootstrap
+RUN cd frontend
+RUN npm install react-router-dom@latest
 
 EXPOSE 3000
 

@@ -4,10 +4,10 @@ function Footer() {
         color: '#fff',
     }
 
-    return <footer class="bg-body-tertiary text-center text-lg-start">
-    <div class="text-center p-3" style={footerStyle}>
+    return <footer className="bg-body-tertiary text-center text-lg-start">
+    <div className="text-center p-3" style={footerStyle}>
       © 2023 Copyright:
-      <a class="text-body" href="TODO: wstawić link"> FitCrafters</a>
+      <a className="text-body" href="TODO: wstawić link"> FitCrafters</a>
     </div>
   </footer>
 }

@@ -21,6 +21,7 @@ npm install
 npm install react react-dom
 npm install react-bootstrap bootstrap
 npm install react-router-dom@latest
+npm install chart.js
 npm update eslint jest
 npm install -g n
 n latest

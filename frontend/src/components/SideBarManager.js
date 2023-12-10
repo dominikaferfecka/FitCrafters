@@ -1,5 +1,5 @@
 function SideBarManager() {
-    return <><div className="d-flex fixed-left" id="wrapper">
+    return <><div className="d-flex fixed-top" id="wrapper">
     <div className="border-end bg-white" id="sidebar-wrapper">
         <div className="sidebar-heading border-bottom bg-success" style={{color: "white"}}>Panel menadżera</div>
         <div className="list-group list-group-flush">

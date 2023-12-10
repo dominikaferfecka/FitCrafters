@@ -1,3 +1,4 @@
+import BarChart from "./BarChart"
 import List from "./List"
 import SideBarManager from "./SideBarManager"
 import UserHeader from "./UserHeader"
@@ -11,6 +12,8 @@ function ManagerPage()  {
         <UserHeader />
         <List header="Lista siłowni"/>
         <List header="Lista sprzętu"/>
+        <BarChart />
+        <List header="Lista trenerów"/>
         </div>
     </>
 }

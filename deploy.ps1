@@ -9,6 +9,7 @@ cd frontend
 npm install@latest
 npm install react-bootstrap bootstrap
 npm install react-router-dom@latest
+npm install chart.js
 
 echo "frontend installed"
 

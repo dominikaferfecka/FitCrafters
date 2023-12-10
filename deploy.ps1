@@ -6,7 +6,7 @@ pip install mysqlclient
 echo "backend installed"
 
 cd frontend
-npm install
+npm install@latest
 npm install react-bootstrap bootstrap
 npm install react-router-dom@latest
 

@@ -13,3 +13,7 @@
 .carousel, .slide, .carousel-item{
   height: 100vh;
 }
+
+.text-center {
+  text-align: center;
+}

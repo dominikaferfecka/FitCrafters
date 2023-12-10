@@ -1,12 +1,10 @@
-import  MenuBar from "./components/MenuBar"
 import './App.css';
-import Carousel from "./components/CarouselFrontPage";
+import FrontPage from './components/FrontPage';
 
 function App() {
 
   return <> 
-  <MenuBar />
-  <Carousel />
+  <FrontPage />
   </>;
 }
 

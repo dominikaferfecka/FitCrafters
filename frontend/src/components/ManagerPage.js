@@ -1,4 +1,8 @@
+import SideBarManager from "./SideBarManager"
+
 function ManagerPage()  {
-    return <p>Hello manager</p>
+    return <>
+        <SideBarManager />
+    </>
 }
 export default ManagerPage

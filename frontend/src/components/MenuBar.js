@@ -1,7 +1,16 @@
 import logo from '../img/icons8-fit-50.png';
+import { useState } from "react";
+import LogIn from './LogIn';
 
 function MenuBar() {
-  return (
+  const [accountType, setAccountType] = useState('');
+
+  const handleAccountType = (type) => {
+    setAccountType(type);
+  };
+
+  return (<>
+    <LogIn accountType={accountType} />
     <nav className="navbar fixed-top bg-body-tertiary">
       <div className="container-fluid d-flex justify-content-between align-items-center">
         {/* Logo i nazwa po lewej */}
@@ -14,14 +23,15 @@ function MenuBar() {
         <div className="d-flex">
           <a className="navbar-brand" href="#">Zaloguj jako</a>
           <div className="btn-group me-4" role="group" aria-label="Basic outlined example">
-            <button type="button" className="btn btn-outline-success">Klient</button>
-            <button type="button" className="btn btn-outline-success">Trener</button>
-            <button type="button" className="btn btn-outline-success">Menadżer</button>
+            <button type="button" onClick={() => handleAccountType("klient")} accountType={accountType} className="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#LogInModal">Klient</button>
+            <button type="button" onClick={() => handleAccountType("trener")} accountType={accountType} className="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#LogInModal">Trener</button>
+            <button type="button" onClick={() => handleAccountType("menadżer")} accountType={accountType} className="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#LogInModal">Menadżer</button>
           </div>
           <button type="button" className="btn btn-success me-2">Zarejestruj się</button>
         </div>
       </div>
     </nav>
+    </>
   );
 }
 

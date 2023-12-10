@@ -3,6 +3,7 @@ import Carousel from "./CarouselFrontPage";
 import TextField from "./TextField";
 import QuoteCard from "./QuoteCard";
 import Footer from "./Footer";
+import LogIn from "./LogIn";
 
 function FrontPage() {
     return <> 

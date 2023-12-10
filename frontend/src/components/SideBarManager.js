@@ -1,11 +1,11 @@
 function SideBarManager() {
-    return <><div className="d-flex" id="wrapper">
+    return <><div className="d-flex fixed-left" id="wrapper">
     <div className="border-end bg-white" id="sidebar-wrapper">
         <div className="sidebar-heading border-bottom bg-success" style={{color: "white"}}>Panel menadżera</div>
         <div className="list-group list-group-flush">
-            <a className="list-group-item list-group-item-action list-group-item-success p-3" href="#!">Lista sprzętu</a>
-            <a className="list-group-item list-group-item-action list-group-item-success p-3" href="#!">Statystyki siłowni</a>
-            <a className="list-group-item list-group-item-action list-group-item-success p-3" href="#!">Lista siłowni</a>
+        <a className="list-group-item list-group-item-action list-group-item-success p-3">Lista siłowni</a>
+            <a className="list-group-item list-group-item-action list-group-item-success p-3">Lista sprzętu</a>
+            <a className="list-group-item list-group-item-action list-group-item-success p-3">Statystyki siłowni</a>
             <a className="list-group-item list-group-item-action list-group-item-success p-3" href="#!">Lista trenerów</a>
             <a className="list-group-item list-group-item-action list-group-item-success p-3 dropdown-toggle" id="dropdownEquipment" data-bs-toggle="dropdown" data-bs-offset="10,10" href="#!">Sprzęt</a>
             <a className="list-group-item list-group-item-action list-group-item-success p-3 dropdown-toggle" id="dropdownTrainer" data-bs-toggle="dropdown" data-bs-offset="10,10" href="#!">Trenerzy</a>

@@ -7,7 +7,7 @@ function Footer() {
     return <footer className="bg-body-tertiary text-center text-lg-start">
     <div className="text-center p-3" style={footerStyle}>
       © 2023 Copyright:
-      <a className="text-body" href="TODO: wstawić link"> FitCrafters</a>
+      <a className="text-body" href="/"> FitCrafters</a>
     </div>
   </footer>
 }

@@ -63,7 +63,7 @@ function EquipmentForm(props) {
             </option>
             {mappedSelectEquipment}
           </select>
-          <div class="valid-feedback">Looks good!</div>
+          <div class="valid-feedback">Wygląda dobrze!</div>
         </div>
         <div class="col-md-6">
           <label for="validationCustom03" class="form-label">

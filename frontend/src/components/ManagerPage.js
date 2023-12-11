@@ -1,5 +1,7 @@
 import BarChart from "./BarChart";
 import EquipmentForm from "./EquipmentForm";
+import Footer from "./Footer";
+import GymForm from "./GymForm";
 import List from "./List";
 import SideBarManager from "./SideBarManager";
 import TrainerForm from "./TrainerForm";
@@ -23,6 +25,8 @@ function ManagerPage() {
         <List header="Lista trenerów" scrollId="trainerList" />
         <EquipmentForm scrollId="equipForm" />
         <TrainerForm scrollId="trainerForm" />
+        <GymForm scrollId="gymForm" />
+        <Footer />
       </div>
     </>
   );

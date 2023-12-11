@@ -79,11 +79,11 @@ class Gyms(models.Model):
 
 
 class GymsEquipmentType(models.Model):
-    gym = models.OneToOneField(Gyms, models.DO_NOTHING, primary_key=True)  # The composite primary key (gym_id, equipment_id) found, that is not supported. The first column is selected.
+    gym = models.OneToOneField(Gyms, models.DO_NOTHING) 
     equipment = models.ForeignKey(EquipmentType, models.DO_NOTHING)
     available = models.IntegerField()
     used = models.IntegerField()
-    serial_number = models.CharField(max_length=20)
+    serial_number = models.CharField(max_length=20, primary_key=True)
 
     class Meta:
         managed = False

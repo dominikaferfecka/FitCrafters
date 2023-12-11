@@ -2,6 +2,7 @@ import BarChart from "./BarChart";
 import EquipmentForm from "./EquipmentForm";
 import List from "./List";
 import SideBarManager from "./SideBarManager";
+import TrainerForm from "./TrainerForm";
 import UserHeader from "./UserHeader";
 
 function ManagerPage() {
@@ -21,6 +22,7 @@ function ManagerPage() {
         <BarChart scrollId="gymStats" />
         <List header="Lista trenerów" scrollId="trainerList" />
         <EquipmentForm scrollId="equipForm" />
+        <TrainerForm scrollId="trainerForm" />
       </div>
     </>
   );

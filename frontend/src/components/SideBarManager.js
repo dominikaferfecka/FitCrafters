@@ -42,7 +42,7 @@ function SideBarManager() {
             </a>
             <a
               className="list-group-item list-group-item-action list-group-item-success p-3"
-              href="#!"
+              href="#trainerForm"
             >
               Trenerzy
             </a>

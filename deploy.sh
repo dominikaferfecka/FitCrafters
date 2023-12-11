@@ -12,7 +12,7 @@ sudo apt-get install nodejs
 sudo apt-get install npm
 
 
-pip install django django-cors-headers
+pip3 install django django-cors-headers
 
 echo "backend installed"
 

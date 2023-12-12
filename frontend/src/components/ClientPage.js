@@ -1,8 +1,11 @@
 import BarChart from "./BarChart";
+import ClientInfo from "./ClientInfo";
 import ClientPlan from "./ClientPlan";
 import List from "./List";
 import SideBarClient from "./SideBarClient";
+import TrainerInfo from "./TrainerInfo";
 import UserHeader from "./UserHeader";
+import Footer from "./Footer";
 
 function ClientPage() {
   const selectStats = [
@@ -33,6 +36,9 @@ function ClientPage() {
           scrollId="statsTraining"
         />
         <ClientPlan selectItems={[]} scrollId="clientsPlan" />
+        <TrainerInfo scrollId="trainersInfo" />
+        <ClientInfo scrollId="clientInfo" />
+        <Footer />
       </div>
     </>
   );

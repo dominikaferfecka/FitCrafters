@@ -69,6 +69,7 @@ function ClientPlan(props) {
         </table>
       </div>
 
+      <h5 className="text-center m-4">Dodaj plan treningowy</h5>
       <form>
         <div class="row flex-d justify-content-center" id="formClientPlan">
           <div class="mb-3 col-md-3">
@@ -98,6 +99,7 @@ function ClientPlan(props) {
           </div>
         </div>
       </form>
+      <h5 className="text-center m-4">Dodaj ćwiczenie</h5>
       <form>
         <div class="row flex-d justify-content-center" id="formClientPlan">
           <div class="row col-md-10 justify-content-center">

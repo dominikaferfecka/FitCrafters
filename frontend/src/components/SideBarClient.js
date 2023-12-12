@@ -12,7 +12,7 @@ function SideBarClient() {
           <div className="list-group list-group-flush">
             <a
               className="list-group-item list-group-item-action list-group-item-success p-3"
-              href="#trainingList"
+              href="#trainingHistory"
             >
               Historia treningów
             </a>
@@ -32,17 +32,12 @@ function SideBarClient() {
               className="list-group-item list-group-item-action list-group-item-success p-3 "
               href="#trainersInfo"
             >
-              Informacje o trenerach
+              Trenerzy
             </a>
+
             <a
               className="list-group-item list-group-item-action list-group-item-success p-3"
-              href="#trainersSignUp"
-            >
-              Zapisz się do trenera
-            </a>
-            <a
-              className="list-group-item list-group-item-action list-group-item-success p-3"
-              href="#modifyInfo"
+              href="#clientInfo"
             >
               Modyfikuj swoje dane
             </a>

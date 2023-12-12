@@ -35,6 +35,7 @@ function ManagerPage() {
         <List
           header="Lista sprzętu"
           showSelect="true"
+          firstSelectTitle="Wybierz sprzęt"
           selectItems={selectGyms}
           scrollId="equipmentList"
         />
@@ -48,6 +49,7 @@ function ManagerPage() {
         <List
           header="Lista trenerów"
           showSelect="true"
+          firstSelectTitle="Wybierz siłownię"
           selectItems={selectGyms}
           scrollId="trainerList"
         />

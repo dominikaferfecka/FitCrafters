@@ -1,4 +1,12 @@
+import { useNavigate } from "react-router-dom";
+
 function Register() {
+  const navigate = useNavigate();
+
+  function handleRegisterClick() {
+    navigate("/client");
+  }
+
   return (
     <div class="modal" id="RegisterModal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
@@ -84,7 +92,12 @@ function Register() {
             >
               Anuluj
             </button>
-            <button type="button" class="btn btn-success">
+            <button
+              type="button"
+              class="btn btn-success"
+              data-bs-dismiss="modal"
+              onClick={() => handleRegisterClick()}
+            >
               Zarejestruj się
             </button>
           </div>

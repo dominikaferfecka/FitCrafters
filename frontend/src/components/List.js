@@ -1,20 +1,14 @@
 import { Container } from "react-bootstrap";
 
 function List(props) {
-  const selectItems = [
-    "siłownia1",
-    "siłownia2",
-    "siłownia3",
-    "siłownia4",
-    "siłownia5",
-  ];
   const columns = ["#", "First", "Last", "Handle"];
   const listItems = columns.map((col, index) => (
     <th key={index} scope="col">
       {col}
     </th>
   ));
-  const mappedSelectItems = selectItems.map((item, index) => (
+
+  const mappedSelectItems = props.selectItems.map((item, index) => (
     <option key={index} value={index + 1}>
       {item}
     </option>
@@ -32,7 +26,8 @@ function List(props) {
           }}
         >
           <select className="form-select w-50" aria-label="Select">
-            <option value="0">Wybierz siłownię</option>
+            <option value="0">{props.firstSelectTitle}</option>
+
             {mappedSelectItems}
           </select>
         </div>

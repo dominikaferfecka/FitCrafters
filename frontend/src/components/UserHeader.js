@@ -12,7 +12,7 @@ function UserHeader() {
           <div className="d-flex justify-content-center align-items-center h-100">
             <div className="text-white">
               <h1 className="mb-3">Witaj *imię*!</h1>
-              <h4 className="mb-3">Panel menadżera</h4>
+              <h4 className="mb-3">Panel użytkownika</h4>
             </div>
           </div>
         </div>

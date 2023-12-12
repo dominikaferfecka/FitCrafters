@@ -39,13 +39,13 @@ function TrainerInfo(props) {
             zdrowie fizyczne i psychiczne podopiecznych. Jego profesjonalizm,
             empatia i skuteczność przyciągają osoby pragnące transformacji.
           </p>
-          <a
+          <button
             class="btn btn-success"
             data-bs-toggle="modal"
             data-bs-target="#trainerSignUp"
           >
             Zapisz się
-          </a>
+          </button>
         </div>
       </div>
     </Container>

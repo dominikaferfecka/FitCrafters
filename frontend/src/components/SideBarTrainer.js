@@ -30,7 +30,10 @@ function SideBarTrainer() {
             >
               Plany ćwiczeń klienta
             </a>
-            <a className="list-group-item list-group-item-action list-group-item-success p-3">
+            <a
+              className="list-group-item list-group-item-action list-group-item-success p-3"
+              href="/trainer"
+            >
               Kalendarz
             </a>
             <a

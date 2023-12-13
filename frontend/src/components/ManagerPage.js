@@ -17,13 +17,6 @@ function ManagerPage() {
     "statystyka5",
   ];
 
-  const selectGyms = [
-    "siłownia1",
-    "siłownia2",
-    "siłownia3",
-    "siłownia4",
-    "siłownia5",
-  ];
 
   const [gym_data, setgymData] = useState([]);
 
@@ -31,12 +24,22 @@ function ManagerPage() {
 
   const [trainers_data, setgymTrainersData] = useState([]);
 
+  const [manager_data, setManagerData] = useState({});
+
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/gyms-endpoint/')
+    fetch('http://127.0.0.1:8000/manager-name-endpoint/')
+    .then(response => response.json())
+    .then(manager_data => {setManagerData(manager_data); console.log(manager_data)})
+    .catch(error => {  console.log(manager_data);console.error('Błąd przy pobieraniu danych:', error)});
+  }, []);
+  
+  console.log(manager_data)
+  useEffect(() => {
+    fetch('http://127.0.0.1:8000/gyms-endpoint/?manager_id=' + String(manager_data.manager_id))
     .then(response => response.json())
     .then(gym_data => {setgymData(gym_data); console.log(gym_data)})
     .catch(error => {  console.log(gym_data);console.error('Błąd przy pobieraniu danych:', error)});
-  }, []);
+  }, [manager_data]);
 
   useEffect(() => {
     fetch('http://127.0.0.1:8000/equipment-endpoint/')
@@ -52,13 +55,15 @@ function ManagerPage() {
     .catch(error => {  console.log(trainers_data);console.error('Błąd przy pobieraniu danych:', error)});
   }, []);
 
+  const selectGyms = gym_data.map(element => element.street);
+
   return (
     <>
       <div style={{ width: "250px", float: "left" }}>
         <SideBarManager />
       </div>
       <div style={{ marginLeft: "230px" }}>
-        <UserHeader />
+        <UserHeader name={manager_data.name}/>
         <List header="Lista siłowni" selectItems={[]} scrollId="gymList" items={gym_data} />
         <List
           header="Lista sprzętu"

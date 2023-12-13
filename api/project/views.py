@@ -18,7 +18,8 @@ class DataBaseAPIView(APIView):
     
     @api_view(['GET'])
     def getManagerGyms(request):
-        gyms = Gyms.objects.all()
+        v_manager_id = request.GET['manager_id']
+        gyms = Gyms.objects.filter(manager_id=v_manager_id)
         data = GymSerializer(gyms, many=True).data
         return JsonResponse(data, safe=False)
     

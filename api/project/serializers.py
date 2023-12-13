@@ -4,12 +4,12 @@ from .models import Managers, Gyms, EquipmentType, Trainers
 class ManagerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Managers
-        fields = ['name']
+        fields = ('manager_id', 'name')
 
 class GymSerializer(serializers.ModelSerializer):
     class Meta:
         model = Gyms
-        fields = ('gym_id', 'city', 'street', 'phone_number')
+        fields = ('gym_id', 'city', 'street', 'manager_id', 'phone_number')
 
 class EquipmentSerializer(serializers.ModelSerializer):
     class Meta:

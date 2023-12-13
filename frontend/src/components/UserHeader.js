@@ -1,17 +1,7 @@
 import background from "../img/userBackground.jpg";
-import React, { useEffect, useState } from 'react';
 
 
-function UserHeader() {
-  const [fetched_data, setData] = useState({});
-
-  useEffect(() => {
-    fetch('http://127.0.0.1:8000/manager-name-endpoint/')
-    .then(response => response.json())
-    .then(fetched_data => {setData(fetched_data); console.log(fetched_data)})
-    .catch(error => {  console.log(fetched_data);console.error('Błąd przy pobieraniu danych:', error)});
-  }, []);
-
+function UserHeader(props) {
 
   return (
     <header>
@@ -26,7 +16,7 @@ function UserHeader() {
             <div className="text-white">
 
             {
-                <h1 className="mb-3">Witaj {fetched_data.name}!</h1>
+                <h1 className="mb-3">Witaj {props.name}!</h1>
             }
               <h4 className="mb-3">Panel menadżera</h4>
             </div>

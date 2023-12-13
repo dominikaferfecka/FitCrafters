@@ -1,3 +1,5 @@
+USE FitCraftersDatabase;
+
 -- foreign keys
 ALTER TABLE exercises
     DROP FOREIGN KEY exercises_equipment_type;

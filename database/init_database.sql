@@ -1,4 +1,3 @@
-CREATE DATABASE IF NOT EXISTS FitCraftersDatabase;
 USE FitCraftersDatabase;
 
 -- tables
@@ -7,7 +6,7 @@ CREATE TABLE clients (
     client_id int  NOT NULL,
     name longtext  NOT NULL,
     surname longtext  NOT NULL,
-    phone_number serial  NOT NULL,
+    phone_number longtext  NOT NULL,
     email longtext  NOT NULL,
     age int  NULL,
     weight int  NULL,
@@ -47,12 +46,12 @@ CREATE TABLE exercises_training_plans (
 CREATE TABLE gyms (
     gym_id int  NOT NULL,
     city longtext  NOT NULL,
-    postal_code VARCHAR(20)  NOT NULL,
+    postal_code longtext  NOT NULL,
     street longtext  NOT NULL,
     street_number int  NOT NULL,
     building_number int  NULL,
     manager_id int  NOT NULL,
-    phone_number VARCHAR(20)  NOT NULL,
+    phone_number serial  NOT NULL,
     CONSTRAINT gyms_pk PRIMARY KEY (gym_id)
 );
 
@@ -63,7 +62,7 @@ CREATE TABLE gyms_equipment_type (
     available bool  NOT NULL,
     used bool  NOT NULL,
     serial_number varchar(20)  NOT NULL,
-    CONSTRAINT gyms_equipment_type_pk PRIMARY KEY (gym_id,equipment_id)
+    CONSTRAINT gyms_equipment_type_pk PRIMARY KEY (serial_number)
 );
 
 -- Table: managers
@@ -71,7 +70,7 @@ CREATE TABLE managers (
     manager_id int  NOT NULL,
     name longtext  NOT NULL,
     surname longtext  NOT NULL,
-    phone_number serial  NOT NULL,
+    phone_number longtext  NOT NULL,
     email longtext  NOT NULL,
     hash_pass varchar(40)  NOT NULL,
     CONSTRAINT managers_pk PRIMARY KEY (manager_id)
@@ -82,7 +81,7 @@ CREATE TABLE trainers (
     trainer_id int  NOT NULL,
     name longtext  NOT NULL,
     surname longtext  NOT NULL,
-    phone_number serial  NOT NULL,
+    phone_number longtext  NOT NULL,
     email longtext  NOT NULL,
     hour_salary int  NULL,
     gym_id int  NOT NULL,

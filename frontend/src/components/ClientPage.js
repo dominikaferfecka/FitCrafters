@@ -6,8 +6,10 @@ import SideBarClient from "./SideBarClient";
 import TrainerInfo from "./TrainerInfo";
 import UserHeader from "./UserHeader";
 import Footer from "./Footer";
+import React, { useState } from 'react';
 
 function ClientPage() {
+  const [userRole] = useState("user");
   const selectStats = [
     "statystyka1",
     "statystyka2",
@@ -22,7 +24,7 @@ function ClientPage() {
         <SideBarClient />
       </div>
       <div style={{ marginLeft: "230px" }}>
-        <UserHeader />
+        <UserHeader userRole={userRole} />
         <List
           header="Historia treningów"
           selectItems={[]}

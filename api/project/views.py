@@ -34,8 +34,6 @@ class DataBaseAPIView(APIView):
         data = TrainersSerializer(trainers, many=True).data
         return JsonResponse(data, safe=False)
 
-
-
 def index(request):
     manager = Managers.objects.first()
 

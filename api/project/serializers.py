@@ -19,4 +19,5 @@ class EquipmentSerializer(serializers.ModelSerializer):
 class TrainersSerializer(serializers.ModelSerializer):
     class Meta:
         model = Trainers
-        fields = ('trainer_id', 'name', 'surname', 'phone_number')
+        fields = ('trainer_id', 'name', 'surname', 'phone_number', 'info')
+

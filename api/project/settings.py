@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', '20.199.86.122']
 # Application definition
 
 INSTALLED_APPS = [
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'project'
+    'project',
 ]
 
 MIDDLEWARE = [
@@ -131,5 +132,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ORIGIN_WHITELIST = [
      'http://127.0.0.1:3000',
+     'http://127.0.0.1:3001',
+     'http://localhost:3001',
+
      'http://20.199.86.122:3000',
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True

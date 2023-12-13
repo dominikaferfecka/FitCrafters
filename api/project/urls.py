@@ -23,5 +23,8 @@ from rest_framework import routers
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index),
-    path('my-endpoint/', DataBaseAPIView.get )
+    path('manager-name-endpoint/', DataBaseAPIView.getManagerName ),
+    path('gyms-endpoint/', DataBaseAPIView.getManagerGyms ),
+    path('equipment-endpoint/', DataBaseAPIView.getEquipment ),
+    path('trainer-endpoint/', DataBaseAPIView.getTrainer )
 ]

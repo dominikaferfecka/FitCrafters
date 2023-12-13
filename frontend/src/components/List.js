@@ -1,7 +1,10 @@
 import { Container } from "react-bootstrap";
 
 function List(props) {
-  const columns = ["#", "First", "Last", "Handle"];
+  var columns = ["#", "First", "Last", "Handle"];
+  if (props.scrollId==="gymList" ){ columns = ["#", "Nazwa", "Ulica", "Numer telefonu"]}
+  if (props.scrollId==="equipmentList" ){ columns = ["#", "Kategoria", "Nazwa"]}
+  if (props.scrollId==="trainerList" ){ columns = ["#", "Imię", "Nazwisko", "Numer telefonu"]}
   const listItems = columns.map((col, index) => (
     <th key={index} scope="col">
       {col}
@@ -37,12 +40,30 @@ function List(props) {
           <tr>{listItems}</tr>
         </thead>
         <tbody>
+        {props.scrollId==="gymList" && props.items.map(element => 
           <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
+            <th scope="row">{element.gym_id}</th>
+            
+            <><td>{element.city}</td><td>{element.street}</td><td>{element.phone_number}</td></>
+            
           </tr>
+        )}
+        {props.scrollId==="equipmentList" && props.items.map(element => 
+          <tr>
+            <th scope="row">{element.equipment_id}</th>
+            
+            <><td>{element.category}</td><td>{element.name}</td></>
+            
+          </tr>
+        )}
+        {props.scrollId==="trainerList" && props.items.map(element => 
+          <tr>
+            <th scope="row">{element.trainer_id}</th>
+            
+            <><td>{element.name}</td><td>{element.surname}</td><td>{element.phone_number}</td></>
+            
+          </tr>
+        )}
         </tbody>
       </table>
     </Container>

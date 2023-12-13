@@ -6,11 +6,11 @@ function UserHeader() {
   const [fetched_data, setData] = useState({});
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/my-endpoint/')
+    fetch('http://127.0.0.1:8000/manager-name-endpoint/')
     .then(response => response.json())
     .then(fetched_data => {setData(fetched_data); console.log(fetched_data)})
     .catch(error => {  console.log(fetched_data);console.error('Błąd przy pobieraniu danych:', error)});
-  }, [fetched_data]);
+  }, []);
 
 
   return (

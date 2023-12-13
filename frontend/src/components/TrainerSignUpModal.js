@@ -1,4 +1,4 @@
-function TrainerSignUpModal() {
+function TrainerSignUpModal(props) {
   return (
     <div
       class="modal fade"
@@ -11,7 +11,7 @@ function TrainerSignUpModal() {
         <div class="modal-content">
           <div class="modal-header">
             <h1 class="modal-title fs-5" id="exampleModalLabel">
-              Zapisz się do *imię i nazwisko trenera*
+            Zapisz się do {props.trainer}
             </h1>
             <button
               type="button"

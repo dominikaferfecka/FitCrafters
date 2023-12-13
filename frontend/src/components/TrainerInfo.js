@@ -37,7 +37,6 @@ function TrainerInfo(props) {
 
   return (
     <Container id={props.scrollId}>
-      <TrainerSignUpModal />
       <h1 className="text-center m-5">Informacja o trenerach</h1>
       <div
         style={{
@@ -63,6 +62,7 @@ function TrainerInfo(props) {
             {selectedTrainer ? selectedTrainer.info :
             "To doświadczony trener personalny, z pasją wspierający innych w osiąganiu celów zdrowotnych. Jego podejście opiera się na spersonalizowanych programach treningowych i dietetycznych, dostosowanych do indywidualnych potrzeb klientów. Zawsze pełen energii i motywacji, Jan inspiruje do zmiany stylu życia, dbając o zdrowie fizyczne i psychiczne podopiecznych. Jego profesjonalizm, empatia i skuteczność przyciągają osoby pragnące transformacji."}
           </p>
+          <TrainerSignUpModal trainer={selectedTrainer ? `${selectedTrainer.name} ${selectedTrainer.surname}` : 'Jan Kowalski'}/>
           <button
             class="btn btn-success"
             data-bs-toggle="modal"

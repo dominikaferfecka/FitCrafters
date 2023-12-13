@@ -2,12 +2,10 @@ import background from "../img/userBackground.jpg";
 import React, { useEffect, useState } from 'react';
 
 
-function UserHeader({ userRole }) {
+function UserHeader(props) {
   const [fetched_data, setData] = useState({});
 
   useEffect(() => {
-      //   const endpoint = userRole === "manager" ? 'http://127.0.0.1:8000/manager-name-endpoint/' : 'http://127.0.0.1:8000/user-name-endpoint/';
-      // fetch(endpoint)
     fetch('http://127.0.0.1:8000/manager-name-endpoint/')
     .then(response => response.json())
     .then(fetched_data => {setData(fetched_data); console.log(fetched_data)})
@@ -28,9 +26,9 @@ function UserHeader({ userRole }) {
             <div className="text-white">
 
             {
-                <h1 className="mb-3">Witaj {fetched_data.name}!</h1>
+                <h1 className="mb-3">Witaj {props.name}!</h1>
             }
-              <h4 className="mb-3">Panel {userRole === "user" ? "użytkownika" : "menadżera"}</h4>
+              <h4 className="mb-3">Panel {props.userRole === "user" ? "użytkownika" : "menadżera"}</h4>
             </div>
           </div>
         </div>

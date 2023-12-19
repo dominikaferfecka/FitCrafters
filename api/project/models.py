@@ -139,9 +139,9 @@ class TrainingPlans(models.Model):
 
 
 class Trainings(models.Model):
-    training_id = models.IntegerField(primary_key=True)
-    start_time = models.IntegerField(blank=True, null=True)
-    end_time = models.IntegerField(blank=True, null=True)
+    training_id = models.AutoField(primary_key=True)
+    start_time = models.DateTimeField(blank=True, null=True)
+    end_time = models.DateTimeField(blank=True, null=True)
     client = models.ForeignKey(Clients, models.DO_NOTHING)
     trainer = models.ForeignKey(Trainers, models.DO_NOTHING)
     training_plan = models.ForeignKey(TrainingPlans, models.DO_NOTHING, blank=True, null=True)

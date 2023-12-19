@@ -1,11 +1,13 @@
 from django.http import JsonResponse
-from datetime import datetime
+from datetime import datetime, timedelta
 from project.models import Managers
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer
-from .models import Managers, Gyms, EquipmentType, Trainers
+from .models import Managers, Gyms, EquipmentType, Trainers, Trainings
+import json
 
 class DataBaseAPIView(APIView):
     @api_view(['GET'])
@@ -34,6 +36,33 @@ class DataBaseAPIView(APIView):
         trainers = Trainers.objects.all()
         data = TrainersSerializer(trainers, many=True).data
         return JsonResponse(data, safe=False)
+
+
+
+
+    @csrf_exempt
+    def signToTrainer(request):
+        data = json.loads(request.body)
+
+        date = data.get('date')
+        time = data.get('time')
+        trainer_id = data.get('trainer_id')
+        client_id = data.get('client_id')
+        
+        start_datetime = datetime.strptime(date + ' ' + time, '%Y-%m-%d %H:%M')
+        end_datetime = start_datetime + timedelta(hours=1)
+
+        training = Trainings(
+            start_time=start_datetime,
+            end_time=end_datetime,
+            trainer_id=trainer_id,
+            client_id=client_id
+        )
+        
+        training.save()
+
+        return JsonResponse({'status': 'success'})
+
 
 def index(request):
     manager = Managers.objects.first()

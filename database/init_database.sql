@@ -102,8 +102,8 @@ CREATE TABLE training_plans (
 -- Table: trainings
 CREATE TABLE trainings (
     training_id int  NOT NULL,
-    start_time int  NULL,
-    end_time int  NULL,
+    start_time datetime  NULL,
+    end_time datetime  NULL,
     client_id int  NOT NULL,
     trainer_id int  NOT NULL,
     training_plan_id int  NULL,

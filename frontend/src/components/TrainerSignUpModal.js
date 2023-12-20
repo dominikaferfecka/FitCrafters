@@ -1,4 +1,42 @@
-function TrainerSignUpModal() {
+import React, { useState } from 'react';
+
+function TrainerSignUpModal(props) {
+
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
+
+  const handleDateChange = (event) => {
+    setDate(event.target.value);
+  };
+
+  const handleTimeChange = (event) => {
+    setTime(event.target.value);
+  };
+
+  const handleSave = () => {    
+    const data = {
+      date: date,
+      time: time,
+      trainer_id: props.trainer.trainer_id,
+      client_id: 1 //TO DO
+    };
+
+    fetch('http://127.0.0.1:8000/signToTrainer/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+      .then(response => response.json())
+      .then(result => {
+        console.log(result);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  };
+  
   return (
     <div
       class="modal fade"
@@ -11,7 +49,7 @@ function TrainerSignUpModal() {
         <div class="modal-content">
           <div class="modal-header">
             <h1 class="modal-title fs-5" id="exampleModalLabel">
-              Zapisz się do *imię i nazwisko trenera*
+            Zapisz się do {props.trainer.name} {props.trainer.surname}
             </h1>
             <button
               type="button"
@@ -26,13 +64,13 @@ function TrainerSignUpModal() {
                 <label for="date" class="form-label">
                   Data
                 </label>
-                <input type="date" class="form-control" id="date" />
+                <input type="date" class="form-control" id="date" value={date} onChange={handleDateChange}/>
               </div>
               <div class="mb-3 col-md-6">
                 <label for="time" class="form-label">
                   Godzina
                 </label>
-                <input type="time" class="form-control" id="time" />
+                <input type="time" class="form-control" id="time" value={time} onChange={handleTimeChange}/>
               </div>
             </form>
           </div>
@@ -44,7 +82,7 @@ function TrainerSignUpModal() {
             >
               Anuluj
             </button>
-            <button type="button" class="btn btn-success">
+            <button type="button" class="btn btn-success"  data-bs-dismiss="modal" onClick={handleSave}>
               Zapisz się
             </button>
           </div>

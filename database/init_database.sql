@@ -26,8 +26,8 @@ CREATE TABLE equipment_type (
 -- Table: exercises
 CREATE TABLE exercises (
     exercise_id int  NOT NULL,
-    category int  NOT NULL,
-    name int  NOT NULL,
+    category longtext  NOT NULL,
+    name longtext  NOT NULL,
     equipment_id int  NOT NULL,
     CONSTRAINT exercises_pk PRIMARY KEY (exercise_id)
 );

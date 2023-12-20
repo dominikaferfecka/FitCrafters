@@ -21,7 +21,7 @@ class Clients(models.Model):
 
 
 class EquipmentType(models.Model):
-    equipment_id = models.IntegerField(primary_key=True)
+    equipment_id = models.AutoField(primary_key=True)
     category = models.TextField()
     name = models.TextField()
     
@@ -34,9 +34,9 @@ class EquipmentType(models.Model):
 
 
 class Exercises(models.Model):
-    exercise_id = models.IntegerField(primary_key=True)
-    category = models.IntegerField()
-    name = models.IntegerField()
+    exercise_id = models.AutoField(primary_key=True)
+    category = models.TextField()
+    name = models.TextField()
     equipment = models.ForeignKey(EquipmentType, models.DO_NOTHING)
 
     def __str__(self):

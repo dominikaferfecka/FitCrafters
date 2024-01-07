@@ -152,7 +152,7 @@ class Trainings(models.Model):
 
 
 class TrainingsExercises(models.Model):
-    training = models.OneToOneField(Trainings, models.DO_NOTHING, primary_key=True)  # The composite primary key (training_id, exercise_id) found, that is not supported. The first column is selected.
+    training = models.OneToOneField(Trainings, models.DO_NOTHING)  # The composite primary key (training_id, exercise_id) found, that is not supported. The first column is selected.
     exercise = models.ForeignKey(Exercises, models.DO_NOTHING)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField(blank=True, null=True)

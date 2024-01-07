@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Managers, Gyms, EquipmentType, Trainers, Clients
+from .models import Managers, Gyms, EquipmentType, Trainers, GymsEquipmentType, Clients
 
 class ManagerSerializer(serializers.ModelSerializer):
     class Meta:
@@ -12,9 +12,14 @@ class GymSerializer(serializers.ModelSerializer):
         fields = ('gym_id', 'city', 'street', 'manager_id', 'phone_number')
 
 class EquipmentSerializer(serializers.ModelSerializer):
+    quantity = serializers.SerializerMethodField()
     class Meta:
         model = EquipmentType
-        fields = ('equipment_id', 'category', 'name')
+        fields = ('equipment_id', 'category', 'name', 'quantity')
+    
+    def get_quantity(self, obj):
+        return obj
+
 
 class TrainersSerializer(serializers.ModelSerializer):
     class Meta:

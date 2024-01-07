@@ -83,7 +83,7 @@ DATABASES = {
         'NAME': 'FitCraftersDatabase',
         'USER': 'pc',
         'PASSWORD': 'pc',
-        'HOST':'20.199.51.93',
+        'HOST':'20.199.12.237',
         'PORT':'3306',
     }
 }

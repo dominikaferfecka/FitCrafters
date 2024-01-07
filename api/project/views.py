@@ -5,8 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view, authentication_classes
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
-from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer
-from .models import Managers, Gyms, EquipmentType, Trainers, Trainings
+from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer, ClientsSerializer
+from .models import Managers, Gyms, EquipmentType, Trainers, Trainings, Clients
 import json
 
 class DataBaseAPIView(APIView):
@@ -36,8 +36,16 @@ class DataBaseAPIView(APIView):
         trainers = Trainers.objects.all()
         data = TrainersSerializer(trainers, many=True).data
         return JsonResponse(data, safe=False)
+    
+    @api_view(['GET'])
+    def getTrainerClients(request, trainer_id):
+        trainings = Trainings.objects.filter(trainer_id=trainer_id)
+        client_ids = trainings.values_list('client_id', flat=True).distinct()
 
+        clients = Clients.objects.filter(client_id__in=client_ids)
+        data = ClientsSerializer(clients, many=True).data
 
+        return JsonResponse(data, safe=False)
 
 
     @csrf_exempt

@@ -5,6 +5,7 @@ function List(props) {
   if (props.scrollId==="gymList" ){ columns = ["#", "Nazwa", "Ulica", "Numer telefonu"]}
   if (props.scrollId==="equipmentList" ){ columns = ["#", "Kategoria", "Nazwa"]}
   if (props.scrollId==="trainerList" ){ columns = ["#", "Imię", "Nazwisko", "Numer telefonu"]}
+  if (props.scrollId==="clientList" ){ columns = ["#", "Imię", "Nazwisko", "Numer telefonu", "Email", "Wiek", "Waga", "Wzrost"]}
   const listItems = columns.map((col, index) => (
     <th key={index} scope="col">
       {col}
@@ -62,6 +63,13 @@ function List(props) {
             
             <><td>{element.name}</td><td>{element.surname}</td><td>{element.phone_number}</td></>
             
+          </tr>
+        )}
+        {props.scrollId==="clientList" && props.items.map(element => 
+          <tr>
+            <th scope="row">{element.client_id}</th>
+            
+            <><td>{element.name}</td><td>{element.surname}</td><td>{element.phone_number}</td><td>{element.email}</td><td>{element.age}</td><td>{element.weight}</td><td>{element.height}</td></>
           </tr>
         )}
         </tbody>

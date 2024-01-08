@@ -12,9 +12,12 @@ Do uruchomienia generatora potrzebujemy modułów:
 
 - celery[redis]
 - redis
+- eventlet (niezbędne dla Windowsa)
 
-Uruchamiamy celery z katalogu pzsp2-fitcrafters/generator:
+#### Uruchamiamy celery z katalogu pzsp2-fitcrafters/generator:
+
 celery -A generator worker -l info -P eventlet
 
-Uruchamiamy celery beat z katalogu pzsp2-fitcrafters/generator:
+#### Uruchamiamy celery beat z katalogu pzsp2-fitcrafters/generator:
+
 celery -A generator beat --loglevel=info

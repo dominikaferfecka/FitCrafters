@@ -55,7 +55,7 @@ class ExercisesTrainingPlans(models.Model):
     load = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'exercises_training_plans'
         unique_together = (('exercise', 'training_plan'),)
 
@@ -152,8 +152,9 @@ class Trainings(models.Model):
 
 
 class TrainingsExercises(models.Model):
-    training = models.OneToOneField(Trainings, models.DO_NOTHING)  # The composite primary key (training_id, exercise_id) found, that is not supported. The first column is selected.
-    exercise = models.ForeignKey(Exercises, models.DO_NOTHING)
+    id = models.AutoField(primary_key=True)
+    training = models.ForeignKey('Trainings', on_delete=models.CASCADE)
+    exercise = models.ForeignKey('Exercises', on_delete=models.CASCADE)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField(blank=True, null=True)
     repeats = models.IntegerField(blank=True, null=True)
@@ -162,6 +163,5 @@ class TrainingsExercises(models.Model):
     calories = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'trainings_exercises'
         unique_together = (('training', 'exercise'),)

@@ -4,7 +4,7 @@ import List from "./List";
 import SideBarTrainer from "./SideBarTrainer";
 import UserHeader from "./UserHeader";
 import ClientPlan from "./ClientPlan";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
 function TrainerPage() {
   const selectStats = [
@@ -19,13 +19,18 @@ function TrainerPage() {
   const [clients_data, setClientsData] = useState([]);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/trainer_clients/' + String(trainerId))
-    .then(response => response.json())
-    .then(clients_data => {setClientsData(clients_data); console.log(clients_data)})
-    .catch(error => {  console.log(clients_data);console.error('Błąd przy pobieraniu danych:', error)});
+    fetch("http://127.0.0.1:8000/trainer_clients/" + String(trainerId))
+      .then((response) => response.json())
+      .then((clients_data) => {
+        setClientsData(clients_data);
+        console.log(clients_data);
+      })
+      .catch((error) => {
+        console.log(clients_data);
+        console.error("Błąd przy pobieraniu danych:", error);
+      });
   }, [clients_data]);
-  console.log(clients_data)
-
+  console.log(clients_data);
 
   return (
     <>
@@ -34,7 +39,12 @@ function TrainerPage() {
       </div>
       <div style={{ marginLeft: "230px" }}>
         <UserHeader />
-        <List header="Klienci" selectItems={[]} scrollId="clientList" items={clients_data}  />
+        <List
+          header="Klienci"
+          selectItems={[]}
+          scrollId="clientList"
+          items={clients_data}
+        />
         <BarChart
           header="Statystyki klientów"
           firstSelectTitle="Wybierz klienta"

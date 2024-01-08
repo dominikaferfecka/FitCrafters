@@ -1,5 +1,5 @@
 import { Container } from "react-bootstrap";
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect } from "react";
 
 function List(props) {
   const [equipment_data, setEquipmentData] = useState([]);
@@ -9,20 +9,32 @@ function List(props) {
   const [selectedGym, setSelectedGym] = useState("");
 
   useEffect(() => {
-    props.scrollId==="equipmentList" &&
-    fetch(`http://127.0.0.1:8000/equipment-endpoint/?gym=${selectedGym}`)
-    .then(response => response.json())
-    .then(equipment_data => {setEquipmentData(equipment_data); console.log(equipment_data)})
-    .catch(error => {  console.log(equipment_data);console.error('Błąd przy pobieraniu danych:', error)});
+    props.scrollId === "equipmentList" &&
+      fetch(`http://127.0.0.1:8000/equipment-endpoint/?gym=${selectedGym}`)
+        .then((response) => response.json())
+        .then((equipment_data) => {
+          setEquipmentData(equipment_data);
+          console.log(equipment_data);
+        })
+        .catch((error) => {
+          console.log(equipment_data);
+          console.error("Błąd przy pobieraniu danych:", error);
+        });
     console.log(selectedGym);
   }, [selectedGym]);
 
   useEffect(() => {
-    props.scrollId==="trainerList" &&
-    fetch(`http://127.0.0.1:8000/trainer-endpoint/?gym=${selectedGym}`)
-    .then(response => response.json())
-    .then(trainers_data => {setgymTrainersData(trainers_data); console.log(trainers_data)})
-    .catch(error => {  console.log(trainers_data);console.error('Błąd przy pobieraniu danych:', error)});
+    props.scrollId === "trainerList" &&
+      fetch(`http://127.0.0.1:8000/trainer-endpoint/?gym=${selectedGym}`)
+        .then((response) => response.json())
+        .then((trainers_data) => {
+          setgymTrainersData(trainers_data);
+          console.log(trainers_data);
+        })
+        .catch((error) => {
+          console.log(trainers_data);
+          console.error("Błąd przy pobieraniu danych:", error);
+        });
   }, [selectedGym]);
 
   var columns = ["#", "First", "Last", "Handle"];
@@ -45,7 +57,7 @@ function List(props) {
 
   const handleSelectChange = (event) => {
     setSelectedGym(event.target.value);
-  }
+  };
 
   return (
     <Container className="w-75" id={props.scrollId}>
@@ -58,7 +70,11 @@ function List(props) {
             alignItems: "center",
           }}
         >
-          <select className="form-select w-50" aria-label="Select" onChange={handleSelectChange} >
+          <select
+            className="form-select w-50"
+            aria-label="Select"
+            onChange={handleSelectChange}
+          >
             <option value="0">{props.firstSelectTitle}</option>
 
             {mappedSelectItems}
@@ -104,8 +120,6 @@ function List(props) {
         {props.scrollId==="trainingHistory" && props.items.map(element => 
           <tr>
             <th scope="row">{element.training_id}</th>
-
-            
             <><td>{element.training_plan_name ? element.training_plan_name : "Custom training"}</td><td>{element.training_plan_category ? element.training_plan_category : '-'}</td><td>{element.start_time}</td><td>{element.training_plan_time ? element.training_plan_time : '-'}</td><td>{element.trainer_name} {element.trainer_surname}</td></>
           </tr>
         )}

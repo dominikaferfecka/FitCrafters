@@ -17,10 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 # from .views import index
-from .views import DataBaseAPIView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     # path('', index),
-    path('generate-exercise/<int:training_plan_id>/<int:exercise_id>/', DataBaseAPIView.generateExercise, name='generate-exercise'),
 ]

@@ -6,10 +6,11 @@ import SideBarClient from "./SideBarClient";
 import TrainerInfo from "./TrainerInfo";
 import UserHeader from "./UserHeader";
 import Footer from "./Footer";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 function ClientPage() {
   const [userRole] = useState("user");
+  const [trainings_data, setTrainingsData] = useState([]);
   const selectStats = [
     "statystyka1",
     "statystyka2",
@@ -17,6 +18,15 @@ function ClientPage() {
     "statystyka4",
     "statystyka5",
   ];
+
+  const clientId = 1; // change later for real
+
+  useEffect(() => {
+    fetch('http://127.0.0.1:8000/client_trainings/' + String(clientId))
+    .then(response => response.json())
+    .then(trainings_data => {setTrainingsData(trainings_data); console.log(trainings_data)})
+    .catch(error => {  console.log(trainings_data);console.error('Błąd przy pobieraniu danych:', error)});
+  }, []);
 
   return (
     <>
@@ -29,6 +39,7 @@ function ClientPage() {
           header="Historia treningów"
           selectItems={[]}
           scrollId="trainingHistory"
+          items={trainings_data}
         />
         <BarChart
           header="Statystyki treningów"

@@ -30,6 +30,7 @@ function List(props) {
   if (props.scrollId==="equipmentList" ){ columns = ["#", "Kategoria", "Nazwa", "Ilość"]}
   if (props.scrollId==="trainerList" ){ columns = ["#", "Imię", "Nazwisko", "Numer telefonu"]}
   if (props.scrollId==="clientList" ){ columns = ["#", "Imię", "Nazwisko", "Numer telefonu", "Email", "Wiek", "Waga", "Wzrost"]}
+  if (props.scrollId==="trainingHistory" ){ columns = ["#", "Nazwa treningu", "Kategoria", "Początek treningu", "Czas trwania (min)", "Trener"]}
   const listItems = columns.map((col, index) => (
     <th key={index} scope="col">
       {col}
@@ -98,6 +99,14 @@ function List(props) {
             <th scope="row">{element.client_id}</th>
             
             <><td>{element.name}</td><td>{element.surname}</td><td>{element.phone_number}</td><td>{element.email}</td><td>{element.age}</td><td>{element.weight}</td><td>{element.height}</td></>
+          </tr>
+        )}
+        {props.scrollId==="trainingHistory" && props.items.map(element => 
+          <tr>
+            <th scope="row">{element.training_id}</th>
+
+            
+            <><td>{element.training_plan_name ? element.training_plan_name : "Custom training"}</td><td>{element.training_plan_category ? element.training_plan_category : '-'}</td><td>{element.start_time}</td><td>{element.training_plan_time ? element.training_plan_time : '-'}</td><td>{element.trainer_name} {element.trainer_surname}</td></>
           </tr>
         )}
         </tbody>

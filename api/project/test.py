@@ -72,3 +72,33 @@ class getEquipmentTestCase(TestCase):
         self.assertJSONEqual(
             str(response.content, encoding="utf8"), json.dumps(expected_response)
         )
+
+class AddGymAsManagerTest(TestCase):
+    def setUp(self):
+        self.manager = Managers.objects.create(
+            manager_id = 1,
+            name = "Jan",
+            surname = "Kowalski",
+            phone_number = "123456789",
+            email = "jan.kowalski@gmail.com",
+            hash_pass = "hash_haslo",
+        )
+        
+    def test_save_gym(self):
+        response = self.client.post(
+            reverse("addGym"),
+            {
+                "gym_id": 1,
+                "city": "Warszawa",
+                "postal_code": "00-000",
+                "street": "Złota",
+                "street_number": 12,
+                "building_number": 3,
+                "manager": 1,
+                "phone_number": "123456789",
+            },
+            format="multipart")
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(
+            str(response.content, encoding="utf8"), {"status": "success"}
+        )

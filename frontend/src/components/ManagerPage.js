@@ -81,7 +81,10 @@ function ManagerPage() {
       });
   }, []);
 
-  const selectGyms = gym_data.map((element) => element.street);
+  const selectGyms = gym_data.map(
+    (element) => element.city + ", " + element.street
+  );
+  const selectEquipment = equipment_data.map((element) => element.name);
 
   return (
     <>
@@ -119,7 +122,11 @@ function ManagerPage() {
           scrollId="trainerList"
           items={trainers_data}
         />
-        <EquipmentForm scrollId="equipForm" />
+        <EquipmentForm
+          scrollId="equipForm"
+          selectGyms={gym_data}
+          selectEquipment={selectEquipment}
+        />
         <TrainerForm
           scrollId="trainerForm"
           firstSelectTitle="Wybierz siłownię"

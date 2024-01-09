@@ -2,6 +2,7 @@ import { Container } from "react-bootstrap";
 import React, { useState } from "react";
 
 function GymForm(props) {
+  // create state variables for all fields in form
   const [gymPhone, setGymPhone] = useState("");
   const [gymCity, setGymCity] = useState("");
   const [gymPostalCode, setGymPostalCode] = useState("");
@@ -9,6 +10,7 @@ function GymForm(props) {
   const [gymStreetNumber, setGymStreetNumber] = useState("");
   const [gymBuildingNumber, setGymBuildingNumber] = useState("");
 
+  // handle changing fields in form methods
   const handleGymPhoneChange = (event) => {
     setGymPhone(event.target.value);
   };
@@ -33,9 +35,18 @@ function GymForm(props) {
     setGymBuildingNumber(event.target.value);
   };
 
+  // method to handle post
   const handleAddGymOnSubmit = async (e) => {
+    /*
+    params: e [event]
+    method prepares data to send to django server
+    clears form after success save to db
+    prints in console status of operation or returned error
+    */
+
     e.preventDefault();
 
+    // prepare data to send
     const requestData = {
       gymPhone: gymPhone,
       gymCity: gymCity,
@@ -47,6 +58,7 @@ function GymForm(props) {
 
     console.log(requestData);
 
+    // send data as JSON
     fetch("http://127.0.0.1:8000/addGym/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -54,7 +66,8 @@ function GymForm(props) {
     })
       .then((response) => response.json())
       .then((result) => {
-        if (result == { status: "success" }) {
+        // if status is success clear form
+        if (result.status === "success") {
           console.log(result);
           setGymPhone("");
           setGymCity("");
@@ -64,6 +77,7 @@ function GymForm(props) {
           setGymBuildingNumber("");
           e.target.value = null;
         } else {
+          // print message from django server
           console.log(result);
         }
       })

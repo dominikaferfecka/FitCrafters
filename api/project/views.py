@@ -94,8 +94,16 @@ class DataBaseAPIView(APIView):
 
     @csrf_exempt
     def addGym(request):
+        """
+        params: request [json]
+        return: status of operation [JSONResoponse]
+        method extracts received data and saves new gym to db
+        """
+
+        # load data
         gym_data = json.loads(request.body)
         print(gym_data)
+        # extract data
         phone_number = gym_data.get("gymPhone")
         city = gym_data.get("gymCity")
         postal_code = gym_data.get("gymPostalCode")
@@ -104,7 +112,9 @@ class DataBaseAPIView(APIView):
         building_number = gym_data.get("gymbuildingNumber")
 
         try:
+            # create Gyms object to save
             gym = Gyms(
+                # get next available id - workaround
                 gym_id = Gyms.objects.order_by('-gym_id').first().gym_id + 1,
                 city = city,
                 postal_code = postal_code,
@@ -116,8 +126,9 @@ class DataBaseAPIView(APIView):
             )
             print(gym)
 
+            # save new gym to db
             gym.save()
-
+            # return success
             return JsonResponse({"status": "success"})
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)

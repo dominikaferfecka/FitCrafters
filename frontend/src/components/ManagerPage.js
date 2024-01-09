@@ -120,7 +120,11 @@ function ManagerPage() {
           items={trainers_data}
         />
         <EquipmentForm scrollId="equipForm" />
-        <TrainerForm scrollId="trainerForm" />
+        <TrainerForm
+          scrollId="trainerForm"
+          firstSelectTitle="Wybierz siłownię"
+          selectItems={selectGyms}
+        />
         <GymForm scrollId="gymForm" />
         <Footer />
       </div>

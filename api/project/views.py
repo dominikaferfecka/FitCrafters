@@ -133,6 +133,49 @@ class DataBaseAPIView(APIView):
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
 
+    @csrf_exempt
+    def addTrainer(request):
+        """
+        params: request [json]
+        return: status of operation [JSONResoponse]
+        method extracts received data and saves new trainer to db
+        """
+
+        # load data
+        trainer_data = json.loads(request.body)
+        print(trainer_data)
+        # extract data
+        gym_selected = trainer_data.get("gymSelected")
+        trainer_name = trainer_data.get("trainerName")
+        trainer_surname = trainer_data.get("trainerSurname")
+        trainer_phone = trainer_data.get("trainerPhone")
+        trainer_salary = trainer_data.get("trainerSalary")
+        trainer_email = trainer_data.get("trainerEmail")
+        trainer_pass = trainer_data.get("trainerPass")
+
+        try:
+            # create Trainers object to save
+            trainer = Trainers(
+                # get next available id - workaround
+                trainer_id = Trainers.objects.order_by('-trainer_id').first().trainer_id + 1,
+                name = trainer_name,
+                surname = trainer_surname,
+                phone_number = trainer_phone,
+                email = trainer_email,
+                hour_salary = trainer_salary,
+                gym = Gyms.objects.get(gym_id = gym_selected),
+                hash_pass = trainer_pass,
+                info = "",
+            )
+            print(trainer)
+
+            # save new gym to db
+            trainer.save()
+            # return success
+            return JsonResponse({"status": "success"})
+        except Exception as e:
+            return JsonResponse({"message": str(e)}, status=500)
+
 def index(request):
     manager = Managers.objects.first()
 

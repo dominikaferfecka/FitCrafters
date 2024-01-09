@@ -61,7 +61,7 @@ class ExercisesTrainingPlans(models.Model):
 
 
 class Gyms(models.Model):
-    gym_id = models.IntegerField(primary_key=True)
+    gym_id = models.AutoField(primary_key=True)
     city = models.TextField()
     postal_code = models.CharField(max_length=20)
     street = models.TextField()

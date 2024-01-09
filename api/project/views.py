@@ -92,6 +92,35 @@ class DataBaseAPIView(APIView):
 
         return JsonResponse({'status': 'success'})
 
+    @csrf_exempt
+    def addGym(request):
+        gym_data = json.loads(request.body)
+        print(gym_data)
+        phone_number = gym_data.get("gymPhone")
+        city = gym_data.get("gymCity")
+        postal_code = gym_data.get("gymPostalCode")
+        street = gym_data.get("gymStreet")
+        street_number = gym_data.get("gymStreetNumber")
+        building_number = gym_data.get("gymbuildingNumber")
+
+        try:
+            gym = Gyms(
+                gym_id = Gyms.objects.order_by('-gym_id').first().gym_id + 1,
+                city = city,
+                postal_code = postal_code,
+                street = street,
+                street_number = street_number,
+                building_number = building_number,
+                manager = Managers.objects.get(manager_id = 1),
+                phone_number = phone_number,
+            )
+            print(gym)
+
+            gym.save()
+
+            return JsonResponse({"status": "success"})
+        except Exception as e:
+            return JsonResponse({"message": str(e)}, status=500)
 
 def index(request):
     manager = Managers.objects.first()

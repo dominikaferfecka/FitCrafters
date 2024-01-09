@@ -103,7 +103,7 @@ class DataBaseAPIView(APIView):
         """
 
         # load data
-        gym_data = json.loads(request.body)
+        gym_data = json.loads(request.body.decode("utf-8"))
         # extract data
         phone_number = gym_data.get("gymPhone")
         city = gym_data.get("gymCity")

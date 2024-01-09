@@ -1,6 +1,17 @@
 import CalendarModal from "./CalendarModal";
+import { useState } from "react";
 
 function SideBarTrainer() {
+
+  const [showModal, setShowModal] = useState(false);
+
+  const handleOpenModal = () => {
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
   return (
     <>
       <div className="d-flex fixed-top" id="wrapper">
@@ -30,12 +41,15 @@ function SideBarTrainer() {
             >
               Plany ćwiczeń klienta
             </a>
-            <a
+
+            <button 
+              type="button"
               className="list-group-item list-group-item-action list-group-item-success p-3"
-              href="/trainer"
-            >
+              onClick={() => handleOpenModal()}
+              data-toggle="modal" data-target="#exampleModal">
               Kalendarz
-            </a>
+            </button>
+      
             <a
               className="list-group-item list-group-item-action list-group-item-success p-3"
               href="/"
@@ -45,7 +59,8 @@ function SideBarTrainer() {
           </div>
         </div>
       </div>
-      <CalendarModal />
+      <CalendarModal  />
+      {/* onClose={() => handleCloseModal()} */}
     </>
   );
 }

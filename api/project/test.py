@@ -245,6 +245,78 @@ class AddEquipmentViewTest(TestCase):
         self.assertEqual(response.status_code, 500)
 
 
+class ModifyGymViewTest(TestCase):
+    def setUp(self):
+        # set up data
+        self.manager = Managers.objects.create(
+            manager_id = 1,
+            name = "Jan",
+            surname = "Kowalski",
+            phone_number = "123456789",
+            email = "jan.kowalski@gmail.com",
+            hash_pass = "hash_haslo",
+        )
+
+        self.gym = Gyms.objects.create(
+            gym_id=1,
+            city="Kraków",
+            postal_code="12-345",
+            street="Sezamkowa",
+            street_number="1",
+            building_number="1",
+            phone_number="123456789",
+            manager_id=1,
+        )
+
+
+    def test_modify_gym_view(self):
+        modify_data = {
+            "gymId": 1,
+            "gymPhone": "987654321",
+            "gymCity": "Warszawa",
+            "gymPostalCode": "54-321",
+            "gymStreet": "Złota",
+            "gymStreetNumber": 2,
+            "gymBuildingNumber": 4,
+        }
+        # process modify operation
+        response = self.client.post(reverse("modifyGym"), json.dumps(modify_data), content_type="application/json")
+
+        # assert operation was successful
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["status"], "success")
+
+        # assert gym was modified
+        updated_gym = Gyms.objects.get(gym_id=1)
+        self.assertEqual(updated_gym.phone_number, "987654321")
+        self.assertEqual(updated_gym.city, "Warszawa")
+        self.assertEqual(updated_gym.postal_code, "54-321")
+        self.assertEqual(updated_gym.street, "Złota")
+        self.assertEqual(updated_gym.street_number, 2)
+        self.assertEqual(updated_gym.building_number, 4)
+
+    def test_modify_gym_view_failure(self):
+        # set up wrong data
+        modify_data = {
+            "gymId": 99, # wrong ID
+            "gymPhone": "987654321",
+            "gymCity": "Warszawa",
+            "gymPostalCode": "54-321",
+            "gymStreet": "Złota",
+            "gymStreetNumber": "2",
+            "gymBuildingNumber": "4",
+        }
+
+        # process modify operation
+        response = self.client.post(reverse("modifyGym"), json.dumps(modify_data), content_type="application/json")
+
+        # assert operation ended with error
+        self.assertEqual(response.status_code, 501)
+        self.assertEqual(response.json()["status"], "gymDeleted")
+
+
+
+
 class TrainerClientsTestCase(TestCase):
     def setUp(self):
         manager = Managers.objects.create( manager_id = 1, name = "Jan", surname = "Kowalski", phone_number = "123456789", email = "jan.kowalski@gmail.com", hash_pass = "hash_haslo")

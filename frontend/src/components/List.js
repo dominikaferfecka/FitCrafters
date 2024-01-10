@@ -1,5 +1,6 @@
 import { Container } from "react-bootstrap";
 import React, { useState, useEffect } from "react";
+import GymDetailModal from "./GymDetailModal";
 
 function List(props) {
   const [equipment_data, setEquipmentData] = useState([]);
@@ -7,6 +8,8 @@ function List(props) {
   const [trainers_data, setgymTrainersData] = useState([]);
 
   const [selectedGym, setSelectedGym] = useState("");
+
+  const [selectedGymDetails, setSelectedGymDetails] = useState(null);
 
   useEffect(() => {
     props.scrollId === "equipmentList" &&
@@ -39,7 +42,7 @@ function List(props) {
 
   var columns = ["#", "First", "Last", "Handle"];
   if (props.scrollId === "gymList") {
-    columns = ["#", "Nazwa", "Ulica", "Numer telefonu"];
+    columns = ["#", "Nazwa", "Ulica", "Numer telefonu", "Szczegóły"];
   }
   if (props.scrollId === "equipmentList") {
     columns = ["#", "Kategoria", "Nazwa", "Ilość"];
@@ -75,88 +78,113 @@ function List(props) {
     setSelectedGym(event.target.value);
   };
 
+  const handleGymDetailsClick = (gymDetails) => {
+    // console.log(gymDetails);
+    setSelectedGymDetails(gymDetails);
+  };
+
   return (
-    <Container className="w-75" id={props.scrollId}>
-      <h1 className="text-center m-5">{props.header}</h1>
-      {props.showSelect && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <select
-            className="form-select w-50"
-            aria-label="Select"
-            onChange={handleSelectChange}
+    <>
+      <GymDetailModal gymDetails={selectedGymDetails} />
+      <Container className="w-75" id={props.scrollId}>
+        <h1 className="text-center m-5">{props.header}</h1>
+        {props.showSelect && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
           >
-            <option value="0">{props.firstSelectTitle}</option>
+            <select
+              className="form-select w-50"
+              aria-label="Select"
+              onChange={handleSelectChange}
+            >
+              <option value="0">{props.firstSelectTitle}</option>
 
-            {mappedSelectItems}
-          </select>
-        </div>
-      )}
-      <table className="table table-bordered border-success m-5">
-        <thead>
-          <tr>{listItems}</tr>
-        </thead>
-        <tbody>
-          {props.scrollId === "gymList" &&
-            props.items.map((element) => (
-              <tr>
-                <th scope="row">{element.gym_id}</th>
+              {mappedSelectItems}
+            </select>
+          </div>
+        )}
+        <table className="table table-bordered border-success m-5">
+          <thead>
+            <tr>{listItems}</tr>
+          </thead>
+          <tbody>
+            {props.scrollId === "gymList" &&
+              props.items.map((element) => (
+                <tr>
+                  <th scope="row">{element.gym_id}</th>
 
-                <>
-                  <td>{element.city}</td>
-                  <td>{element.street}</td>
-                  <td>{element.phone_number}</td>
-                </>
-              </tr>
-            ))}
-          {props.scrollId === "equipmentList" &&
-            equipment_data.map((element) => (
-              <tr>
-                <th scope="row">{element.equipment_id}</th>
+                  <>
+                    <td>{element.city}</td>
+                    <td>{element.street}</td>
+                    <td>{element.phone_number}</td>
+                    <td
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <button
+                        class="btn btn-success btn-sm"
+                        type="submit"
+                        data-bs-toggle="modal"
+                        data-bs-target="#GymDetailModal"
+                        onClick={() => handleGymDetailsClick(element)}
+                      >
+                        +
+                      </button>
+                    </td>
+                  </>
+                </tr>
+              ))}
+            {props.scrollId === "equipmentList" &&
+              equipment_data.map((element) => (
+                <tr>
+                  <th scope="row">{element.equipment_id}</th>
 
-                <>
-                  <td>{element.category}</td>
-                  <td>{element.name}</td>
-                  <td>{element.quantity}</td>
-                </>
-              </tr>
-            ))}
-          {props.scrollId === "trainerList" &&
-            trainers_data.map((element) => (
-              <tr>
-                <th scope="row">{element.trainer_id}</th>
+                  <>
+                    <td>{element.category}</td>
+                    <td>{element.name}</td>
+                    <td>{element.quantity}</td>
+                  </>
+                </tr>
+              ))}
+            {props.scrollId === "trainerList" &&
+              trainers_data.map((element) => (
+                <tr>
+                  <th scope="row">{element.trainer_id}</th>
 
-                <>
-                  <td>{element.name}</td>
-                  <td>{element.surname}</td>
-                  <td>{element.phone_number}</td>
-                </>
-              </tr>
-            ))}
-          {props.scrollId === "clientList" &&
-            props.items.map((element) => (
-              <tr>
-                <th scope="row">{element.client_id}</th>
+                  <>
+                    <td>{element.name}</td>
+                    <td>{element.surname}</td>
+                    <td>{element.phone_number}</td>
+                  </>
+                </tr>
+              ))}
+            {props.scrollId === "clientList" &&
+              props.items.map((element) => (
+                <tr>
+                  <th scope="row">{element.client_id}</th>
 
-                <>
-                  <td>{element.name}</td>
-                  <td>{element.surname}</td>
-                  <td>{element.phone_number}</td>
-                  <td>{element.email}</td>
-                  <td>{element.age}</td>
-                  <td>{element.weight}</td>
-                  <td>{element.height}</td>
-                </>
-              </tr>
-            ))}
-        </tbody>
-      </table>
-    </Container>
+                  <>
+                    <td>{element.name}</td>
+                    <td>{element.surname}</td>
+                    <td>{element.phone_number}</td>
+                    <td>{element.email}</td>
+                    <td>{element.age}</td>
+                    <td>{element.weight}</td>
+                    <td>{element.height}</td>
+                  </>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </Container>
+    </>
   );
 }
 

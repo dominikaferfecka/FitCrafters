@@ -6,6 +6,7 @@ from rest_framework.decorators import api_view, authentication_classes
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from django.db.models import Count
+from django.db import transaction
 from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer, ClientsSerializer,  ClientTrainingsSerializer, EquipmentAllSerializer
 from .models import Managers, Gyms, EquipmentType, Trainers, Trainings, GymsEquipmentType, Clients
 import json
@@ -132,6 +133,72 @@ class DataBaseAPIView(APIView):
             gym.save()
             # return success
             return JsonResponse({"status": "success"})
+        except Exception as e:
+            return JsonResponse({"message": str(e)}, status=500)
+
+    @csrf_exempt
+    def modifyGym(request):
+        """
+        params: request [json]
+        return: status of operation [JSONResoponse]
+        method extracts received data and saves modified gym to db
+        """
+
+        # load data
+        gym_data = json.loads(request.body.decode("utf-8"))
+        # extract data
+        gym_id = gym_data.get("gymId")
+        phone_number = gym_data.get("gymPhone")
+        city = gym_data.get("gymCity")
+        postal_code = gym_data.get("gymPostalCode")
+        street = gym_data.get("gymStreet")
+        street_number = gym_data.get("gymStreetNumber")
+        building_number = gym_data.get("gymBuildingNumber")
+        try:
+            # get gym object to modify 
+            gym = Gyms.objects.get(gym_id = gym_id)
+            # modify fields in gym object
+            gym.gym_id = gym_id
+            gym.city = city
+            gym.postal_code = postal_code
+            gym.street = street
+            gym.street_number = street_number
+            gym.building_number = building_number
+            gym.phone_number = phone_number
+            # save modified gym to db
+            gym.save()
+            # return success
+            return JsonResponse({"status": "success"})
+        except Gyms.DoesNotExist:
+            return JsonResponse({"status": "gymDeleted"}, status=501)
+        except Exception as e:
+            return JsonResponse({"message": str(e)}, status=500)
+
+    @csrf_exempt
+    def deleteGym(request):
+        """
+        params: request [json]
+        return: status of operation [JSONResoponse]
+        method extracts received gym_id and deletes it with all connected objects
+        """
+
+        # load data
+        gym_data = json.loads(request.body.decode("utf-8"))
+        # extract data
+        gym_id = gym_data.get("gymId")
+        print(gym_id)
+        try:
+            # get gym to delete
+            gym = Gyms.objects.get(gym_id = gym_id)
+            # atomic transaction of deleting gym and all connected objects
+            with transaction.atomic():
+                GymsEquipmentType.objects.filter(gym=gym).delete()
+                Trainers.objects.filter(gym=gym_id).delete()
+                Gyms.objects.filter(gym_id=gym_id).delete()
+            # return success
+            return JsonResponse({"status": "success"})
+        except Gyms.DoesNotExist:
+            return JsonResponse({"status": "gymDeleted"})
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
 

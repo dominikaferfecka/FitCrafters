@@ -9,7 +9,7 @@ class ManagerSerializer(serializers.ModelSerializer):
 class GymSerializer(serializers.ModelSerializer):
     class Meta:
         model = Gyms
-        fields = ('gym_id', 'city', 'street', 'manager_id', 'phone_number')
+        fields = ('gym_id', 'city', 'street', 'manager_id', 'phone_number', "street_number", "building_number", "postal_code")
 
 class EquipmentSerializer(serializers.ModelSerializer):
     quantity = serializers.SerializerMethodField()

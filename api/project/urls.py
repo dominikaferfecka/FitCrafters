@@ -31,6 +31,8 @@ urlpatterns = [
     path('trainer_clients/<int:trainer_id>/', DataBaseAPIView.getTrainerClients, name='trainer_clients'),
     path('client_trainings/<int:client_id>/', DataBaseAPIView.getClientTrainings),
     path("addGym/", DataBaseAPIView.addGym, name="addGym"),
+    path("deleteGym/", DataBaseAPIView.deleteGym, name="deleteGym"),
+    path("modifyGym/", DataBaseAPIView.modifyGym, name="modifyGym"),
     path("addTrainer/", DataBaseAPIView.addTrainer, name="addTrainer"),
     path("addEquipment/", DataBaseAPIView.addEquipment, name="addEquipment"),
     

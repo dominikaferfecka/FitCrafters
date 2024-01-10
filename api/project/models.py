@@ -120,8 +120,8 @@ class Trainers(models.Model):
 
 class TrainingPlans(models.Model):
     training_plan_id = models.IntegerField(primary_key=True)
-    category = models.IntegerField()
-    name = models.IntegerField()
+    category = models.TextField()
+    name = models.TextField()
     time = models.IntegerField(blank=True, null=True)
 
     class Meta:

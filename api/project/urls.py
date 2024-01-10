@@ -29,7 +29,7 @@ urlpatterns = [
     path('trainer-endpoint/', DataBaseAPIView.getTrainer ),
     path('signToTrainer/', DataBaseAPIView.signToTrainer ),
     path('trainer_clients/<int:trainer_id>/', DataBaseAPIView.getTrainerClients, name='trainer_clients'),
-    path('client_trainings/<int:client_id>/', DataBaseAPIView.getClientTrainings),
+    path('client_trainings/<int:client_id>/', DataBaseAPIView.getClientTrainings, name='client_trainings'),
     path("addGym/", DataBaseAPIView.addGym, name="addGym"),
     path("deleteGym/", DataBaseAPIView.deleteGym, name="deleteGym"),
     path("modifyGym/", DataBaseAPIView.modifyGym, name="modifyGym"),

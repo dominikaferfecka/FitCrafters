@@ -92,6 +92,117 @@ class DataBaseAPIView(APIView):
 
         return JsonResponse({'status': 'success'})
 
+    @csrf_exempt
+    def addGym(request):
+        """
+        params: request [json]
+        return: status of operation [JSONResoponse]
+        method extracts received data and saves new gym to db
+        """
+
+        # load data
+        gym_data = json.loads(request.body.decode("utf-8"))
+        # extract data
+        phone_number = gym_data.get("gymPhone")
+        city = gym_data.get("gymCity")
+        postal_code = gym_data.get("gymPostalCode")
+        street = gym_data.get("gymStreet")
+        street_number = gym_data.get("gymStreetNumber")
+        building_number = gym_data.get("gymbuildingNumber")
+        try:
+            gym_id = Gyms.objects.order_by('-gym_id').first().gym_id + 1
+        except Exception:
+            gym_id = 1
+        try:
+            # create Gyms object to save
+            gym = Gyms(
+                # get next available id - workaround
+                gym_id = gym_id,
+                city = city,
+                postal_code = postal_code,
+                street = street,
+                street_number = street_number,
+                building_number = building_number,
+                manager = Managers.objects.get(manager_id = 1),
+                phone_number = phone_number,
+            )
+            # save new gym to db
+            gym.save()
+            # return success
+            return JsonResponse({"status": "success"})
+        except Exception as e:
+            return JsonResponse({"message": str(e)}, status=500)
+
+    @csrf_exempt
+    def addTrainer(request):
+        """
+        params: request [json]
+        return: status of operation [JSONResoponse]
+        method extracts received data and saves new trainer to db
+        """
+
+        # load data
+        trainer_data = json.loads(request.body)
+        # extract data
+        gym_selected = trainer_data.get("gymSelected")
+        trainer_name = trainer_data.get("trainerName")
+        trainer_surname = trainer_data.get("trainerSurname")
+        trainer_phone = trainer_data.get("trainerPhone")
+        trainer_salary = trainer_data.get("trainerSalary")
+        trainer_email = trainer_data.get("trainerEmail")
+        trainer_pass = trainer_data.get("trainerPass")
+
+        try:
+            # create Trainers object to save
+            trainer = Trainers(
+                # get next available id - workaround
+                trainer_id = Trainers.objects.order_by('-trainer_id').first().trainer_id + 1,
+                name = trainer_name,
+                surname = trainer_surname,
+                phone_number = trainer_phone,
+                email = trainer_email,
+                hour_salary = trainer_salary,
+                gym = Gyms.objects.get(gym_id = gym_selected),
+                hash_pass = trainer_pass,
+                info = "",
+            )
+            # save new gym to db
+            trainer.save()
+            # return success
+            return JsonResponse({"status": "success"})
+        except Exception as e:
+            return JsonResponse({"message": str(e)}, status=500)
+        
+    @csrf_exempt
+    def addEquipment(request):
+        """
+        params: request [json]
+        return: status of operation [JSONResoponse]
+        method extracts received data and saves new equipment to certain gym to db
+        """
+
+        # load data
+        equipment_data = json.loads(request.body)
+        # extract data
+        selected_gym = equipment_data.get("gymSelected")
+        equipment_id = equipment_data.get("equipmentId")
+        equipment_serial_no = equipment_data.get("equipmentSerialNo")
+        try:
+            # create GymsEquipmentType object to save
+            gym_equipment = GymsEquipmentType(
+                gym_id = selected_gym,
+                equipment_id = equipment_id,
+                available = 1,
+                used = 0,
+                serial_number = equipment_serial_no,
+            )
+
+            # save new equipment type to gym to db
+            gym_equipment.save()
+            # return success
+            return JsonResponse({"status": "success"})
+        except Exception as e:
+            return JsonResponse({"message": str(e)}, status=500)
 
 def index(request):
     manager = Managers.objects.first()

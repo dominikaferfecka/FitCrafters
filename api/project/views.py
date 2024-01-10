@@ -111,12 +111,15 @@ class DataBaseAPIView(APIView):
         street = gym_data.get("gymStreet")
         street_number = gym_data.get("gymStreetNumber")
         building_number = gym_data.get("gymbuildingNumber")
-
+        try:
+            gym_id = Gyms.objects.order_by('-gym_id').first().gym_id + 1
+        except Exception:
+            gym_id = 1
         try:
             # create Gyms object to save
             gym = Gyms(
                 # get next available id - workaround
-                gym_id = Gyms.objects.order_by('-gym_id').first().gym_id + 1,
+                gym_id = gym_id,
                 city = city,
                 postal_code = postal_code,
                 street = street,
@@ -150,12 +153,17 @@ class DataBaseAPIView(APIView):
         trainer_salary = trainer_data.get("trainerSalary")
         trainer_email = trainer_data.get("trainerEmail")
         trainer_pass = trainer_data.get("trainerPass")
+    
+        try:
+            trainer_id = Trainers.objects.order_by('-trainer_id').first().trainer_id_id + 1
+        except Exception:
+            trainer_id = 1
 
         try:
             # create Trainers object to save
             trainer = Trainers(
                 # get next available id - workaround
-                trainer_id = Trainers.objects.order_by('-trainer_id').first().trainer_id + 1,
+                trainer_id = trainer_id,
                 name = trainer_name,
                 surname = trainer_surname,
                 phone_number = trainer_phone,
@@ -170,6 +178,7 @@ class DataBaseAPIView(APIView):
             # return success
             return JsonResponse({"status": "success"})
         except Exception as e:
+            print(str(e))
             return JsonResponse({"message": str(e)}, status=500)
         
     @csrf_exempt

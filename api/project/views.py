@@ -6,17 +6,15 @@ from rest_framework.decorators import api_view, authentication_classes
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from django.db.models import Count
-from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer, ClientsSerializer,  ClientTrainingsSerializer
+from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer, ClientsSerializer,  ClientTrainingsSerializer, EquipmentAllSerializer
 from .models import Managers, Gyms, EquipmentType, Trainers, Trainings, GymsEquipmentType, Clients
 import json
 
 class DataBaseAPIView(APIView):
     @api_view(['GET'])
     def getManagerName(request):
-        print(request.headers)
         manager= Managers.objects.first()
         data= ManagerSerializer(manager).data
-        print(data)
         return JsonResponse(data)
     
     @api_view(['GET'])
@@ -32,13 +30,17 @@ class DataBaseAPIView(APIView):
             data = json.loads(request.body.decode("utf-8"))
         else:
             data = request.GET
-        v_gym_id = data.get("gym")
-        v_equipment = GymsEquipmentType.objects.filter(gym=v_gym_id).values_list("equipment", flat=True)
-        quantities = GymsEquipmentType.objects.filter(gym=v_gym_id).values('equipment').annotate(count=Count('equipment'))
-        equipment = EquipmentType.objects.filter(equipment_id__in=v_equipment)
-        data = EquipmentSerializer(equipment, many=True).data
-        for quantity, equipment in zip(quantities, data):
-            equipment["quantity"] = str(quantity["count"])
+        if(data.get("gym")):
+            v_gym_id = data.get("gym")
+            v_equipment = GymsEquipmentType.objects.filter(gym=v_gym_id).values_list("equipment", flat=True)
+            quantities = GymsEquipmentType.objects.filter(gym=v_gym_id).values('equipment').annotate(count=Count('equipment'))
+            equipment = EquipmentType.objects.filter(equipment_id__in=v_equipment)
+            data = EquipmentSerializer(equipment, many=True).data
+            for quantity, equipment in zip(quantities, data):
+                equipment["quantity"] = str(quantity["count"])
+        else:
+            equipment = EquipmentType.objects.all()
+            data = EquipmentAllSerializer(equipment, many=True).data
         return JsonResponse(data, safe=False)
     
     @api_view(['GET'])

@@ -28,8 +28,11 @@ urlpatterns = [
     path('equipment-endpoint/', DataBaseAPIView.getEquipment, name="get_equipment" ),
     path('trainer-endpoint/', DataBaseAPIView.getTrainer ),
     path('signToTrainer/', DataBaseAPIView.signToTrainer ),
-    path('trainer_clients/<int:trainer_id>/', DataBaseAPIView.getTrainerClients),
+    path('trainer_clients/<int:trainer_id>/', DataBaseAPIView.getTrainerClients, name='trainer_clients'),
     path('client_trainings/<int:client_id>/', DataBaseAPIView.getClientTrainings),
+    path("addGym/", DataBaseAPIView.addGym, name="addGym"),
+    path("addTrainer/", DataBaseAPIView.addTrainer, name="addTrainer"),
+    path("addEquipment/", DataBaseAPIView.addEquipment, name="addEquipment"),
     
     #path('signToTrainer/', DataBaseAPIView.as_view({'post': 'signToTrainer'}), name='sign_to_trainer')
 ]

@@ -20,6 +20,10 @@ class EquipmentSerializer(serializers.ModelSerializer):
     def get_quantity(self, obj):
         return obj
 
+class EquipmentAllSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EquipmentType
+        fields = ('equipment_id', 'category', 'name')
 
 class TrainersSerializer(serializers.ModelSerializer):
     class Meta:

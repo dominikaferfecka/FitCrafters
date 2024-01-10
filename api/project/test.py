@@ -75,6 +75,7 @@ class getEquipmentTestCase(TestCase):
         )
 
 class AddGymAsManagerTest(TestCase):
+    # set up needed data - create menager who will add gyms
     def setUp(self):
         self.manager = Managers.objects.create(
             manager_id = 1,
@@ -85,7 +86,8 @@ class AddGymAsManagerTest(TestCase):
             hash_pass = "hash_haslo",
         )
         
-    def test_save_gym(self):
+    def test_add_gym(self):
+        # set up correct data for gym
         data = {
                 "gymCity": "Warszawa",
                 "gymPostalCode": "00-000",
@@ -94,15 +96,153 @@ class AddGymAsManagerTest(TestCase):
                 "gymBuildingNumber": 3,
                 "gymPhone": "123456789",
             }
+        # process adding gym
         response = self.client.post(
             reverse("addGym"), 
             json.dumps(data),
             content_type="application/json",)
-        print(response.content) 
+        # assert that adding was successfull
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(Gyms.objects.count(), 1)
         self.assertJSONEqual(
             str(response.content, encoding="utf8"), {"status": "success"}
         )
+
+    def test_add_gym_failure(self):
+        # set up wrong data - missing phone number
+        data = {
+            "gymCity": "Test City",
+            "gymPostalCode": "00-000",
+            "gymStreet": "Test Street",
+            "gymStreetNumber": 123,
+            "gymBuildingNumber": 3,
+        }
+
+        # process adding gym
+        response = self.client.post(reverse('addGym'), json.dumps(data), content_type='application/json')
+
+        # assert adding gym wasn't successfull
+        self.assertEqual(response.status_code, 500)
+
+
+class AddTrainerViewTest(TestCase):
+    def setUp(self):
+        # set up needed data - create gym and manager
+
+        self.manager = Managers.objects.create(
+            manager_id = 1,
+            name = "Jan",
+            surname = "Kowalski",
+            phone_number = "123456789",
+            email = "jan.kowalski@gmail.com",
+            hash_pass = "hash_haslo",
+        )
+        
+        self.gym = Gyms.objects.create(
+            gym_id=1,
+            city='Test City',
+            postal_code='00-000',
+            street='Test Street',
+            street_number='123',
+            building_number=1,
+            manager_id=1,
+            phone_number='123456789'
+        )
+
+    def test_add_trainer_success(self):
+        # set up correct data to create trainer
+        data = {
+            "gymSelected": 1,
+            "trainerName": "John",
+            "trainerSurname": "Doe",
+            "trainerPhone": "987654321",
+            "trainerSalary": 50.00,
+            "trainerEmail": "john.doe@example.com",
+            "trainerPass": "password123"
+        }
+
+        # process adding trainer to db
+        response = self.client.post(reverse("addTrainer"), json.dumps(data), content_type='application/json')
+
+        # assert that adding trainer was successful
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Trainers.objects.count(), 1)
+        self.assertEqual(json.loads(response.content)['status'], 'success')
+
+    def test_add_trainer_failure(self):
+        # set up wrong data for trainer - missing gym id
+        data = {
+            "trainerName": "John",
+            "trainerSurname": "Doe",
+            "trainerPhone": "987654321",
+            "trainerSalary": 50.00,
+            "trainerEmail": "john.doe@example.com",
+            "trainerPass": "password123"
+        }
+
+        # process adding new trainer
+        response = self.client.post(reverse("addTrainer"), json.dumps(data), content_type='application/json')
+
+        # assert that adding trainer failed
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(Trainers.objects.count(), 0)
+
+class AddEquipmentViewTest(TestCase):
+    def setUp(self):
+        # Create a test gym for the GymsEquipmentType
+        self.manager = Managers.objects.create(
+            manager_id = 1,
+            name = "Jan",
+            surname = "Kowalski",
+            phone_number = "123456789",
+            email = "jan.kowalski@gmail.com",
+            hash_pass = "hash_haslo",
+        )
+
+        self.gym = Gyms.objects.create(
+            gym_id=1,
+            city='Test City',
+            postal_code='00-000',
+            street='Test Street',
+            street_number='123',
+            building_number=1,
+            manager_id=1,
+            phone_number='123456789'
+        )
+        self.equipment_type = EquipmentType.objects.create(
+            equipment_id=17, 
+            category='Cardio', 
+            name='Orbitrek'   
+        )
+
+    def test_add_equipment_success(self):
+        # set up correct data for GymsEquipmentType
+        data = {
+            "gymSelected": 1,
+            "equipmentId": 17,
+            "equipmentSerialNo": "123456"
+        }
+
+        # process adding equipment to gym
+        response = self.client.post(reverse("addEquipment"), json.dumps(data), content_type='application/json')
+
+        # assert that adding equipment to gym was successful
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(GymsEquipmentType.objects.count(), 1)
+        self.assertEqual(json.loads(response.content)['status'], 'success')
+
+    def test_add_equipment_failure(self):
+        # set up wrong data
+        data = {
+            "equipmentId": 17,
+            "equipmentSerialNo": "123456"
+        }
+
+        # process adding equipment to gym
+        response = self.client.post(reverse("addEquipment"), json.dumps(data), content_type='application/json')
+
+        # assert adding resulted in failure
+        self.assertEqual(response.status_code, 500)
 
 
 class TrainerClientsTestCase(TestCase):

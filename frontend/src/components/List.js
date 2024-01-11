@@ -1,6 +1,7 @@
 import { Container } from "react-bootstrap";
 import React, { useState, useEffect } from "react";
 import GymDetailModal from "./GymDetailModal";
+import TrainingDetailModal from "./TrainingDetailModal";
 
 function List(props) {
   const [equipment_data, setEquipmentData] = useState([]);
@@ -10,6 +11,8 @@ function List(props) {
   const [selectedGym, setSelectedGym] = useState("");
 
   const [selectedGymDetails, setSelectedGymDetails] = useState(null);
+
+  const [selectedTrainingDetails, setSelectedTrainingDetails] = useState(null);
 
   useEffect(() => {
     props.scrollId === "equipmentList" &&
@@ -51,7 +54,7 @@ function List(props) {
     columns = ["#", "Imię", "Nazwisko", "Numer telefonu"];
   }
   if (props.scrollId==="clientList" ){ columns = ["#", "Imię", "Nazwisko", "Numer telefonu", "Email", "Wiek", "Waga", "Wzrost"]}
-  if (props.scrollId==="trainingHistory" ){ columns = ["#", "Nazwa treningu", "Kategoria", "Początek treningu", "Czas trwania (min)", "Trener"]}
+  if (props.scrollId==="trainingHistory" ){ columns = ["#", "Nazwa treningu", "Kategoria", "Początek treningu", "Czas trwania (min)", "Trener", "Sprawdź ćwiczenia"]}
   const listItems = columns.map((col, index) => (
     <th key={index} scope="col">
       {col}
@@ -73,9 +76,15 @@ function List(props) {
     setSelectedGymDetails(gymDetails);
   };
 
+  const handleTrainingDetailsClick = (trainingDetails) => {
+    console.log(trainingDetails);
+    setSelectedTrainingDetails(trainingDetails);
+  };
+
   return (
     <>
       <GymDetailModal gymDetails={selectedGymDetails} />
+      <TrainingDetailModal trainingDetails={selectedTrainingDetails} />
       <Container className="w-75" id={props.scrollId}>
         <h1 className="text-center m-5">{props.header}</h1>
         {props.showSelect && (
@@ -119,7 +128,7 @@ function List(props) {
                       }}
                     >
                       <button
-                        class="btn btn-success btn-sm"
+                        className="btn btn-success btn-sm"
                         type="submit"
                         data-bs-toggle="modal"
                         data-bs-target="#GymDetailModal"
@@ -174,9 +183,30 @@ function List(props) {
               {props.scrollId==="trainingHistory" && props.items.map(element => 
                 <tr>
                   <th scope="row">{element.training_id}</th>
-
-                  
-                  <><td>{element.training_plan_name ? element.training_plan_name : "Custom training"}</td><td>{element.training_plan_category ? element.training_plan_category : '-'}</td><td>{element.start_time}</td><td>{element.training_plan_time ? element.training_plan_time : '-'}</td><td>{element.trainer_name} {element.trainer_surname}</td></>
+                  <>
+                  <td>{element.training_plan_name ? element.training_plan_name : "Custom training"}</td>
+                  <td>{element.training_plan_category ? element.training_plan_category : '-'}</td>
+                  <td>{element.start_time}</td>
+                  <td>{element.training_plan_time ? element.training_plan_time : '-'}</td>
+                  <td>{element.trainer_name} {element.trainer_surname}</td>
+                  <td
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <button
+                        className="btn btn-success btn-sm"
+                        type="submit"
+                        data-bs-toggle="modal"
+                        data-bs-target="#TrainingDetailModal"
+                        onClick={() => handleTrainingDetailsClick(element)}
+                      >
+                        +
+                      </button>
+                    </td>
+                    </>
                 </tr>
               )}
 

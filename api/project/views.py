@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from django.db.models import Count
 from django.db import transaction
 from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer, ClientsSerializer,  ClientTrainingsSerializer, EquipmentAllSerializer
-from .models import Managers, Gyms, EquipmentType, Trainers, Trainings, GymsEquipmentType, Clients
+from .models import Managers, Gyms, EquipmentType, Trainers, Trainings, GymsEquipmentType, Clients, TrainingsExercises
 import json
 
 class DataBaseAPIView(APIView):
@@ -246,6 +246,35 @@ class DataBaseAPIView(APIView):
             return JsonResponse({"status": "success"})
         except Exception as e:
             print(str(e))
+            return JsonResponse({"message": str(e)}, status=500)
+        
+    @csrf_exempt
+    def deleteTrainer(request):
+        """
+        params: request [json]
+        return: status of operation [JSONResoponse]
+        method extracts received trainer_id and deletes it with all connected objects
+        """
+        # load data
+        trainer_data = json.loads(request.body.decode("utf-8"))
+        # extract data
+        trainer_id = trainer_data.get("trainerId")
+        try:
+            # get trainer to delete
+            trainer = Trainers.objects.get(trainer_id = trainer_id)
+            # atomic transaction of deleting gym and all connected objects
+            with transaction.atomic():
+                # delete exercises in trainer's trainings 
+                TrainingsExercises.objects.filter(training__trainer=trainer).delete()
+                # delete trainer's trainings
+                Trainings.objects.filter(trainer=trainer).delete()
+                # delete trainer
+                Trainers.objects.filter(trainer_id=trainer_id).delete()
+            # return success
+            return JsonResponse({"status": "success"})
+        except Trainers.DoesNotExist:
+            return JsonResponse({"status": "trainerDeleted"}, status=501)
+        except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
         
     @csrf_exempt

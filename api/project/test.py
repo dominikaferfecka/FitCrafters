@@ -2,7 +2,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from unittest.mock import patch
 from datetime import datetime
-from .models import Gyms, Managers, EquipmentType, GymsEquipmentType, Trainers, Trainings, Gyms, Clients, TrainingPlans
+from .models import Gyms, Managers, EquipmentType, GymsEquipmentType, Trainers, Trainings, Gyms, Clients, TrainingPlans, TrainingsExercises
 import json
 from unittest import expectedFailure
 from django.core.exceptions import ObjectDoesNotExist
@@ -187,6 +187,65 @@ class AddTrainerViewTest(TestCase):
         self.assertEqual(response.status_code, 500)
         self.assertEqual(Trainers.objects.count(), 0)
 
+class DeleteTrainerViewTest(TestCase):
+    def setUp(self):
+        self.manager = Managers.objects.create(
+            manager_id = 1,
+            name = "Jan",
+            surname = "Kowalski",
+            phone_number = "123456789",
+            email = "jan.kowalski@gmail.com",
+            hash_pass = "hash_haslo",
+        )
+        
+        self.gym = Gyms.objects.create(
+            gym_id=1,
+            city='Test City',
+            postal_code='00-000',
+            street='Test Street',
+            street_number='123',
+            building_number=1,
+            manager_id=1,
+            phone_number='123456789'
+        )
+
+        self.trainer = Trainers.objects.create(
+            trainer_id=1, 
+            name="Andrzej", 
+            surname="Nowak", 
+            phone_number = "987654321", 
+            gym = self.gym)
+
+    def test_delete_trainer(self):
+        # add training and exercises connected to trainer
+        Clients.objects.create(client_id=1, name="Anna", surname="Kowalska", phone_number="123456789", email="anna.kowalska@fitcrafters.com", age=25, weight=70, height=180)
+        training = Trainings.objects.create(trainer_id=1, client_id=1)
+        # TrainingsExercises.objects.create(training=training)
+
+        response = self.client.post(reverse("deleteTrainer"), json.dumps({"trainerId": 1}), content_type='application/json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"status": "success"})
+
+        # Check if trainer was deleted
+        with self.assertRaises(Trainers.DoesNotExist):
+            Trainers.objects.get(trainer_id=1)
+
+        # Check if training was deleted
+        with self.assertRaises(Trainings.DoesNotExist):
+            Trainings.objects.get(pk=training.pk)
+
+        # Check if exercise in training was deleted
+        self.assertEqual(TrainingsExercises.objects.count(), 0)
+
+    def test_delete_nonexistent_trainer(self):
+        # process deleting non existant trainer
+        response = self.client.post(reverse("deleteTrainer"), json.dumps({"trainerId": 2}), content_type='application/json')
+
+        # assert operation failed
+        self.assertEqual(response.status_code, 501)
+        self.assertEqual(response.json(), {"status": "trainerDeleted"})
+
 class AddEquipmentViewTest(TestCase):
     def setUp(self):
         # Create a test gym for the GymsEquipmentType
@@ -267,7 +326,6 @@ class ModifyGymViewTest(TestCase):
             phone_number="123456789",
             manager_id=1,
         )
-
 
     def test_modify_gym_view(self):
         modify_data = {

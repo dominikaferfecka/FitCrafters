@@ -35,6 +35,7 @@ urlpatterns = [
     path("modifyGym/", DataBaseAPIView.modifyGym, name="modifyGym"),
     path("addTrainer/", DataBaseAPIView.addTrainer, name="addTrainer"),
     path("addEquipment/", DataBaseAPIView.addEquipment, name="addEquipment"),
+    path('training_exercises/<int:training_id>/', DataBaseAPIView.getTrainingExercises, name='training_exercises'),
     
     #path('signToTrainer/', DataBaseAPIView.as_view({'post': 'signToTrainer'}), name='sign_to_trainer')
 ]

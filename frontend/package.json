@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@syncfusion/ej2-base": "^24.1.42",
+    "@syncfusion/ej2-buttons": "^24.1.45",
     "@syncfusion/ej2-calendars": "^24.1.44",
     "@syncfusion/ej2-dropdowns": "^24.1.45",
     "@syncfusion/ej2-react-schedule": "^24.1.41",
@@ -50,6 +52,7 @@
     "postcss": "$postcss"
   },
   "devDependencies": {
-    "react-scripts": "^5.0.1"
+    "react-scripts": "^5.0.1",
+    "webpack": "^5.89.0"
   }
 }

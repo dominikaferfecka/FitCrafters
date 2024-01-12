@@ -1,6 +1,7 @@
 import { Container } from "react-bootstrap";
 import React, { useState, useEffect } from "react";
 import GymDetailModal from "./GymDetailModal";
+import TrainerDetailModal from "./TrainerDetailModal";
 import TrainingDetailModal from "./TrainingDetailModal";
 
 function List(props) {
@@ -11,6 +12,8 @@ function List(props) {
   const [selectedGym, setSelectedGym] = useState("");
 
   const [selectedGymDetails, setSelectedGymDetails] = useState(null);
+
+  const [selectedTrainer, setSelectedTrainer] = useState(0);
 
   const [selectedTrainingDetails, setSelectedTrainingDetails] = useState(null);
 
@@ -44,6 +47,7 @@ function List(props) {
   }, [selectedGym]);
 
   var columns = ["#", "First", "Last", "Handle"];
+
   if (props.scrollId === "gymList") {
     columns = ["#", "Nazwa", "Ulica", "Numer telefonu", "Szczegóły"];
   }
@@ -51,10 +55,33 @@ function List(props) {
     columns = ["#", "Kategoria", "Nazwa", "Ilość"];
   }
   if (props.scrollId === "trainerList") {
-    columns = ["#", "Imię", "Nazwisko", "Numer telefonu"];
+    columns = ["#", "Imię", "Nazwisko", "Numer telefonu", "Szczegóły"];
   }
-  if (props.scrollId==="clientList" ){ columns = ["#", "Imię", "Nazwisko", "Numer telefonu", "Email", "Wiek", "Waga", "Wzrost"]}
-  if (props.scrollId==="trainingHistory" ){ columns = ["#", "Nazwa treningu", "Kategoria", "Początek treningu", "Czas trwania (min)", "Trener", "Sprawdź ćwiczenia"]}
+
+  console.log(columns);
+  if (props.scrollId === "clientList") {
+    columns = [
+      "#",
+      "Imię",
+      "Nazwisko",
+      "Numer telefonu",
+      "Email",
+      "Wiek",
+      "Waga",
+      "Wzrost",
+    ];
+  }
+  if (props.scrollId === "trainingHistory") {
+    columns = [
+      "#",
+      "Nazwa treningu",
+      "Kategoria",
+      "Początek treningu",
+      "Czas trwania (min)",
+      "Trener",
+      "Sprawdź ćwiczenia",
+    ];
+  }
   const listItems = columns.map((col, index) => (
     <th key={index} scope="col">
       {col}
@@ -76,6 +103,9 @@ function List(props) {
     setSelectedGymDetails(gymDetails);
   };
 
+  const handleTrainerClick = (trainer) => {
+    setSelectedTrainer(trainer);
+  };
   const handleTrainingDetailsClick = (trainingDetails) => {
     console.log(trainingDetails);
     setSelectedTrainingDetails(trainingDetails);
@@ -83,8 +113,19 @@ function List(props) {
 
   return (
     <>
-      <GymDetailModal gymDetails={selectedGymDetails} />
-      <TrainingDetailModal trainingDetails={selectedTrainingDetails} />
+      {props.scrollId === "gymList" && (
+        <GymDetailModal gymDetails={selectedGymDetails} />
+      )}
+      {props.scrollId === "trainerList" && (
+        <TrainerDetailModal
+          trainerDetails={selectedTrainer}
+          mappedGyms={mappedSelectItems}
+        />
+      )}
+      {props.scrollId === "trainingHistory" && (
+        <TrainingDetailModal trainingDetails={selectedTrainingDetails} />
+      )}
+
       <Container className="w-75" id={props.scrollId}>
         <h1 className="text-center m-5">{props.header}</h1>
         {props.showSelect && (
@@ -161,6 +202,23 @@ function List(props) {
                     <td>{element.name}</td>
                     <td>{element.surname}</td>
                     <td>{element.phone_number}</td>
+                    <td
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <button
+                        class="btn btn-success btn-sm"
+                        type="submit"
+                        data-bs-toggle="modal"
+                        data-bs-target="#TrainerDetailModal"
+                        onClick={() => handleTrainerClick(element)}
+                      >
+                        +
+                      </button>
+                    </td>
                   </>
                 </tr>
               ))}
@@ -180,16 +238,31 @@ function List(props) {
                   </>
                 </tr>
               ))}
-              {props.scrollId==="trainingHistory" && props.items.map(element => 
+            {props.scrollId === "trainingHistory" &&
+              props.items.map((element) => (
                 <tr>
                   <th scope="row">{element.training_id}</th>
                   <>
-                  <td>{element.training_plan_name ? element.training_plan_name : "Custom training"}</td>
-                  <td>{element.training_plan_category ? element.training_plan_category : '-'}</td>
-                  <td>{element.start_time}</td>
-                  <td>{element.training_plan_time ? element.training_plan_time : '-'}</td>
-                  <td>{element.trainer_name} {element.trainer_surname}</td>
-                  <td
+                    <td>
+                      {element.training_plan_name
+                        ? element.training_plan_name
+                        : "Custom training"}
+                    </td>
+                    <td>
+                      {element.training_plan_category
+                        ? element.training_plan_category
+                        : "-"}
+                    </td>
+                    <td>{element.start_time}</td>
+                    <td>
+                      {element.training_plan_time
+                        ? element.training_plan_time
+                        : "-"}
+                    </td>
+                    <td>
+                      {element.trainer_name} {element.trainer_surname}
+                    </td>
+                    <td
                       style={{
                         display: "flex",
                         justifyContent: "center",
@@ -206,10 +279,9 @@ function List(props) {
                         +
                       </button>
                     </td>
-                    </>
+                  </>
                 </tr>
-              )}
-
+              ))}
           </tbody>
         </table>
       </Container>

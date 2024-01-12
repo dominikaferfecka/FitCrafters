@@ -6,10 +6,10 @@ import SideBarClient from "./SideBarClient";
 import TrainerInfo from "./TrainerInfo";
 import UserHeader from "./UserHeader";
 import Footer from "./Footer";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
 function ClientPage() {
-  const [userRole] = useState("user");
+  const [clientData, setClientData] = useState(null);
   const [trainings_data, setTrainingsData] = useState([]);
   const selectStats = [
     "statystyka1",
@@ -22,10 +22,29 @@ function ClientPage() {
   const clientId = 1; // change later for real
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/client_trainings/' + String(clientId))
-    .then(response => response.json())
-    .then(trainings_data => {setTrainingsData(trainings_data); console.log(trainings_data)})
-    .catch(error => {  console.log(trainings_data);console.error('Błąd przy pobieraniu danych:', error)});
+    fetch(`http://127.0.0.1:8000/getClient/` + String(clientId))
+      .then((response) => response.json())
+      .then((clientData) => {
+        setClientData(clientData);
+        console.log(clientData);
+      })
+      .catch((error) => {
+        console.log(clientData);
+        console.error("Błąd przy pobieraniu danych:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/client_trainings/" + String(clientId))
+      .then((response) => response.json())
+      .then((trainings_data) => {
+        setTrainingsData(trainings_data);
+        console.log(trainings_data);
+      })
+      .catch((error) => {
+        console.log(trainings_data);
+        console.error("Błąd przy pobieraniu danych:", error);
+      });
   }, []);
 
   return (
@@ -34,7 +53,7 @@ function ClientPage() {
         <SideBarClient />
       </div>
       <div style={{ marginLeft: "230px" }}>
-        <UserHeader userRole={userRole} />
+        <UserHeader roleTitle="użytkownika" />
         <List
           header="Historia treningów"
           selectItems={[]}
@@ -50,7 +69,7 @@ function ClientPage() {
         />
         <ClientPlan selectItems={[]} scrollId="clientsPlan" />
         <TrainerInfo scrollId="trainersInfo" />
-        <ClientInfo scrollId="clientInfo" />
+        <ClientInfo scrollId="clientInfo" clientData={clientData} />
         <Footer />
       </div>
     </>

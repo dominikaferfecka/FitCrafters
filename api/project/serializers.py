@@ -28,12 +28,12 @@ class EquipmentAllSerializer(serializers.ModelSerializer):
 class TrainersSerializer(serializers.ModelSerializer):
     class Meta:
         model = Trainers
-        fields = ('trainer_id', 'name', 'surname', 'phone_number', 'info')
+        fields = ('trainer_id', 'name', 'surname', 'phone_number', 'info', 'email', 'hash_pass', 'hour_salary', 'gym')
 
 class ClientsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Clients
-        fields = ('client_id', 'name', 'surname', 'phone_number', 'email', 'age', 'weight', 'height')
+        fields = ('client_id', 'name', 'surname', 'phone_number', 'email', 'age', 'weight', 'height', "hash_pass")
 
 
 class ClientTrainingsSerializer(serializers.Serializer):

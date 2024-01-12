@@ -50,8 +50,11 @@ class DataBaseAPIView(APIView):
             data = json.loads(request.body.decode("utf-8"))
         else:
             data = request.GET
-        v_gym_id = data.get("gym")
-        trainers = Trainers.objects.filter(gym=v_gym_id)
+        if data.get("gym"):
+            v_gym_id = data.get("gym")
+            trainers = Trainers.objects.filter(gym=v_gym_id)
+        else:
+            trainers = Trainers.objects.all()
         data = TrainersSerializer(trainers, many=True).data
         return JsonResponse(data, safe=False)
     
@@ -70,6 +73,12 @@ class DataBaseAPIView(APIView):
         trainings = Trainings.objects.filter(client_id=client_id).select_related('training_plan', 'trainer')
         serializer = ClientTrainingsSerializer(trainings, many=True)
         return JsonResponse(serializer.data, safe=False)
+    
+    @api_view(['GET'])
+    def getClient(request, client_id):
+        client = Clients.objects.get(client_id = client_id)
+        data= ClientsSerializer(client).data
+        return JsonResponse(data)
     
     # @api_view(['GET'])
     # def getTrainingExercises(request, training_id):
@@ -99,6 +108,7 @@ class DataBaseAPIView(APIView):
 
     @csrf_exempt
     def signToTrainer(request):
+        timezone_to_add="+01:00"
         data = json.loads(request.body)
 
         date = data.get('date')
@@ -106,7 +116,7 @@ class DataBaseAPIView(APIView):
         trainer_id = data.get('trainer_id')
         client_id = data.get('client_id')
         
-        start_datetime = datetime.strptime(date + ' ' + time, '%Y-%m-%d %H:%M')
+        start_datetime = datetime.strptime(date + ' ' + time, '%Y-%m-%d %H:%M'+timezone_to_add)
         end_datetime = start_datetime + timedelta(hours=1)
 
         # conflicting_trainings = Trainings.objects.filter(
@@ -283,6 +293,76 @@ class DataBaseAPIView(APIView):
             return JsonResponse({"message": str(e)}, status=500)
         
     @csrf_exempt
+    def modifyTrainer(request):
+        """
+        params: request [json]
+        return: status of operation [JSONResoponse]
+        method extracts received data and saves modified trainer to db
+        """
+
+        # load data
+        trainer_data = json.loads(request.body)
+        # extract data
+        trainer_id = trainer_data.get("trainerId")
+        gym_selected = trainer_data.get("gymSelected")
+        trainer_name = trainer_data.get("trainerName")
+        trainer_surname = trainer_data.get("trainerSurname")
+        trainer_phone = trainer_data.get("trainerPhone")
+        trainer_salary = trainer_data.get("trainerSalary")
+        trainer_email = trainer_data.get("trainerEmail")
+        trainer_pass = trainer_data.get("trainerPass")
+        trainer_info = trainer_data.get("trainerInfo")
+        try:
+            trainer = Trainers.objects.get(trainer_id = trainer_id)
+            # save modified data to trainer object
+            trainer.name = trainer_name
+            trainer.surname = trainer_surname
+            trainer.phone_number = trainer_phone
+            trainer.email = trainer_email
+            trainer.hour_salary = trainer_salary
+            trainer.gym = Gyms.objects.get(gym_id = gym_selected)
+            trainer.hash_pass = trainer_pass
+            trainer.info = trainer_info
+
+            # save trainer with modified data
+            trainer.save()
+            # return success
+            return JsonResponse({"status": "success"})
+        except Trainers.DoesNotExist:
+            return JsonResponse({"status": "trainerDeleted"}, status=501)
+        except Exception as e:
+            return JsonResponse({"message": str(e)}, status=500)
+        
+    @csrf_exempt
+    def deleteTrainer(request):
+        """
+        params: request [json]
+        return: status of operation [JSONResoponse]
+        method extracts received trainer_id and deletes it with all connected objects
+        """
+        # load data
+        trainer_data = json.loads(request.body.decode("utf-8"))
+        # extract data
+        trainer_id = trainer_data.get("trainerId")
+        try:
+            # get trainer to delete
+            trainer = Trainers.objects.get(trainer_id = trainer_id)
+            # atomic transaction of deleting gym and all connected objects
+            with transaction.atomic():
+                # delete exercises in trainer's trainings 
+                TrainingsExercises.objects.filter(training__trainer=trainer).delete()
+                # delete trainer's trainings
+                Trainings.objects.filter(trainer=trainer).delete()
+                # delete trainer
+                Trainers.objects.filter(trainer_id=trainer_id).delete()
+            # return success
+            return JsonResponse({"status": "success"})
+        except Trainers.DoesNotExist:
+            return JsonResponse({"status": "trainerDeleted"}, status=501)
+        except Exception as e:
+            return JsonResponse({"message": str(e)}, status=500)
+        
+    @csrf_exempt
     def addEquipment(request):
         """
         params: request [json]
@@ -310,6 +390,47 @@ class DataBaseAPIView(APIView):
             gym_equipment.save()
             # return success
             return JsonResponse({"status": "success"})
+        except Exception as e:
+            return JsonResponse({"message": str(e)}, status=500)
+
+    @csrf_exempt
+    def modifyClient(request):
+        """
+        params: request [json]
+        return: status of operation [JSONResoponse]
+        method extracts received data and saves modified client info to db
+        """
+
+        # load data
+        client_data = json.loads(request.body.decode("utf-8"))
+        # extract data
+        client_id = client_data.get("clientId")
+        name = client_data.get("clientName")
+        surname = client_data.get("clientSurname")
+        phone_number = client_data.get("clientPhone")
+        email = client_data.get("clientEmail")
+        hash_pass = client_data.get("clientPass")
+        age = client_data.get("clientAge")
+        weight = client_data.get("clientWeight")
+        height = client_data.get("clientHeight")
+        try:
+            # get client object to modify 
+            client = Clients.objects.get(client_id = client_id)
+            # modify fields in client object
+            client.name = name
+            client.surname = surname
+            client.phone_number = phone_number
+            client.email = email
+            client.hash_pass = hash_pass
+            client.age = age
+            client.weight = weight
+            client.height = height
+            # save modified client to db
+            client.save()
+            # return success
+            return JsonResponse({"status": "success"})
+        except Clients.DoesNotExist:
+            return JsonResponse({"status": "clientDeleted"}, status=501)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
 

@@ -38,7 +38,7 @@ function ManagerPage() {
       });
   }, []);
 
-  console.log(manager_data);
+  // console.log(manager_data);
   useEffect(() => {
     fetch(
       "http://127.0.0.1:8000/gyms-endpoint/?manager_id=" +
@@ -92,7 +92,7 @@ function ManagerPage() {
         <SideBarManager />
       </div>
       <div style={{ marginLeft: "230px" }}>
-        <UserHeader name={manager_data.name} />
+        <UserHeader roleTitle="menadżera" name={manager_data.name} />
         <List
           header="Lista siłowni"
           selectItems={[]}

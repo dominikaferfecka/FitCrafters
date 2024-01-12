@@ -187,6 +187,168 @@ class AddTrainerViewTest(TestCase):
         self.assertEqual(response.status_code, 500)
         self.assertEqual(Trainers.objects.count(), 0)
 
+class ModifyTrainerTestCase(TestCase):
+    def setUp(self):
+        # set up data to use in tests
+        self.manager = Managers.objects.create(
+            manager_id = 1,
+            name = "Jan",
+            surname = "Kowalski",
+            phone_number = "123456789",
+            email = "jan.kowalski@gmail.com",
+            hash_pass = "hash_haslo",
+        )
+        
+        self.gym = Gyms.objects.create(
+            gym_id=1,
+            city='Test City',
+            postal_code='00-000',
+            street='Test Street',
+            street_number='123',
+            building_number=1,
+            manager_id=1,
+            phone_number='123456789'
+        )
+
+        self.trainer = Trainers.objects.create(
+            trainer_id=1, 
+            name="Andrzej", 
+            surname="Nowak", 
+            phone_number = "987654321", 
+            email = "andrzej.nowak@gmail.com",
+            gym = self.gym)
+        
+    def test_modify_trainer_success(self):
+        # set up modified data
+        modified_data = {
+            "gymSelected": self.gym.gym_id,
+            "trainerId": self.trainer.trainer_id,
+            "trainerName": "Marcin",
+            "trainerSurname": "Fiołek",
+            "trainerPhone": self.trainer.phone_number,
+            "trainerSalary": 50,
+            "trainerEmail": self.trainer.email,
+            "trainerPass": self.trainer.hash_pass,
+            "trainerInfo": self.trainer.info,
+        }
+
+        # Wywołaj funkcję
+        response = self.client.post(reverse("modifyTrainer"), json.dumps(modified_data), content_type='application/json')
+        # Sprawdź, czy otrzymano poprawną odpowiedź JSON
+        self.assertEqual(response.status_code, 200)
+
+        # Odśwież obiekt trenera i sprawdź, czy dane zostały zmodyfikowane
+        self.trainer.refresh_from_db()
+        self.assertEqual(self.trainer.name, "Marcin")
+        self.assertEqual(self.trainer.surname, "Fiołek")
+        self.assertEqual(self.trainer.phone_number, "987654321")
+        self.assertEqual(self.trainer.hour_salary, 50)
+        self.assertEqual(self.trainer.email, "andrzej.nowak@gmail.com")
+        self.assertEqual(self.trainer.info, "")
+
+    def test_modify_trainer_trainer_not_found(self):
+        # Przygotuj dane do żądania, używając nieistniejącego ID trenera
+        modified_data = {
+            "gymSelected": self.gym.gym_id,
+            "trainerId": 999,
+            "trainerName": "Marcin",
+            "trainerSurname": "Fiołek",
+            "trainerPhone": self.trainer.phone_number,
+            "trainerSalary": 50,
+            "trainerEmail": self.trainer.email,
+            "trainerPass": self.trainer.hash_pass,
+            "trainerInfo": self.trainer.info,
+        }
+
+        # Wywołaj funkcję
+        response = self.client.post(reverse("modifyTrainer"), json.dumps(modified_data), content_type='application/json')
+
+        # Sprawdź, czy otrzymano odpowiednią odpowiedź JSON
+        self.assertEqual(response.status_code, 501)
+
+    def test_modify_trainer_exception(self):
+        # Przygotuj dane do żądania, powodując wyjątek podczas próby modyfikacji trenera
+        modified_data = {
+            "gymSelected": self.gym.gym_id,
+            "trainerId": self.trainer.trainer_id,
+            "trainerName": None,
+            "trainerSurname": "Fiołek",
+            "trainerPhone": self.trainer.phone_number,
+            "trainerSalary": 50,
+            "trainerEmail": self.trainer.email,
+            "trainerPass": self.trainer.hash_pass,
+            "trainerInfo": self.trainer.info,
+        }
+
+        # Wywołaj funkcję, spowoduj wyjątek przez manipulację danymi w obiekcie trenera
+        self.trainer.save()
+
+        # Wywołaj funkcję
+        response = self.client.post(reverse("modifyTrainer"), json.dumps(modified_data), content_type='application/json')
+
+        # Sprawdź, czy otrzymano odpowiednią odpowiedź JSON
+        self.assertEqual(response.status_code, 500)
+        self.assertIn("message", response.json())
+
+class DeleteTrainerViewTest(TestCase):
+    def setUp(self):
+        self.manager = Managers.objects.create(
+            manager_id = 1,
+            name = "Jan",
+            surname = "Kowalski",
+            phone_number = "123456789",
+            email = "jan.kowalski@gmail.com",
+            hash_pass = "hash_haslo",
+        )
+        
+        self.gym = Gyms.objects.create(
+            gym_id=1,
+            city='Test City',
+            postal_code='00-000',
+            street='Test Street',
+            street_number='123',
+            building_number=1,
+            manager_id=1,
+            phone_number='123456789'
+        )
+
+        self.trainer = Trainers.objects.create(
+            trainer_id=1, 
+            name="Andrzej", 
+            surname="Nowak", 
+            phone_number = "987654321", 
+            gym = self.gym)
+
+    def test_delete_trainer(self):
+        # add training and exercises connected to trainer
+        Clients.objects.create(client_id=1, name="Anna", surname="Kowalska", phone_number="123456789", email="anna.kowalska@fitcrafters.com", age=25, weight=70, height=180)
+        training = Trainings.objects.create(trainer_id=1, client_id=1)
+        # TrainingsExercises.objects.create(training=training)
+
+        response = self.client.post(reverse("deleteTrainer"), json.dumps({"trainerId": 1}), content_type='application/json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"status": "success"})
+
+        # Check if trainer was deleted
+        with self.assertRaises(Trainers.DoesNotExist):
+            Trainers.objects.get(trainer_id=1)
+
+        # Check if training was deleted
+        with self.assertRaises(Trainings.DoesNotExist):
+            Trainings.objects.get(pk=training.pk)
+
+        # Check if exercise in training was deleted
+        self.assertEqual(TrainingsExercises.objects.count(), 0)
+
+    def test_delete_nonexistent_trainer(self):
+        # process deleting non existant trainer
+        response = self.client.post(reverse("deleteTrainer"), json.dumps({"trainerId": 2}), content_type='application/json')
+
+        # assert operation failed
+        self.assertEqual(response.status_code, 501)
+        self.assertEqual(response.json(), {"status": "trainerDeleted"})
+
 class AddEquipmentViewTest(TestCase):
     def setUp(self):
         # Create a test gym for the GymsEquipmentType
@@ -268,7 +430,6 @@ class ModifyGymViewTest(TestCase):
             manager_id=1,
         )
 
-
     def test_modify_gym_view(self):
         modify_data = {
             "gymId": 1,
@@ -314,7 +475,78 @@ class ModifyGymViewTest(TestCase):
         self.assertEqual(response.status_code, 501)
         self.assertEqual(response.json()["status"], "gymDeleted")
 
+class ModifyClientTestCase(TestCase):
 
+    def setUp(self):
+        self.client_modify = Clients.objects.create(
+            client_id=1,
+            name="Anna", 
+            surname="Kowalska", 
+            phone_number="123456789", 
+            email="anna.kowalska@fitcrafters.com", 
+            hash_pass="haslo",
+            age=25, 
+            weight=70, 
+            height=180
+        )
+
+    def test_modify_client_success(self):
+        data = {
+            "clientId": 1,
+            "clientName": "Maria",
+            "clientSurname": "Nowak",
+            "clientPhone": "123456788",
+            "clientEmail": self.client_modify.email,
+            "clientPass": self.client_modify.hash_pass,
+            "clientAge": 24,
+            "clientWeight": 71,
+            "clientHeight": 185
+        }
+
+        # process modify operation
+        response = self.client.post(reverse("modifyClient"), json.dumps(data), content_type='application/json')
+
+        # check if operation was successful
+        self.assertEqual(response.status_code, 200)
+
+        # check if data was updated in db
+        updated_client = Clients.objects.get(client_id=self.client_modify.client_id)
+        self.assertEqual(updated_client.name, "Maria")
+        self.assertEqual(updated_client.surname, "Nowak")
+        self.assertEqual(updated_client.email, "anna.kowalska@fitcrafters.com")
+
+    def test_modify_client_nonexistent_client(self):
+        # wrong data
+        data = {
+            "clientId": 999,  # non existing client
+            "clientName": "Maria",
+            "clientSurname": "Nowak",
+            "clientPhone": "123456788",
+            "clientEmail": self.client_modify.email,
+            "clientPass": self.client_modify.hash_pass,
+            "clientAge": 24,
+            "clientWeight": 71,
+            "clientHeight": 185
+        }
+
+        # process opearation
+        response = self.client.post(reverse("modifyClient"), json.dumps(data), content_type='application/json')
+
+        # assert that operation failed
+        self.assertEqual(response.status_code, 501)  # status for non existing client
+
+    def test_modify_client_error(self):
+        # not all needed data
+        data = {
+            "clientId": 1,
+            "clientName": "NewName",
+        }
+
+        # process operation
+        response = self.client.post(reverse("modifyClient"), json.dumps(data), content_type='application/json')
+
+        # assert that operation failed with correct status_code
+        self.assertEqual(response.status_code, 500)
 
 
 class TrainerClientsTestCase(TestCase):
@@ -339,6 +571,7 @@ class TrainerClientsTestCase(TestCase):
                 'age': 25,
                 'weight': 70,
                 'height': 180,
+                'hash_pass': '',
             }
         ]
         actual_data = response.json()

@@ -250,7 +250,7 @@ function List(props) {
                   </>
                 </tr>
               ))}
-            {props.scrollId === "trainingHistory" &&
+            {props.scrollId === "trainingHistory" && props.items &&
               props.items.map((element) => (
                 <tr>
                   <th scope="row">{element.training_id}</th>
@@ -294,12 +294,12 @@ function List(props) {
                   </>
                 </tr>
               ))}
-              {props.scrollId === "clientsPlan" &&
+              {props.scrollId === "clientsPlan" && props.items &&
               props.items.map((element) => (
                 <tr>
                   <th scope="row">{element.training_id}</th>
                   <>
-                    {/* <td>
+                    <td>
                       {element.training_plan_name
                         ? element.training_plan_name
                         : "Custom training"}
@@ -314,7 +314,10 @@ function List(props) {
                       {element.training_plan_time
                         ? element.training_plan_time
                         : "-"}
-                    </td> */}
+                    </td>
+                    <td>
+                      {element.trainer_name} {element.trainer_surname}
+                    </td>
                   </>
                 </tr>
               ))}

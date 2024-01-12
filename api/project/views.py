@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from django.db.models import Count
 from django.db import transaction
-from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer, ClientsSerializer,  ClientTrainingsSerializer, EquipmentAllSerializer, TrainingsExercisesSerializer, ClientTrainingsWithTrainingPlan
+from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer, ClientsSerializer,  ClientTrainingsSerializer, EquipmentAllSerializer, TrainingsExercisesSerializer
 from .models import Managers, Gyms, EquipmentType, Trainers, Trainings, GymsEquipmentType, Clients, TrainingsExercises
 import json
 from django.utils import timezone
@@ -89,6 +89,8 @@ class DataBaseAPIView(APIView):
 
     #     return Response(data_with_localtime)
     
+
+    #history
     @api_view(['GET'])
     def getClientTrainings(request, client_id):
         trainings = Trainings.objects.filter(client_id=client_id).select_related('training_plan', 'trainer')
@@ -98,6 +100,29 @@ class DataBaseAPIView(APIView):
             if doesExist:
                 done_trainings.append(training)
         serializer = ClientTrainingsSerializer(done_trainings, many=True)
+
+        # Uwzględnij strefę czasową przed wysłaniem odpowiedzi
+        data_with_localtime = []
+        for training_data in serializer.data:
+            training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
+            if training_data['end_time']:
+                training_data['end_time'] = parser.parse(training_data['end_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
+            print(training_data)
+            data_with_localtime.append(training_data)
+
+        return Response(data_with_localtime)
+    
+    #new
+    @api_view(['GET'])
+    def getClientTrainingsFuture(request, client_id):
+        trainings = Trainings.objects.filter(client_id=client_id).select_related('training_plan', 'trainer')
+
+        new_trainings = []
+        for training in trainings:
+            doesExist = TrainingsExercises.objects.filter(training = training)
+            if not doesExist:
+                new_trainings.append(training)
+        serializer = ClientTrainingsSerializer(new_trainings, many=True)
 
         # Uwzględnij strefę czasową przed wysłaniem odpowiedzi
         data_with_localtime = []
@@ -152,14 +177,14 @@ class DataBaseAPIView(APIView):
         return JsonResponse(data, safe=False)
     
 
-    @api_view(['GET'])
-    def getClientsTrainingsWithTrainingPlan(request, client_id):
-        try:
-            trainings = Trainings.objects.filter(client_id=client_id)
-            serializer = ClientTrainingsWithTrainingPlan(trainings, many=True)
-            return Response(serializer.data)
-        except Clients.DoesNotExist:
-            return Response({'error': 'Client not found'}, status=404)
+    # @api_view(['GET'])
+    # def getClientsTrainingsWithTrainingPlan(request, client_id):
+    #     try:
+    #         trainings = Trainings.objects.filter(client_id=client_id)
+    #         serializer = ClientTrainingsWithTrainingPlan(trainings, many=True)
+    #         return Response(serializer.data)
+    #     except Clients.DoesNotExist:
+    #         return Response({'error': 'Client not found'}, status=404)
     
 
 

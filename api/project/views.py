@@ -201,7 +201,10 @@ class DataBaseAPIView(APIView):
             gym.postal_code = postal_code
             gym.street = street
             gym.street_number = street_number
-            gym.building_number = building_number
+            if building_number:
+                gym.building_number = building_number
+            else:
+                gym.building_number = None
             gym.phone_number = phone_number
             # save modified gym to db
             gym.save()

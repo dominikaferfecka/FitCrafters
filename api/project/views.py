@@ -92,7 +92,12 @@ class DataBaseAPIView(APIView):
     @api_view(['GET'])
     def getClientTrainings(request, client_id):
         trainings = Trainings.objects.filter(client_id=client_id).select_related('training_plan', 'trainer')
-        serializer = ClientTrainingsSerializer(trainings, many=True)
+        done_trainings = []
+        for training in trainings:
+            doesExist = TrainingsExercises.objects.filter(training = training)
+            if doesExist:
+                done_trainings.append(training)
+        serializer = ClientTrainingsSerializer(done_trainings, many=True)
 
         # Uwzględnij strefę czasową przed wysłaniem odpowiedzi
         data_with_localtime = []
@@ -133,6 +138,16 @@ class DataBaseAPIView(APIView):
 
         exercises = TrainingsExercises.objects.filter(training=training)
         data = TrainingsExercisesSerializer(exercises, many=True).data
+        data_with_localtime = []
+        for exercise_data in data:
+            exercise_data['start_time'] = parser.parse(exercise_data['start_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
+            print(exercise_data['start_time'])
+            if exercise_data['end_time']:
+                exercise_data['end_time'] = parser.parse(exercise_data['end_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
+            print("Ćwiczenie", exercise_data)
+            data_with_localtime.append(exercise_data)
+
+
 
         return JsonResponse(data, safe=False)
     
@@ -173,7 +188,7 @@ class DataBaseAPIView(APIView):
         training = Trainings(
             start_time=start_datetime,
             end_time=end_datetime,
-            trainer_id=trainer_id,
+            trainer=Trainers.objects.get(trainer_id=trainer_id),
             client_id=client_id
         )
         

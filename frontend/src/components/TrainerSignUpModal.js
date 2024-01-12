@@ -4,6 +4,7 @@ function TrainerSignUpModal(props) {
 
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
+  const [notification, setNotification] = useState({ type: '', message: '' });
 
   const handleDateChange = (event) => {
     setDate(event.target.value);
@@ -29,11 +30,16 @@ function TrainerSignUpModal(props) {
       body: JSON.stringify(data),
     })
       .then(response => response.json())
-      .then(result => {
-        console.log(result);
+      .then((result) => {
+        if (result.status === 'success') {
+          alert("Zapisano się pomyślnie do trenera!");
+        } else {
+          alert("Nie udało się zapisać do trenera :( - " + result.message);
+        }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error:', error);
+        alert('Nie udało się zapisać do trenera :(');
       });
   };
   

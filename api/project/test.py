@@ -536,3 +536,104 @@ class ClientTrainingsTestCase(TestCase):
         actual_data = response.json()
 
         self.assertEqual(actual_data, expected_data)
+
+class GetTrainingExercisesTestCase(TestCase):
+    def setUp(self):
+        manager = Managers.objects.create(
+            manager_id=1,
+            name="Jan",
+            surname="Kowalski",
+            phone_number="123456789",
+            email="jan.kowalski@gmail.com",
+            hash_pass="hash_haslo",
+        )
+
+        gym = Gyms.objects.create(
+            gym_id=1,
+            city="City",
+            postal_code="12345",
+            street="Street",
+            street_number=123,
+            phone_number="987654321",
+            manager=manager,
+        )
+
+        trainer = Trainers.objects.create(
+            trainer_id=1, name="Andrzej", surname="Nowak", phone_number="987654321", gym=gym
+        )
+
+        client = Clients.objects.create(
+            client_id=1,
+            name="Anna",
+            surname="Kowalska",
+            phone_number="123456789",
+            email="anna.kowalska@fitcrafters.com",
+            age=25,
+            weight=70,
+            height=180,
+        )
+
+        training_plan = TrainingPlans.objects.create(
+            training_plan_id=1, name="Plan Cardio", category="Cardio", time=30
+        )
+
+        training = Trainings.objects.create(
+            training_id=1, training_plan=training_plan, trainer=trainer, client=client
+        )
+
+        equipment_type = EquipmentType.objects.create(
+            equipment_id=1, category="Cardio", name="Bieżnia"
+        )
+        GymsEquipmentType.objects.create(
+            gym=gym, equipment=equipment_type, available=1, used=0, serial_number="123"
+        )
+
+        exercise = Exercises.objects.create(
+            exercise_id=1, category="Cardio", name="Bieżnia", equipment= equipment_type
+        )
+
+        TrainingsExercises.objects.create(
+            training=training,
+            exercise_id=1,
+            start_time="2024-01-06 16:46:54",
+            end_time=None,
+            repeats=10,
+            time=15,
+            load=20,
+            calories=50,
+        )
+
+    def test_get_training_exercises_success(self):
+        url = reverse("training_exercises", args=[1])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        expected_data = [
+        {
+            'exercise': {'exercise_id': 1, 'category': 'Cardio', 'name': 'Bieżnia', 'equipment': 1},
+            'start_time': '06-01-2024 16:46:54',
+            'end_time': None,
+            'repeats': 10,
+            'time': 15,
+            'load': 20,
+            'calories': 50,
+            'equipment_name': 'Bieżnia'
+        }
+        ]
+
+        actual_data = response.json()
+
+        self.assertEqual(actual_data, expected_data)
+
+    def test_get_training_exercises_failure(self):
+        url = reverse("training_exercises", args=[999])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        expected_data = {"error": "Training not found"}
+
+        actual_data = response.json()
+
+        self.assertEqual(actual_data, expected_data)

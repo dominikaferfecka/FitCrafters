@@ -2,6 +2,7 @@ import { Container } from "react-bootstrap";
 import React, { useState, useEffect } from "react";
 import GymDetailModal from "./GymDetailModal";
 import TrainerDetailModal from "./TrainerDetailModal";
+import TrainingDetailModal from "./TrainingDetailModal";
 
 function List(props) {
   const [equipment_data, setEquipmentData] = useState([]);
@@ -13,6 +14,9 @@ function List(props) {
   const [selectedGymDetails, setSelectedGymDetails] = useState(null);
 
   const [selectedTrainer, setSelectedTrainer] = useState(0);
+
+  const [selectedTrainingDetails, setSelectedTrainingDetails] = useState(null);
+
 
   useEffect(() => {
     props.scrollId === "equipmentList" &&
@@ -75,6 +79,9 @@ function List(props) {
       "Trener",
     ];
   }
+
+  if (props.scrollId==="clientList" ){ columns = ["#", "Imię", "Nazwisko", "Numer telefonu", "Email", "Wiek", "Waga", "Wzrost"]}
+  if (props.scrollId==="trainingHistory" ){ columns = ["#", "Nazwa treningu", "Kategoria", "Początek treningu", "Czas trwania (min)", "Trener", "Sprawdź ćwiczenia"]}
   const listItems = columns.map((col, index) => (
     <th key={index} scope="col">
       {col}
@@ -98,6 +105,11 @@ function List(props) {
 
   const handleTrainerClick = (trainer) => {
     setSelectedTrainer(trainer);
+
+  const handleTrainingDetailsClick = (trainingDetails) => {
+    console.log(trainingDetails);
+    setSelectedTrainingDetails(trainingDetails);
+
   };
 
   return (
@@ -111,6 +123,7 @@ function List(props) {
           mappedGyms={mappedSelectItems}
         />
       )}
+
       <Container className="w-75" id={props.scrollId}>
         <h1 className="text-center m-5">{props.header}</h1>
         {props.showSelect && (
@@ -154,7 +167,7 @@ function List(props) {
                       }}
                     >
                       <button
-                        class="btn btn-success btn-sm"
+                        className="btn btn-success btn-sm"
                         type="submit"
                         data-bs-toggle="modal"
                         data-bs-target="#GymDetailModal"
@@ -229,26 +242,29 @@ function List(props) {
                   <th scope="row">{element.training_id}</th>
 
                   <>
-                    <td>
-                      {element.training_plan_name
-                        ? element.training_plan_name
-                        : "Custom training"}
+                  <td>{element.training_plan_name ? element.training_plan_name : "Custom training"}</td>
+                  <td>{element.training_plan_category ? element.training_plan_category : '-'}</td>
+                  <td>{element.start_time}</td>
+                  <td>{element.training_plan_time ? element.training_plan_time : '-'}</td>
+                  <td>{element.trainer_name} {element.trainer_surname}</td>
+                  <td
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <button
+                        className="btn btn-success btn-sm"
+                        type="submit"
+                        data-bs-toggle="modal"
+                        data-bs-target="#TrainingDetailModal"
+                        onClick={() => handleTrainingDetailsClick(element)}
+                      >
+                        +
+                      </button>
                     </td>
-                    <td>
-                      {element.training_plan_category
-                        ? element.training_plan_category
-                        : "-"}
-                    </td>
-                    <td>{element.start_time}</td>
-                    <td>
-                      {element.training_plan_time
-                        ? element.training_plan_time
-                        : "-"}
-                    </td>
-                    <td>
-                      {element.trainer_name} {element.trainer_surname}
-                    </td>
-                  </>
+                    </>
                 </tr>
               ))}
           </tbody>

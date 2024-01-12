@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from django.db.models import Count
 from django.db import transaction
-from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer, ClientsSerializer,  ClientTrainingsSerializer, EquipmentAllSerializer
+from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer, ClientsSerializer,  ClientTrainingsSerializer, EquipmentAllSerializer, TrainingsExercisesSerializer
 from .models import Managers, Gyms, EquipmentType, Trainers, Trainings, GymsEquipmentType, Clients, TrainingsExercises
 import json
 
@@ -70,6 +70,31 @@ class DataBaseAPIView(APIView):
         trainings = Trainings.objects.filter(client_id=client_id).select_related('training_plan', 'trainer')
         serializer = ClientTrainingsSerializer(trainings, many=True)
         return JsonResponse(serializer.data, safe=False)
+    
+    # @api_view(['GET'])
+    # def getTrainingExercises(request, training_id):
+    #     try:
+    #         training = Trainings.objects.get(training_id=training_id)
+    #     except Trainings.DoesNotExist:
+    #         return JsonResponse({'error': 'Training not found'}, status=404)
+
+    #     exercises = TrainingsExercises.objects.filter(training=training)
+    #     data = TrainingsExercisesSerializer(exercises, many=True).data
+
+    #     return JsonResponse(data, safe=False)
+
+    @api_view(['GET'])
+    def getTrainingExercises(request, training_id):
+        try:
+            training = Trainings.objects.get(training_id=training_id)
+        except Trainings.DoesNotExist:
+            return JsonResponse({'error': 'Training not found'}, status=404)
+
+        exercises = TrainingsExercises.objects.filter(training=training)
+        data = TrainingsExercisesSerializer(exercises, many=True).data
+
+        return JsonResponse(data, safe=False)
+
 
 
     @csrf_exempt
@@ -83,6 +108,15 @@ class DataBaseAPIView(APIView):
         
         start_datetime = datetime.strptime(date + ' ' + time, '%Y-%m-%d %H:%M')
         end_datetime = start_datetime + timedelta(hours=1)
+
+        # conflicting_trainings = Trainings.objects.filter(
+        # trainer_id=trainer_id,
+        # start_time__lt=end_datetime,
+        # end_time__gt=start_datetime
+        # )
+
+        # if conflicting_trainings.exists():
+        #     return JsonResponse({'status': 'error', 'message': 'Wybrany trener już ma zaplanowany trening na wtedy'})
 
         training = Trainings(
             start_time=start_datetime,

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Managers, Gyms, EquipmentType, Trainers, GymsEquipmentType, Clients, Trainings, TrainingPlans
+from .models import Managers, Gyms, EquipmentType, Trainers, GymsEquipmentType, Clients, Trainings, TrainingPlans, TrainingsExercises, Exercises
 
 class ManagerSerializer(serializers.ModelSerializer):
     class Meta:
@@ -42,9 +42,31 @@ class ClientTrainingsSerializer(serializers.Serializer):
     training_plan_time = serializers.IntegerField(source='training_plan.time',allow_null=True)
     trainer_name = serializers.CharField(source='trainer.name',allow_null=True)
     trainer_surname = serializers.CharField(source='trainer.surname',allow_null=True)
-    start_time = serializers.DateTimeField(allow_null=True, format='%Y-%m-%d %H:%M:%S')
+    start_time = serializers.DateTimeField(allow_null=True, format='%d-%m-%Y %H:%M:%S')
     end_time = serializers.DateTimeField(allow_null=True)
     training_id = serializers.IntegerField()
 
     class Meta:
         fields = ('training_id','training_plan_name', 'training_plan_category', 'training_plan_time', 'trainer_name', 'trainer_surname', 'start_time', 'end_time')
+
+
+class ExerciseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Exercises
+        fields = ('exercise_id', 'category', 'name', 'equipment')
+
+class TrainingsExercisesSerializer(serializers.ModelSerializer):
+    exercise = ExerciseSerializer()
+    start_time = serializers.DateTimeField(allow_null=True, format='%d-%m-%Y %H:%M:%S')
+    end_time = serializers.DateTimeField(allow_null=True, format='%d-%m-%Y %H:%M:%S')
+
+    class Meta:
+        model = TrainingsExercises
+        fields = ('exercise', 'start_time', 'end_time', 'repeats', 'time', 'load', 'calories', 'equipment_name')
+
+    equipment_name = serializers.SerializerMethodField()
+
+    def get_equipment_name(self, obj):
+        return obj.exercise.equipment.name if obj.exercise.equipment else None
+
+    

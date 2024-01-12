@@ -116,7 +116,7 @@ class DataBaseAPIView(APIView):
         trainer_id = data.get('trainer_id')
         client_id = data.get('client_id')
         
-        start_datetime = datetime.strptime(date + ' ' + time, '%Y-%m-%d %H:%M'+timezone_to_add)
+        start_datetime = datetime.strptime(date + ' ' + time + timezone_to_add, '%Y-%m-%d %H:%M'+timezone_to_add)
         end_datetime = start_datetime + timedelta(hours=1)
 
         # conflicting_trainings = Trainings.objects.filter(

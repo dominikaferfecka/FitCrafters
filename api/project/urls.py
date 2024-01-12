@@ -29,7 +29,7 @@ urlpatterns = [
     path('trainer-endpoint/', DataBaseAPIView.getTrainer ),
     path('signToTrainer/', DataBaseAPIView.signToTrainer ),
     path('trainer_clients/<int:trainer_id>/', DataBaseAPIView.getTrainerClients, name='trainer_clients'),
-    path('client_trainings/<int:client_id>/', DataBaseAPIView.getClientTrainings, name='client_trainings'),
+    path('client_trainings/<int:client_id>/', DataBaseAPIView.getClientTrainings, name='client_trainings'), # history
     path("getClient/<int:client_id>/", DataBaseAPIView.getClient, name="get_client"),
     path("addGym/", DataBaseAPIView.addGym, name="addGym"),
     path("deleteGym/", DataBaseAPIView.deleteGym, name="deleteGym"),
@@ -40,6 +40,7 @@ urlpatterns = [
     path("addEquipment/", DataBaseAPIView.addEquipment, name="addEquipment"),
     path("modifyClient/", DataBaseAPIView.modifyClient, name="modifyClient"),
     path('training_exercises/<int:training_id>/', DataBaseAPIView.getTrainingExercises, name='training_exercises'),
+    path('client_trainings_plans/<int:client_id>/', DataBaseAPIView.getClientsTrainingsWithTrainingPlan, name='client_trainings_plans'),
     
     #path('signToTrainer/', DataBaseAPIView.as_view({'post': 'signToTrainer'}), name='sign_to_trainer')
 ]

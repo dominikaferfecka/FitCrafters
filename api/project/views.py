@@ -91,17 +91,7 @@ class DataBaseAPIView(APIView):
     
     @api_view(['GET'])
     def getClientTrainings(request, client_id):
-        # Zmodyfikowane zapytanie do bazy danych
-        trainings = (
-            Trainings.objects
-            .filter(client_id=client_id, trainings__isnull=False)  # Zmiana na trainings__isnull
-            .select_related('training_plan', 'trainer')
-            .annotate(exercises_count=Count('trainings__exercise'))  # Zmiana na trainings__exercise
-        )
-
-        # Filtruj tylko te, które mają przynajmniej jedno training_exercise
-        trainings = [training for training in trainings if training.exercises_count > 0]
-
+        trainings = Trainings.objects.filter(client_id=client_id).select_related('training_plan', 'trainer')
         serializer = ClientTrainingsSerializer(trainings, many=True)
 
         # Uwzględnij strefę czasową przed wysłaniem odpowiedzi
@@ -114,6 +104,7 @@ class DataBaseAPIView(APIView):
             data_with_localtime.append(training_data)
 
         return Response(data_with_localtime)
+
 
     @api_view(['GET'])
     def getClient(request, client_id):

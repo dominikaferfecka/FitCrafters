@@ -59,6 +59,7 @@ function List(props) {
   }
 
   console.log(columns);
+  console.log(props);
   if (props.scrollId === "clientList") {
     columns = [
       "#",
@@ -80,6 +81,17 @@ function List(props) {
       "Czas trwania (min)",
       "Trener",
       "Sprawdź ćwiczenia",
+    ];
+  }
+  console.log(props.scrollId);
+  if (props.scrollId === "clientsPlan") {
+    columns = [
+      "#",
+      "Nazwa treningu",
+      "Kategoria",
+      "Początek treningu",
+      "Czas trwania (min)",
+      "Trener",
     ];
   }
   const listItems = columns.map((col, index) => (
@@ -279,6 +291,30 @@ function List(props) {
                         +
                       </button>
                     </td>
+                  </>
+                </tr>
+              ))}
+              {props.scrollId === "clientsPlan" &&
+              props.items.map((element) => (
+                <tr>
+                  <th scope="row">{element.training_id}</th>
+                  <>
+                    {/* <td>
+                      {element.training_plan_name
+                        ? element.training_plan_name
+                        : "Custom training"}
+                    </td>
+                    <td>
+                      {element.training_plan_category
+                        ? element.training_plan_category
+                        : "-"}
+                    </td>
+                    <td>{element.start_time}</td>
+                    <td>
+                      {element.training_plan_time
+                        ? element.training_plan_time
+                        : "-"}
+                    </td> */}
                   </>
                 </tr>
               ))}

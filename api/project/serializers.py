@@ -82,6 +82,6 @@ class ClientTrainingsWithTrainingPlan(serializers.ModelSerializer):
 
     class Meta:
         model = Trainings
-        fields = ('training_id', 'start_time', 'end_time', 'client', 'trainer', 'training_plan')
+        fields = ('training_id', 'start_time', 'end_time', 'client', 'trainer', 'training_plan', 'training_plan_name')
 
     

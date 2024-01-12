@@ -53,7 +53,12 @@ function ClientPage() {
         <SideBarClient />
       </div>
       <div style={{ marginLeft: "230px" }}>
-        <UserHeader roleTitle="użytkownika" />
+        {clientData ? (
+          <UserHeader roleTitle="użytkownika" name={clientData.name} />
+        ) : (
+          <UserHeader roleTitle="użytkownika" />
+        )}
+
         <List
           header="Historia treningów"
           selectItems={[]}

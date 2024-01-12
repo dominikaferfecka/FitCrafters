@@ -429,7 +429,7 @@ class DataBaseAPIView(APIView):
             client.save()
             # return success
             return JsonResponse({"status": "success"})
-        except Gyms.DoesNotExist:
+        except Clients.DoesNotExist:
             return JsonResponse({"status": "clientDeleted"}, status=501)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)

@@ -475,7 +475,78 @@ class ModifyGymViewTest(TestCase):
         self.assertEqual(response.status_code, 501)
         self.assertEqual(response.json()["status"], "gymDeleted")
 
+class ModifyClientTestCase(TestCase):
 
+    def setUp(self):
+        self.client_modify = Clients.objects.create(
+            client_id=1,
+            name="Anna", 
+            surname="Kowalska", 
+            phone_number="123456789", 
+            email="anna.kowalska@fitcrafters.com", 
+            hash_pass="haslo",
+            age=25, 
+            weight=70, 
+            height=180
+        )
+
+    def test_modify_client_success(self):
+        data = {
+            "clientId": 1,
+            "clientName": "Maria",
+            "clientSurname": "Nowak",
+            "clientPhone": "123456788",
+            "clientEmail": self.client_modify.email,
+            "clientPass": self.client_modify.hash_pass,
+            "clientAge": 24,
+            "clientWeight": 71,
+            "clientHeight": 185
+        }
+
+        # process modify operation
+        response = self.client.post(reverse("modifyClient"), json.dumps(data), content_type='application/json')
+
+        # check if operation was successful
+        self.assertEqual(response.status_code, 200)
+
+        # check if data was updated in db
+        updated_client = Clients.objects.get(client_id=self.client_modify.client_id)
+        self.assertEqual(updated_client.name, "Maria")
+        self.assertEqual(updated_client.surname, "Nowak")
+        self.assertEqual(updated_client.email, "anna.kowalska@fitcrafters.com")
+
+    def test_modify_client_nonexistent_client(self):
+        # wrong data
+        data = {
+            "clientId": 999,  # non existing client
+            "clientName": "Maria",
+            "clientSurname": "Nowak",
+            "clientPhone": "123456788",
+            "clientEmail": self.client_modify.email,
+            "clientPass": self.client_modify.hash_pass,
+            "clientAge": 24,
+            "clientWeight": 71,
+            "clientHeight": 185
+        }
+
+        # process opearation
+        response = self.client.post(reverse("modifyClient"), json.dumps(data), content_type='application/json')
+
+        # assert that operation failed
+        self.assertEqual(response.status_code, 501)  # status for non existing client
+
+    def test_modify_client_error(self):
+        # not all needed data
+        data = {
+            "clientId": 1,
+            "clientName": "NewName",
+        }
+
+        # process operation
+        response = self.client.post(reverse("modifyClient"), json.dumps(data), content_type='application/json')
+
+        # assert that operation failed with correct status_code
+        self.assertEqual(response.status_code, 500)
 
 
 class TrainerClientsTestCase(TestCase):
@@ -500,6 +571,7 @@ class TrainerClientsTestCase(TestCase):
                 'age': 25,
                 'weight': 70,
                 'height': 180,
+                'hash_pass': '',
             }
         ]
         actual_data = response.json()

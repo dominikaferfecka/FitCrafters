@@ -33,7 +33,7 @@ class TrainersSerializer(serializers.ModelSerializer):
 class ClientsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Clients
-        fields = ('client_id', 'name', 'surname', 'phone_number', 'email', 'age', 'weight', 'height')
+        fields = ('client_id', 'name', 'surname', 'phone_number', 'email', 'age', 'weight', 'height', "hash_pass")
 
 
 class ClientTrainingsSerializer(serializers.Serializer):

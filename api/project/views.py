@@ -74,6 +74,12 @@ class DataBaseAPIView(APIView):
         serializer = ClientTrainingsSerializer(trainings, many=True)
         return JsonResponse(serializer.data, safe=False)
     
+    @api_view(['GET'])
+    def getClient(request, client_id):
+        client = Clients.objects.get(client_id = client_id)
+        data= ClientsSerializer(client).data
+        return JsonResponse(data)
+    
     # @api_view(['GET'])
     # def getTrainingExercises(request, training_id):
     #     try:
@@ -384,6 +390,47 @@ class DataBaseAPIView(APIView):
             gym_equipment.save()
             # return success
             return JsonResponse({"status": "success"})
+        except Exception as e:
+            return JsonResponse({"message": str(e)}, status=500)
+
+    @csrf_exempt
+    def modifyClient(request):
+        """
+        params: request [json]
+        return: status of operation [JSONResoponse]
+        method extracts received data and saves modified client info to db
+        """
+
+        # load data
+        client_data = json.loads(request.body.decode("utf-8"))
+        # extract data
+        client_id = client_data.get("clientId")
+        name = client_data.get("clientName")
+        surname = client_data.get("clientSurname")
+        phone_number = client_data.get("clientPhone")
+        email = client_data.get("clientEmail")
+        hash_pass = client_data.get("clientPass")
+        age = client_data.get("clientAge")
+        weight = client_data.get("clientWeight")
+        height = client_data.get("clientHeight")
+        try:
+            # get client object to modify 
+            client = Clients.objects.get(client_id = client_id)
+            # modify fields in client object
+            client.name = name
+            client.surname = surname
+            client.phone_number = phone_number
+            client.email = email
+            client.hash_pass = hash_pass
+            client.age = age
+            client.weight = weight
+            client.height = height
+            # save modified client to db
+            client.save()
+            # return success
+            return JsonResponse({"status": "success"})
+        except Clients.DoesNotExist:
+            return JsonResponse({"status": "clientDeleted"}, status=501)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
 

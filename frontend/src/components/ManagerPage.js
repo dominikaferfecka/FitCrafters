@@ -38,7 +38,7 @@ function ManagerPage() {
       });
   }, []);
 
-  console.log(manager_data);
+  // console.log(manager_data);
   useEffect(() => {
     fetch(
       "http://127.0.0.1:8000/gyms-endpoint/?manager_id=" +

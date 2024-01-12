@@ -249,6 +249,47 @@ class DataBaseAPIView(APIView):
             return JsonResponse({"message": str(e)}, status=500)
         
     @csrf_exempt
+    def modifyTrainer(request):
+        """
+        params: request [json]
+        return: status of operation [JSONResoponse]
+        method extracts received data and saves modified trainer to db
+        """
+
+        # load data
+        trainer_data = json.loads(request.body)
+        # extract data
+        trainer_id = trainer_data.get("trainerId")
+        gym_selected = trainer_data.get("gymSelected")
+        trainer_name = trainer_data.get("trainerName")
+        trainer_surname = trainer_data.get("trainerSurname")
+        trainer_phone = trainer_data.get("trainerPhone")
+        trainer_salary = trainer_data.get("trainerSalary")
+        trainer_email = trainer_data.get("trainerEmail")
+        trainer_pass = trainer_data.get("trainerPass")
+        trainer_info = trainer_data.get("trainerInfo")
+        try:
+            trainer = Trainers.objects.get(trainer_id = trainer_id)
+            # save modified data to trainer object
+            trainer.name = trainer_name
+            trainer.surname = trainer_surname
+            trainer.phone_number = trainer_phone
+            trainer.email = trainer_email
+            trainer.hour_salary = trainer_salary
+            trainer.gym = Gyms.objects.get(gym_id = gym_selected)
+            trainer.hash_pass = trainer_pass
+            trainer.info = trainer_info
+
+            # save trainer with modified data
+            trainer.save()
+            # return success
+            return JsonResponse({"status": "success"})
+        except Trainers.DoesNotExist:
+            return JsonResponse({"status": "trainerDeleted"}, status=501)
+        except Exception as e:
+            return JsonResponse({"message": str(e)}, status=500)
+        
+    @csrf_exempt
     def deleteTrainer(request):
         """
         params: request [json]

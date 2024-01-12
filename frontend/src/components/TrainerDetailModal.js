@@ -104,6 +104,98 @@ function TrainerDetailModal(props) {
     }
   };
 
+  // handle modifying data after clicking modify button
+  const handleModifyTrainer = (e) => {
+    e.preventDefault();
+
+    // prepare data to send - it might be the same
+    const requestData = {
+      gymSelected: gym,
+      trainerId: trainerId,
+      trainerName: trainerName,
+      trainerSurname: trainerSurname,
+      trainerPhone: trainerPhone,
+      trainerSalary: trainerSalary,
+      trainerEmail: trainerEmail,
+      trainerPass: trainerPass,
+      trainerInfo: trainerInfo,
+    };
+    // prepare data to check changes
+    const oldData = [
+      props.trainerDetails.gym,
+      props.trainerDetails.name,
+      props.trainerDetails.surname,
+      props.trainerDetails.phone_number,
+      props.trainerDetails.hour_salary,
+      props.trainerDetails.email,
+      props.trainerDetails.info,
+    ];
+    const newData = [
+      gym,
+      trainerName,
+      trainerSurname,
+      trainerPhone,
+      trainerSalary,
+      trainerEmail,
+      trainerInfo,
+    ];
+    // prepare changes variable
+    let trainerChanges = "";
+    // check for changes
+    for (let i = 0; i < oldData.length; i++) {
+      if (oldData[i] !== newData[i]) {
+        trainerChanges += oldData[i] + " -> " + newData[i] + "\n";
+      }
+    }
+    if (trainerPass) {
+      if (trainerPass !== trainerRepeatPass) {
+        alert("Hasło i powtórzone hasło nie są identyczne!");
+      } else {
+        trainerChanges += "Stare hasło -> " + trainerPass + "\n";
+      }
+    }
+    // if changes don't exist alert user and do nothing
+    if (trainerChanges === "") {
+      alert("Nie wprowadzono żadnych zmian w trenerze/trenerce");
+    } else {
+      // get confirmation from user about modifying data
+      if (
+        window.confirm("Czy chcesz dokonać tych zmian? \n" + trainerChanges)
+      ) {
+        // send data as JSON
+        fetch("http://127.0.0.1:8000/modifyTrainer/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestData),
+        })
+          .then((response) => response.json())
+          .then((result) => {
+            // if status is success clear form
+            if (result.status === "success") {
+              console.log(result);
+              //   alert about successfull changes
+              alert(
+                "Dokonano następujących zmian w wybranym trenerze:\n" +
+                  trainerChanges
+              );
+              e.target.value = null;
+            } else {
+              // alert about error while modifying
+              alert(
+                "Nastąpił błąd przy modyfikacji, spróbuj ponownie z uwagą na rodzaj wprowadzanych danych."
+              );
+              if (result.message) {
+                console.log(result.message);
+              }
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
+    }
+  };
+
   return (
     <Container>
       <div class="modal" id="TrainerDetailModal" tabindex="-1" role="dialog">
@@ -269,7 +361,7 @@ function TrainerDetailModal(props) {
               <button
                 class="btn btn-success m-2"
                 type="submit"
-                // onClick={handleModifyGym}
+                onClick={handleModifyTrainer}
               >
                 Modyfikuj trenera
               </button>

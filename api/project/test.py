@@ -187,6 +187,109 @@ class AddTrainerViewTest(TestCase):
         self.assertEqual(response.status_code, 500)
         self.assertEqual(Trainers.objects.count(), 0)
 
+class ModifyTrainerTestCase(TestCase):
+    def setUp(self):
+        # set up data to use in tests
+        self.manager = Managers.objects.create(
+            manager_id = 1,
+            name = "Jan",
+            surname = "Kowalski",
+            phone_number = "123456789",
+            email = "jan.kowalski@gmail.com",
+            hash_pass = "hash_haslo",
+        )
+        
+        self.gym = Gyms.objects.create(
+            gym_id=1,
+            city='Test City',
+            postal_code='00-000',
+            street='Test Street',
+            street_number='123',
+            building_number=1,
+            manager_id=1,
+            phone_number='123456789'
+        )
+
+        self.trainer = Trainers.objects.create(
+            trainer_id=1, 
+            name="Andrzej", 
+            surname="Nowak", 
+            phone_number = "987654321", 
+            email = "andrzej.nowak@gmail.com",
+            gym = self.gym)
+        
+    def test_modify_trainer_success(self):
+        # set up modified data
+        modified_data = {
+            "gymSelected": self.gym.gym_id,
+            "trainerId": self.trainer.trainer_id,
+            "trainerName": "Marcin",
+            "trainerSurname": "Fiołek",
+            "trainerPhone": self.trainer.phone_number,
+            "trainerSalary": 50,
+            "trainerEmail": self.trainer.email,
+            "trainerPass": self.trainer.hash_pass,
+            "trainerInfo": self.trainer.info,
+        }
+
+        # Wywołaj funkcję
+        response = self.client.post(reverse("modifyTrainer"), json.dumps(modified_data), content_type='application/json')
+        # Sprawdź, czy otrzymano poprawną odpowiedź JSON
+        self.assertEqual(response.status_code, 200)
+
+        # Odśwież obiekt trenera i sprawdź, czy dane zostały zmodyfikowane
+        self.trainer.refresh_from_db()
+        self.assertEqual(self.trainer.name, "Marcin")
+        self.assertEqual(self.trainer.surname, "Fiołek")
+        self.assertEqual(self.trainer.phone_number, "987654321")
+        self.assertEqual(self.trainer.hour_salary, 50)
+        self.assertEqual(self.trainer.email, "andrzej.nowak@gmail.com")
+        self.assertEqual(self.trainer.info, "")
+
+    def test_modify_trainer_trainer_not_found(self):
+        # Przygotuj dane do żądania, używając nieistniejącego ID trenera
+        modified_data = {
+            "gymSelected": self.gym.gym_id,
+            "trainerId": 999,
+            "trainerName": "Marcin",
+            "trainerSurname": "Fiołek",
+            "trainerPhone": self.trainer.phone_number,
+            "trainerSalary": 50,
+            "trainerEmail": self.trainer.email,
+            "trainerPass": self.trainer.hash_pass,
+            "trainerInfo": self.trainer.info,
+        }
+
+        # Wywołaj funkcję
+        response = self.client.post(reverse("modifyTrainer"), json.dumps(modified_data), content_type='application/json')
+
+        # Sprawdź, czy otrzymano odpowiednią odpowiedź JSON
+        self.assertEqual(response.status_code, 501)
+
+    def test_modify_trainer_exception(self):
+        # Przygotuj dane do żądania, powodując wyjątek podczas próby modyfikacji trenera
+        modified_data = {
+            "gymSelected": self.gym.gym_id,
+            "trainerId": self.trainer.trainer_id,
+            "trainerName": None,
+            "trainerSurname": "Fiołek",
+            "trainerPhone": self.trainer.phone_number,
+            "trainerSalary": 50,
+            "trainerEmail": self.trainer.email,
+            "trainerPass": self.trainer.hash_pass,
+            "trainerInfo": self.trainer.info,
+        }
+
+        # Wywołaj funkcję, spowoduj wyjątek przez manipulację danymi w obiekcie trenera
+        self.trainer.save()
+
+        # Wywołaj funkcję
+        response = self.client.post(reverse("modifyTrainer"), json.dumps(modified_data), content_type='application/json')
+
+        # Sprawdź, czy otrzymano odpowiednią odpowiedź JSON
+        self.assertEqual(response.status_code, 500)
+        self.assertIn("message", response.json())
+
 class DeleteTrainerViewTest(TestCase):
     def setUp(self):
         self.manager = Managers.objects.create(

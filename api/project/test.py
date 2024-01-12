@@ -2,7 +2,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from unittest.mock import patch
 from datetime import datetime
-from .models import Gyms, Managers, EquipmentType, GymsEquipmentType, Trainers, Trainings, Gyms, Clients, TrainingPlans, TrainingsExercises
+from .models import Gyms, Managers, EquipmentType, GymsEquipmentType, Trainers, Trainings, Gyms, Clients, TrainingPlans, TrainingsExercises, Exercises
 import json
 from unittest import expectedFailure
 from django.core.exceptions import ObjectDoesNotExist

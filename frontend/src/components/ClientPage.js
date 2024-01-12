@@ -6,7 +6,7 @@ import SideBarClient from "./SideBarClient";
 import TrainerInfo from "./TrainerInfo";
 import UserHeader from "./UserHeader";
 import Footer from "./Footer";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
 function ClientPage() {
   const [userRole] = useState("user");
@@ -22,10 +22,16 @@ function ClientPage() {
   const clientId = 1; // change later for real
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/client_trainings/' + String(clientId))
-    .then(response => response.json())
-    .then(trainings_data => {setTrainingsData(trainings_data); console.log(trainings_data)})
-    .catch(error => {  console.log(trainings_data);console.error('Błąd przy pobieraniu danych:', error)});
+    fetch("http://127.0.0.1:8000/client_trainings/" + String(clientId))
+      .then((response) => response.json())
+      .then((trainings_data) => {
+        setTrainingsData(trainings_data);
+        console.log(trainings_data);
+      })
+      .catch((error) => {
+        console.log(trainings_data);
+        console.error("Błąd przy pobieraniu danych:", error);
+      });
   }, []);
 
   return (

@@ -17,7 +17,6 @@ function List(props) {
 
   const [selectedTrainingDetails, setSelectedTrainingDetails] = useState(null);
 
-
   useEffect(() => {
     props.scrollId === "equipmentList" &&
       fetch(`http://127.0.0.1:8000/equipment-endpoint/?gym=${selectedGym}`)
@@ -48,6 +47,7 @@ function List(props) {
   }, [selectedGym]);
 
   var columns = ["#", "First", "Last", "Handle"];
+
   if (props.scrollId === "gymList") {
     columns = ["#", "Nazwa", "Ulica", "Numer telefonu", "Szczegóły"];
   }
@@ -57,6 +57,8 @@ function List(props) {
   if (props.scrollId === "trainerList") {
     columns = ["#", "Imię", "Nazwisko", "Numer telefonu", "Szczegóły"];
   }
+
+  console.log(columns);
   if (props.scrollId === "clientList") {
     columns = [
       "#",
@@ -77,11 +79,9 @@ function List(props) {
       "Początek treningu",
       "Czas trwania (min)",
       "Trener",
+      "Sprawdź ćwiczenia",
     ];
   }
-
-  if (props.scrollId==="clientList" ){ columns = ["#", "Imię", "Nazwisko", "Numer telefonu", "Email", "Wiek", "Waga", "Wzrost"]}
-  if (props.scrollId==="trainingHistory" ){ columns = ["#", "Nazwa treningu", "Kategoria", "Początek treningu", "Czas trwania (min)", "Trener", "Sprawdź ćwiczenia"]}
   const listItems = columns.map((col, index) => (
     <th key={index} scope="col">
       {col}
@@ -105,23 +105,25 @@ function List(props) {
 
   const handleTrainerClick = (trainer) => {
     setSelectedTrainer(trainer);
-
+  };
   const handleTrainingDetailsClick = (trainingDetails) => {
     console.log(trainingDetails);
     setSelectedTrainingDetails(trainingDetails);
-
   };
 
   return (
     <>
-      {props.scrollId == "gymList" && (
+      {props.scrollId === "gymList" && (
         <GymDetailModal gymDetails={selectedGymDetails} />
       )}
-      {props.scrollId == "trainerList" && (
+      {props.scrollId === "trainerList" && (
         <TrainerDetailModal
           trainerDetails={selectedTrainer}
           mappedGyms={mappedSelectItems}
         />
+      )}
+      {props.scrollId === "trainingHistory" && (
+        <TrainingDetailModal trainingDetails={selectedTrainingDetails} />
       )}
 
       <Container className="w-75" id={props.scrollId}>
@@ -240,14 +242,27 @@ function List(props) {
               props.items.map((element) => (
                 <tr>
                   <th scope="row">{element.training_id}</th>
-
                   <>
-                  <td>{element.training_plan_name ? element.training_plan_name : "Custom training"}</td>
-                  <td>{element.training_plan_category ? element.training_plan_category : '-'}</td>
-                  <td>{element.start_time}</td>
-                  <td>{element.training_plan_time ? element.training_plan_time : '-'}</td>
-                  <td>{element.trainer_name} {element.trainer_surname}</td>
-                  <td
+                    <td>
+                      {element.training_plan_name
+                        ? element.training_plan_name
+                        : "Custom training"}
+                    </td>
+                    <td>
+                      {element.training_plan_category
+                        ? element.training_plan_category
+                        : "-"}
+                    </td>
+                    <td>{element.start_time}</td>
+                    <td>
+                      {element.training_plan_time
+                        ? element.training_plan_time
+                        : "-"}
+                    </td>
+                    <td>
+                      {element.trainer_name} {element.trainer_surname}
+                    </td>
+                    <td
                       style={{
                         display: "flex",
                         justifyContent: "center",
@@ -264,7 +279,7 @@ function List(props) {
                         +
                       </button>
                     </td>
-                    </>
+                  </>
                 </tr>
               ))}
           </tbody>

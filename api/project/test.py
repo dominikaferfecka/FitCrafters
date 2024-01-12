@@ -609,6 +609,40 @@ class ClientTrainingsTestCase(TestCase):
 
         self.assertEqual(actual_data, expected_data)
 
+class ClientTrainingsFutureTestCase(TestCase):
+    def setUp(self):
+        manager = Managers.objects.create( manager_id = 1, name = "Jan", surname = "Kowalski", phone_number = "123456789", email = "jan.kowalski@gmail.com", hash_pass = "hash_haslo")
+        gym = Gyms.objects.create(gym_id=1, city="City", postal_code="12345", street="Street", street_number=123, phone_number="987654321", manager = manager)
+        trainer = Trainers.objects.create(trainer_id=1, name="Andrzej", surname="Nowak", phone_number = "987654321", gym = gym)
+        training_plan = TrainingPlans.objects.create(training_plan_id=1, name="Plan Cardio", category="Cardio", time=30)
+        client = Clients.objects.create(client_id=1, name="Anna", surname="Kowalska", phone_number="123456789", email="anna.kowalska@fitcrafters.com", age=25, weight=70, height=180)
+        training = Trainings.objects.create(training_id=1, training_plan=training_plan, trainer=trainer, client=client, start_time = "2025-01-06 16:46:54")
+
+    def test_get_client_trainings_future(self):
+        
+        url = reverse("client_trainings_future", args=[1])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        expected_data = [
+            {
+                'training_id': 1,
+                'training_plan_name': 'Plan Cardio',
+                'training_plan_category': 'Cardio',
+                'training_plan_time': 30,
+                'trainer_name': 'Andrzej',
+                'trainer_surname': 'Nowak',
+                'start_time': '06-01-2025 16:46:54',
+                'end_time': None,
+            }
+        ]
+        actual_data = response.json()
+
+        print(actual_data)
+
+        self.assertEqual(actual_data, expected_data)
+
 class GetTrainingExercisesTestCase(TestCase):
     def setUp(self):
         manager = Managers.objects.create(
@@ -695,6 +729,8 @@ class GetTrainingExercisesTestCase(TestCase):
         ]
 
         actual_data = response.json()
+
+        print(actual_data)
 
         self.assertEqual(actual_data, expected_data)
 

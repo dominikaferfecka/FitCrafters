@@ -11,6 +11,7 @@ import React, { useEffect, useState } from "react";
 function ClientPage() {
   const [clientData, setClientData] = useState(null);
   const [trainings_data, setTrainingsData] = useState([]);
+  const [clients_plan, setClientsPlan] = useState(null);
   const selectStats = [
     "statystyka1",
     "statystyka2",
@@ -47,6 +48,19 @@ function ClientPage() {
       });
   }, []);
 
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/client_trainings_plans/" + String(clientId))
+      .then((response) => response.json())
+      .then((clients_plan) => {
+        setClientsPlan(clients_plan);
+        console.log("CLIENTS PLAN: " + clients_plan);
+      })
+      .catch((error) => {
+        console.log(clients_plan);
+        console.error("Błąd przy pobieraniu danych:", error);
+      });
+  }, []);
+
   return (
     <>
       <div style={{ width: "250px", float: "left" }}>
@@ -72,7 +86,13 @@ function ClientPage() {
           stats={selectStats}
           scrollId="statsTraining"
         />
-        <ClientPlan selectItems={[]} scrollId="clientsPlan" />
+        {/* <ClientPlan selectItems={[]} scrollId="clientsPlan" items={clients_plan}/> */}
+        <List
+          header="Plan treningów"
+          selectItems={[]}
+          scrollId="clientsPlan"
+          items={clients_plan}
+        />
         <TrainerInfo scrollId="trainersInfo" />
         <ClientInfo scrollId="clientInfo" clientData={clientData} />
         <Footer />

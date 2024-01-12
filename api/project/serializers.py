@@ -36,13 +36,6 @@ class ClientsSerializer(serializers.ModelSerializer):
         model = Clients
         fields = ('client_id', 'name', 'surname', 'phone_number', 'email', 'age', 'weight', 'height', "hash_pass")
 
-class TrainingSerializer(serializers.ModelSerializer):
-    start_time = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z")
-    end_time = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z", required=False, allow_null=True)
-
-    class Meta:
-        model = Trainings
-        fields = ['training_id', 'start_time', 'end_time', 'client_id', 'trainer_id', 'training_plan_id']
 
 class ClientTrainingsSerializer(serializers.Serializer):
     training_plan_name = serializers.CharField(source='training_plan.name',allow_null=True)
@@ -50,8 +43,8 @@ class ClientTrainingsSerializer(serializers.Serializer):
     training_plan_time = serializers.IntegerField(source='training_plan.time',allow_null=True)
     trainer_name = serializers.CharField(source='trainer.name',allow_null=True)
     trainer_surname = serializers.CharField(source='trainer.surname',allow_null=True)
-    start_time = serializers.DateTimeField(allow_null=True, format='%d-%m-%Y %H:%M:%S')
-    end_time = serializers.DateTimeField(allow_null=True)
+    start_time = serializers.DateTimeField(allow_null=True, format="%Y-%m-%dT%H:%M:%S%z")
+    end_time = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z", required=False, allow_null=True)
     training_id = serializers.IntegerField()
 
     class Meta:

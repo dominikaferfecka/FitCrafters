@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from django.db.models import Count
 from django.db import transaction
-from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer, ClientsSerializer,  ClientTrainingsSerializer, EquipmentAllSerializer, TrainingsExercisesSerializer, TrainingSerializer
+from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer, ClientsSerializer,  ClientTrainingsSerializer, EquipmentAllSerializer, TrainingsExercisesSerializer
 from .models import Managers, Gyms, EquipmentType, Trainers, Trainings, GymsEquipmentType, Clients, TrainingsExercises
 import json
 from django.utils import timezone
@@ -75,7 +75,7 @@ class DataBaseAPIView(APIView):
     @api_view(['GET'])
     def getClientTrainings(request, client_id):
         trainings = Trainings.objects.filter(client_id=client_id).select_related('training_plan', 'trainer')
-        serializer = TrainingSerializer(trainings, many=True)
+        serializer = ClientTrainingsSerializer(trainings, many=True)
 
         # Uwzględnij strefę czasową przed wysłaniem odpowiedzi
         data_with_localtime = []

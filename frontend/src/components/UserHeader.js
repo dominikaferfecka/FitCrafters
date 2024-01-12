@@ -28,9 +28,7 @@ function UserHeader(props) {
           <div className="d-flex justify-content-center align-items-center h-100">
             <div className="text-white">
               {<h1 className="mb-3">Witaj {props.name}!</h1>}
-              <h4 className="mb-3">
-                Panel {props.userRole === "user" ? "użytkownika" : "menadżera"}
-              </h4>
+              <h4 className="mb-3">Panel {props.roleTitle}</h4>
             </div>
           </div>
         </div>

@@ -92,7 +92,7 @@ function ManagerPage() {
         <SideBarManager />
       </div>
       <div style={{ marginLeft: "230px" }}>
-        <UserHeader name={manager_data.name} />
+        <UserHeader roleTitle="menadżera" name={manager_data.name} />
         <List
           header="Lista siłowni"
           selectItems={[]}

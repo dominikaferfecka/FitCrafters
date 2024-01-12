@@ -38,7 +38,7 @@ function TrainerPage() {
         <SideBarTrainer />
       </div>
       <div style={{ marginLeft: "230px" }}>
-        <UserHeader />
+        <UserHeader roleTitle="trenera" />
         <List
           header="Klienci"
           selectItems={[]}

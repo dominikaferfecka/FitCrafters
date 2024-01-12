@@ -50,8 +50,11 @@ class DataBaseAPIView(APIView):
             data = json.loads(request.body.decode("utf-8"))
         else:
             data = request.GET
-        v_gym_id = data.get("gym")
-        trainers = Trainers.objects.filter(gym=v_gym_id)
+        if data.get("gym"):
+            v_gym_id = data.get("gym")
+            trainers = Trainers.objects.filter(gym=v_gym_id)
+        else:
+            trainers = Trainers.objects.all()
         data = TrainersSerializer(trainers, many=True).data
         return JsonResponse(data, safe=False)
     
@@ -99,6 +102,7 @@ class DataBaseAPIView(APIView):
 
     @csrf_exempt
     def signToTrainer(request):
+        timezone_to_add="+01:00"
         data = json.loads(request.body)
 
         date = data.get('date')
@@ -106,7 +110,7 @@ class DataBaseAPIView(APIView):
         trainer_id = data.get('trainer_id')
         client_id = data.get('client_id')
         
-        start_datetime = datetime.strptime(date + ' ' + time, '%Y-%m-%d %H:%M')
+        start_datetime = datetime.strptime(date + ' ' + time, '%Y-%m-%d %H:%M'+timezone_to_add)
         end_datetime = start_datetime + timedelta(hours=1)
 
         # conflicting_trainings = Trainings.objects.filter(

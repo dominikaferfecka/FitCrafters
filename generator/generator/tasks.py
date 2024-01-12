@@ -11,9 +11,9 @@ def check_training_start():
     Function calls task generate_exercise_task
     for every training which started after last check (5 minutes ago)
     """
-    timezone="+01:00"
-    last_check_time = (timezone.localtime(timezone.now()) - timezone.timedelta(minutes=5)).strftime('%Y-%m-%d %H:%M:%S'+timezone)
-    unow = timezone.localtime(timezone.now()).strftime('%Y-%m-%d %H:%M:%S'+timezone)
+    timezone_to_add="+01:00"
+    last_check_time = (timezone.localtime(timezone.now()) - timezone.timedelta(minutes=5)).strftime('%Y-%m-%d %H:%M:%S'+timezone_to_add)
+    unow = timezone.localtime(timezone.now()).strftime('%Y-%m-%d %H:%M:%S'+timezone_to_add)
     # Filter trainings by start_time from last check
     new_trainings = Trainings.objects.filter(start_time__range=(last_check_time, unow))
     for training in new_trainings:

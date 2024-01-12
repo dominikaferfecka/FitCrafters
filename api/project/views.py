@@ -7,9 +7,13 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from django.db.models import Count
 from django.db import transaction
-from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer, ClientsSerializer,  ClientTrainingsSerializer, EquipmentAllSerializer, TrainingsExercisesSerializer
+from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer, ClientsSerializer,  ClientTrainingsSerializer, EquipmentAllSerializer, TrainingsExercisesSerializer, TrainingSerializer
 from .models import Managers, Gyms, EquipmentType, Trainers, Trainings, GymsEquipmentType, Clients, TrainingsExercises
 import json
+from django.utils import timezone
+from dateutil import parser
+import pytz
+tz = pytz.timezone('Europe/Warsaw')
 
 class DataBaseAPIView(APIView):
     @api_view(['GET'])
@@ -71,8 +75,18 @@ class DataBaseAPIView(APIView):
     @api_view(['GET'])
     def getClientTrainings(request, client_id):
         trainings = Trainings.objects.filter(client_id=client_id).select_related('training_plan', 'trainer')
-        serializer = ClientTrainingsSerializer(trainings, many=True)
-        return JsonResponse(serializer.data, safe=False)
+        serializer = TrainingSerializer(trainings, many=True)
+
+        # Uwzględnij strefę czasową przed wysłaniem odpowiedzi
+        data_with_localtime = []
+        for training_data in serializer.data:
+            training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
+            if training_data['end_time']:
+                training_data['end_time'] = parser.parse(training_data['end_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
+            print(training_data)
+            data_with_localtime.append(training_data)
+
+        return Response(data_with_localtime)
     
     @api_view(['GET'])
     def getClient(request, client_id):
@@ -108,7 +122,6 @@ class DataBaseAPIView(APIView):
 
     @csrf_exempt
     def signToTrainer(request):
-        timezone_to_add="+01:00"
         data = json.loads(request.body)
 
         date = data.get('date')
@@ -116,9 +129,10 @@ class DataBaseAPIView(APIView):
         trainer_id = data.get('trainer_id')
         client_id = data.get('client_id')
         
-        start_datetime = datetime.strptime(date + ' ' + time + timezone_to_add, '%Y-%m-%d %H:%M'+timezone_to_add)
-        end_datetime = start_datetime + timedelta(hours=1)
-
+        start_datetime = datetime.strptime(date + ' ' + time, '%Y-%m-%d %H:%M')
+        start_datetime = timezone.make_aware(start_datetime, tz)
+        end_datetime = start_datetime
+        print(start_datetime, end_datetime)
         # conflicting_trainings = Trainings.objects.filter(
         # trainer_id=trainer_id,
         # start_time__lt=end_datetime,

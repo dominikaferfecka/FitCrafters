@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.utils import timezone
 
 class Clients(models.Model):
     client_id = models.IntegerField(primary_key=True)
@@ -130,8 +130,8 @@ class TrainingPlans(models.Model):
 
 class Trainings(models.Model):
     training_id = models.AutoField(primary_key=True)
-    start_time = models.DateTimeField(blank=True, null=True)
-    end_time = models.DateTimeField(blank=True, null=True)
+    start_time = models.DateTimeField(blank=True, null=True, auto_now_add=True)
+    end_time = models.DateTimeField(blank=True, null=True, auto_now_add=True)
     client = models.ForeignKey(Clients, models.DO_NOTHING)
     trainer = models.ForeignKey(Trainers, models.DO_NOTHING)
     training_plan = models.ForeignKey(TrainingPlans, models.DO_NOTHING, blank=True, null=True)

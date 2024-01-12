@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Managers, Gyms, EquipmentType, Trainers, GymsEquipmentType, Clients, Trainings, TrainingPlans, TrainingsExercises, Exercises
+from django.utils import timezone
 
 class ManagerSerializer(serializers.ModelSerializer):
     class Meta:
@@ -35,6 +36,13 @@ class ClientsSerializer(serializers.ModelSerializer):
         model = Clients
         fields = ('client_id', 'name', 'surname', 'phone_number', 'email', 'age', 'weight', 'height', "hash_pass")
 
+class TrainingSerializer(serializers.ModelSerializer):
+    start_time = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z")
+    end_time = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z", required=False, allow_null=True)
+
+    class Meta:
+        model = Trainings
+        fields = ['training_id', 'start_time', 'end_time', 'client_id', 'trainer_id', 'training_plan_id']
 
 class ClientTrainingsSerializer(serializers.Serializer):
     training_plan_name = serializers.CharField(source='training_plan.name',allow_null=True)

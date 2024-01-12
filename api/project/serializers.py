@@ -56,6 +56,11 @@ class ExerciseSerializer(serializers.ModelSerializer):
         model = Exercises
         fields = ('exercise_id', 'category', 'name', 'equipment')
 
+class GymsEquipmentTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GymsEquipmentType
+        fields = '__all__'
+
 class TrainingsExercisesSerializer(serializers.ModelSerializer):
     exercise = ExerciseSerializer()
     start_time = serializers.DateTimeField(allow_null=True, format='%d-%m-%Y %H:%M:%S')

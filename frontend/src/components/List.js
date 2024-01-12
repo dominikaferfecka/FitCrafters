@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import GymDetailModal from "./GymDetailModal";
 import TrainerDetailModal from "./TrainerDetailModal";
 import TrainingDetailModal from "./TrainingDetailModal";
+import EquipmentDetailModal from "./EquipmentDetailModal";
 
 function List(props) {
   const [equipment_data, setEquipmentData] = useState([]);
@@ -16,6 +17,8 @@ function List(props) {
   const [selectedTrainer, setSelectedTrainer] = useState(0);
 
   const [selectedTrainingDetails, setSelectedTrainingDetails] = useState(null);
+
+  const [selectedEquipment, setSelectedEquipment] = useState(null);
 
   useEffect(() => {
     props.scrollId === "equipmentList" &&
@@ -53,6 +56,9 @@ function List(props) {
   }
   if (props.scrollId === "equipmentList") {
     columns = ["#", "Kategoria", "Nazwa", "Ilość"];
+    if (selectedGym) {
+      columns.push("Szczegóły");
+    }
   }
   if (props.scrollId === "trainerList") {
     columns = ["#", "Imię", "Nazwisko", "Numer telefonu", "Szczegóły"];
@@ -107,8 +113,11 @@ function List(props) {
     setSelectedTrainer(trainer);
   };
   const handleTrainingDetailsClick = (trainingDetails) => {
-    console.log(trainingDetails);
     setSelectedTrainingDetails(trainingDetails);
+  };
+
+  const handleEquipmentClick = (equipmentDetails) => {
+    setSelectedEquipment(equipmentDetails);
   };
 
   return (
@@ -126,6 +135,13 @@ function List(props) {
         <TrainingDetailModal trainingDetails={selectedTrainingDetails} />
       )}
 
+      {props.scrollId === "equipmentList" && (
+        <EquipmentDetailModal
+          selectedGym={selectedGym}
+          mappedGyms={mappedSelectItems}
+          selectedEquipment={selectedEquipment}
+        />
+      )}
       <Container className="w-75" id={props.scrollId}>
         <h1 className="text-center m-5">{props.header}</h1>
         {props.showSelect && (
@@ -190,6 +206,25 @@ function List(props) {
                     <td>{element.category}</td>
                     <td>{element.name}</td>
                     <td>{element.quantity}</td>
+                    {selectedGym && (
+                      <td
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <button
+                          class="btn btn-success btn-sm"
+                          type="submit"
+                          data-bs-toggle="modal"
+                          data-bs-target="#EquipmentDetailModal"
+                          onClick={() => handleEquipmentClick(element)}
+                        >
+                          +
+                        </button>
+                      </td>
+                    )}
                   </>
                 </tr>
               ))}

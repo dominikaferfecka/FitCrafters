@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from django.db.models import Count
 from django.db import transaction
-from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer, ClientsSerializer,  ClientTrainingsSerializer, EquipmentAllSerializer, TrainingsExercisesSerializer
+from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer, ClientsSerializer,  ClientTrainingsSerializer, EquipmentAllSerializer, TrainingsExercisesSerializer, GymsEquipmentTypeSerializer
 from .models import Managers, Gyms, EquipmentType, Trainers, Trainings, GymsEquipmentType, Clients, TrainingsExercises
 import json
 from django.utils import timezone
@@ -129,11 +129,18 @@ class DataBaseAPIView(APIView):
             print("Ćwiczenie", exercise_data)
             data_with_localtime.append(exercise_data)
 
-
-
         return JsonResponse(data, safe=False)
 
-
+    @api_view(['GET'])
+    def getGymsEquipment(request, gym_id, equipment_id):
+        if gym_id == "":
+            return JsonResponse({"message": "choose gym"})
+        try:
+            gyms_equipments = GymsEquipmentType.objects.filter(gym_id=gym_id, equipment_id=equipment_id)
+        except GymsEquipmentType.DoesNotExist:
+            return JsonResponse({'error': 'Equipment on this gym not found'}, status=404)
+        data = GymsEquipmentTypeSerializer(gyms_equipments, many=True).data
+        return JsonResponse(data, safe=False)
 
     @csrf_exempt
     def signToTrainer(request):
@@ -422,6 +429,30 @@ class DataBaseAPIView(APIView):
             gym_equipment.save()
             # return success
             return JsonResponse({"status": "success"})
+        except Exception as e:
+            return JsonResponse({"message": str(e)}, status=500)
+        
+    @csrf_exempt
+    def deleteEquipment(request):
+        """
+        params: request [json]
+        return: status of operation [JSONResoponse]
+        method extracts received equipment serial number and deletes equipment with all connected objects
+        """
+
+        # load data
+        equipment_data = json.loads(request.body.decode("utf-8"))
+        # extract data
+        equipment_serial_number = equipment_data.get("equipmentSerialNumber")
+        print(equipment_serial_number)
+        try:
+            # atomic transaction of deleting gym and all connected objects
+            with transaction.atomic():
+                GymsEquipmentType.objects.filter(serial_number = equipment_serial_number).delete()
+            # return success
+            return JsonResponse({"status": "success"})
+        except Gyms.DoesNotExist:
+            return JsonResponse({"status": "equipmentDeleted"})
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
 

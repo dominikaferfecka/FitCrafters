@@ -131,16 +131,16 @@ class DataBaseAPIView(APIView):
         
         start_datetime = datetime.strptime(date + ' ' + time, '%Y-%m-%d %H:%M')
         start_datetime = timezone.make_aware(start_datetime, tz)
-        end_datetime = start_datetime
-        print(start_datetime, end_datetime)
-        # conflicting_trainings = Trainings.objects.filter(
-        # trainer_id=trainer_id,
-        # start_time__lt=end_datetime,
-        # end_time__gt=start_datetime
-        # )
+        end_datetime = start_datetime + timedelta(hours=1)
 
-        # if conflicting_trainings.exists():
-        #     return JsonResponse({'status': 'error', 'message': 'Wybrany trener już ma zaplanowany trening na wtedy'})
+        conflicting_trainings = Trainings.objects.filter(
+        trainer_id=trainer_id,
+        start_time__lt=end_datetime,
+        end_time__gt=start_datetime
+        )
+
+        if conflicting_trainings.exists():
+            return JsonResponse({'status': 'error', 'message': 'Wybrany trener już ma zaplanowany trening na wtedy'})
 
         training = Trainings(
             start_time=start_datetime,

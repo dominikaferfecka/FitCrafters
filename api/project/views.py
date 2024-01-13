@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view, authentication_classes
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from django.db.models import Count
-from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer, ClientsSerializer,  ClientTrainingsSerializer, EquipmentAllSerializer
+from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer, ClientsSerializer,  ClientTrainingsSerializer, EquipmentAllSerializer, TrainerTrainingsSerializer
 from .models import Managers, Gyms, EquipmentType, Trainers, Trainings, GymsEquipmentType, Clients
 import json
 
@@ -211,6 +211,26 @@ class DataBaseAPIView(APIView):
             return JsonResponse({"status": "success"})
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
+        
+                
+    @csrf_exempt
+    def getTrainerTrainings(request):
+        # load data
+        if request.method == "POST":
+            v_trainer_data = json.loads(request.body.decode("utf-8"))
+        else:
+            v_trainer_data = request.GET
+        
+        v_trainer_id = v_trainer_data.get("trainer_id")
+        # extract data
+        try:
+            # create GymsEquipmentType object to save
+            trainings = Trainings.objects.filter(trainer_id=v_trainer_id).select_related('client')
+            serializer = TrainerTrainingsSerializer(trainings, many=True)
+            # return success
+            return JsonResponse(serializer.data, safe=False)
+        except Exception as e:
+            return JsonResponse({"message": str(e)}, status=500)
 
 def index(request):
     manager = Managers.objects.first()
@@ -225,3 +245,5 @@ def index(request):
     }
 
     return JsonResponse(data)
+
+

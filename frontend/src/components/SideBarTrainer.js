@@ -1,7 +1,7 @@
 import CalendarModal from "./CalendarModal";
 import { useState } from "react";
 
-function SideBarTrainer() {
+function SideBarTrainer({trainerId}) {
 
   const [showModal, setShowModal] = useState(false);
 
@@ -59,8 +59,7 @@ function SideBarTrainer() {
           </div>
         </div>
       </div>
-      <CalendarModal  />
-      {/* onClose={() => handleCloseModal()} */}
+      <CalendarModal onClose={handleCloseModal} TrainerId={trainerId} />
     </>
   );
 }

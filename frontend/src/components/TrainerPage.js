@@ -35,7 +35,7 @@ function TrainerPage() {
   return (
     <>
       <div style={{ width: "250px", float: "left" }}>
-        <SideBarTrainer />
+        <SideBarTrainer trainerId={trainerId}/>
       </div>
       <div style={{ marginLeft: "230px" }}>
         <UserHeader />

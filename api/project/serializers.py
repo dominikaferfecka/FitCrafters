@@ -30,6 +30,13 @@ class TrainersSerializer(serializers.ModelSerializer):
         model = Trainers
         fields = ('trainer_id', 'name', 'surname', 'phone_number', 'info')
 
+class TrainerTrainingsSerializer(serializers.ModelSerializer):
+    client_name = serializers.CharField(source='client.name',allow_null=True)
+    client_surname = serializers.CharField(source='client.surname',allow_null=True)
+    class Meta:
+        model = Trainings
+        fields = ('training_id', 'trainer_id', 'client_name', 'client_surname', 'training_plan_id', 'start_time', 'end_time')
+
 class ClientsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Clients

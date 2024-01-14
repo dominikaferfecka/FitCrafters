@@ -561,11 +561,51 @@ class DataBaseAPIView(APIView):
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
 
+
+    @api_view(['POST'])
+    def updateTrainingPlan(request):
+        try:
+            # Load data
+            form_data = request.data
+
+            # extract data
+            date = form_data.get("date")
+            time = form_data.get("time")
+            selected_plan_id = form_data.get("selectedTrainingPlanId")
+            client_id_trainer = form_data.get("clientIdTrainer")
+            trainer_id = form_data.get("trainerId")
+            print(f"AAA: {selected_plan_id}")
+
+            # time_with_seconds = f"{time}:00"
+            # datetime_str = f"{date} {time_with_seconds}"
+            # training_datetime = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
+            # start_time = timezone.make_aware(training_datetime)
+            time_with_seconds = f"{time}"
+            datetime_str = f"{date} {time_with_seconds}"
+            training_datetime = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
+            start_time = timezone.make_aware(training_datetime)
+
+            training = Trainings.objects.get(start_time=start_time, client_id=client_id_trainer, trainer = trainer_id)
+            #training = Trainings.objects.get(start_time=start_time, client_id=client_id_trainer)
+
+            with transaction.atomic():
+                training_plan = TrainingPlans.objects.get(training_plan_id=selected_plan_id)
+
+                training.training_plan = training_plan
+                training.save()
+
+            # Return a success message
+            return Response({"status": "success"})
+
+        except Exception as e:
+            # Return an error message if an exception occurs
+            return Response({"message": str(e)}, status=500)
+
 def index(request):
     manager = Managers.objects.first()
 
     if manager:
-        manager_name = manager.name + ' ' + manager.surname
+        manager_name = manager.name + ' ' + manager.surname 
     else:
         manager_name = "Brak danych o managerze"
 

@@ -53,7 +53,7 @@ function List(props) {
   }, [selectedGym]);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/client_trainings_plans/" + String(props.clientIdTrainer))
+    fetch("http://127.0.0.1:8000/client_trainings_plans/" + String(props.clientIdTrainer) + "/?trainer_id=1")
       .then((response) => response.json())
       .then((clients_plan_trainer) => {
         setClientsPlanTrainer(clients_plan_trainer);

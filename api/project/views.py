@@ -114,24 +114,30 @@ class DataBaseAPIView(APIView):
     #new
     @api_view(['GET'])
     def getClientTrainingsFuture(request, client_id):
+        trainer_id = request.GET.get('trainer_id', None)
+
         trainings = Trainings.objects.filter(client_id=client_id).select_related('training_plan', 'trainer')
+
+        if trainer_id:
+            trainings = trainings.filter(trainer_id=trainer_id)
 
         new_trainings = []
         for training in trainings:
-            doesExist = TrainingsExercises.objects.filter(training = training)
+            doesExist = TrainingsExercises.objects.filter(training=training)
             if not doesExist:
                 new_trainings.append(training)
+
         serializer = ClientTrainingsSerializer(new_trainings, many=True)
 
-        # Uwzględnij strefę czasową przed wysłaniem odpowiedzi
         data_with_localtime = []
         for training_data in serializer.data:
-            training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
+            training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(timezone.get_current_timezone()).strftime('%Y-%m-%d %H:%M')
             if training_data['end_time']:
-                training_data['end_time'] = parser.parse(training_data['end_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
+                training_data['end_time'] = parser.parse(training_data['end_time']).astimezone(timezone.get_current_timezone()).strftime('%Y-%m-%d %H:%M')
             data_with_localtime.append(training_data)
 
         return Response(data_with_localtime)
+
 
 
     @api_view(['GET'])

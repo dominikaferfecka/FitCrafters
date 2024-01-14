@@ -76,10 +76,10 @@ class TrainingsExercisesSerializer(serializers.ModelSerializer):
         return obj.exercise.equipment.name if obj.exercise.equipment else None
     
 
-# class TrainingPlansSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = TrainingPlans
-#         fields = ('training_plan_id', 'category', 'name', 'time')
+class TrainingPlansSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TrainingPlans
+        fields = ('training_plan_id', 'category', 'name', 'time')
 
 
 # class ClientTrainingsWithTrainingPlan(serializers.ModelSerializer):

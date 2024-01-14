@@ -7,8 +7,8 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from django.db.models import Count
 from django.db import transaction
-from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer, ClientsSerializer,  ClientTrainingsSerializer, EquipmentAllSerializer, TrainingsExercisesSerializer, GymsEquipmentTypeSerializer
-from .models import Managers, Gyms, EquipmentType, Trainers, Trainings, GymsEquipmentType, Clients, TrainingsExercises
+from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer, ClientsSerializer,  ClientTrainingsSerializer, EquipmentAllSerializer, TrainingsExercisesSerializer, GymsEquipmentTypeSerializer, TrainingPlansSerializer
+from .models import Managers, Gyms, EquipmentType, Trainers, Trainings, GymsEquipmentType, Clients, TrainingsExercises, TrainingPlans
 import json
 from django.utils import timezone
 from dateutil import parser
@@ -107,7 +107,6 @@ class DataBaseAPIView(APIView):
             training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
             if training_data['end_time']:
                 training_data['end_time'] = parser.parse(training_data['end_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
-            # print("HISTORY" + training_data)
             data_with_localtime.append(training_data)
 
         return Response(data_with_localtime)
@@ -115,25 +114,31 @@ class DataBaseAPIView(APIView):
     #new
     @api_view(['GET'])
     def getClientTrainingsFuture(request, client_id):
+        trainer_id = request.GET.get('trainer_id', None)
+
         trainings = Trainings.objects.filter(client_id=client_id).select_related('training_plan', 'trainer')
+
+        if trainer_id:
+            trainings = trainings.filter(trainer_id=trainer_id)
 
         new_trainings = []
         for training in trainings:
-            doesExist = TrainingsExercises.objects.filter(training = training)
+            doesExist = TrainingsExercises.objects.filter(training=training)
             if not doesExist:
                 new_trainings.append(training)
+
         serializer = ClientTrainingsSerializer(new_trainings, many=True)
 
-        # Uwzględnij strefę czasową przed wysłaniem odpowiedzi
         data_with_localtime = []
         for training_data in serializer.data:
-            training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
+            training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(timezone.get_current_timezone()).strftime('%Y-%m-%d %H:%M')
             if training_data['end_time']:
                 training_data['end_time'] = parser.parse(training_data['end_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
             # print("NEW" + training_data)
             data_with_localtime.append(training_data)
 
         return Response(data_with_localtime)
+
 
 
     @api_view(['GET'])
@@ -193,6 +198,12 @@ class DataBaseAPIView(APIView):
     #         return Response(serializer.data)
     #     except Clients.DoesNotExist:
     #         return Response({'error': 'Client not found'}, status=404)
+
+    @api_view(['GET'])
+    def getTrainingPlans(request):
+        training_plans = TrainingPlans.objects.all()
+        data = TrainingPlansSerializer(training_plans, many=True).data
+        return JsonResponse(data, safe=False)
     
 
 
@@ -584,11 +595,51 @@ class DataBaseAPIView(APIView):
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
 
+
+    @api_view(['POST'])
+    def updateTrainingPlan(request):
+        try:
+            # Load data
+            form_data = request.data
+
+            # extract data
+            date = form_data.get("date")
+            time = form_data.get("time")
+            selected_plan_id = form_data.get("selectedTrainingPlanId")
+            client_id_trainer = form_data.get("clientIdTrainer")
+            trainer_id = form_data.get("trainerId")
+            print(f"AAA: {selected_plan_id}")
+
+            # time_with_seconds = f"{time}:00"
+            # datetime_str = f"{date} {time_with_seconds}"
+            # training_datetime = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
+            # start_time = timezone.make_aware(training_datetime)
+            time_with_seconds = f"{time}"
+            datetime_str = f"{date} {time_with_seconds}"
+            training_datetime = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
+            start_time = timezone.make_aware(training_datetime)
+
+            training = Trainings.objects.get(start_time=start_time, client_id=client_id_trainer, trainer = trainer_id)
+            #training = Trainings.objects.get(start_time=start_time, client_id=client_id_trainer)
+
+            with transaction.atomic():
+                training_plan = TrainingPlans.objects.get(training_plan_id=selected_plan_id)
+
+                training.training_plan = training_plan
+                training.save()
+
+            # Return a success message
+            return Response({"status": "success"})
+
+        except Exception as e:
+            # Return an error message if an exception occurs
+            return Response({"message": str(e)}, status=500)
+
 def index(request):
     manager = Managers.objects.first()
 
     if manager:
-        manager_name = manager.name + ' ' + manager.surname
+        manager_name = manager.name + ' ' + manager.surname 
     else:
         manager_name = "Brak danych o managerze"
 

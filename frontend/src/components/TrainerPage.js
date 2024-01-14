@@ -32,6 +32,10 @@ function TrainerPage() {
   }, [clients_data]);
   console.log(clients_data);
 
+  const selectClients2 = clients_data.map(
+    (element) => element.name + " " + element.surname
+  );
+  console.log(selectClients2);
   return (
     <>
       <div style={{ width: "250px", float: "left" }}>
@@ -52,7 +56,7 @@ function TrainerPage() {
           stats={selectStats}
           scrollId="statsClient"
         />
-        <ClientPlan selectItems={selectClients} scrollId="clientPlan" />
+        <ClientPlan selectItems={selectClients2} scrollId="clientPlan" />
         <Footer />
       </div>
     </>

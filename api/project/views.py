@@ -7,8 +7,8 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from django.db.models import Count
 from django.db import transaction
-from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer, ClientsSerializer,  ClientTrainingsSerializer, EquipmentAllSerializer, TrainingsExercisesSerializer, GymsEquipmentTypeSerializer
-from .models import Managers, Gyms, EquipmentType, Trainers, Trainings, GymsEquipmentType, Clients, TrainingsExercises
+from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer, ClientsSerializer,  ClientTrainingsSerializer, EquipmentAllSerializer, TrainingsExercisesSerializer, GymsEquipmentTypeSerializer, TrainingPlansSerializer
+from .models import Managers, Gyms, EquipmentType, Trainers, Trainings, GymsEquipmentType, Clients, TrainingsExercises, TrainingPlans
 import json
 from django.utils import timezone
 from dateutil import parser
@@ -197,6 +197,12 @@ class DataBaseAPIView(APIView):
     #         return Response(serializer.data)
     #     except Clients.DoesNotExist:
     #         return Response({'error': 'Client not found'}, status=404)
+
+    @api_view(['GET'])
+    def getTrainingPlans(request):
+        training_plans = TrainingPlans.objects.all()
+        data = TrainingPlansSerializer(training_plans, many=True).data
+        return JsonResponse(data, safe=False)
     
 
 

@@ -6,6 +6,9 @@ import List from "./List";
 function ClientPlan(props) {
   const clientId = 1; // change later for real
   const [clients_plan_trainer, setClientsPlanTrainer] = useState(null);
+  const [training_plans, setTrainingPlans] = useState(null);
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
 
   const columns = ["#", "First", "Last", "Handle"];
   const plans = ["planA", "planB", "planC", "planD", "planE"];
@@ -28,9 +31,9 @@ function ClientPlan(props) {
     </option>
   ));
 
-  const mappedSelectPlans = plans.map((item, index) => (
-    <option key={index} value={index + 1}>
-      {item}
+  const mappedSelectPlans = (training_plans || []).map((item, index) => (
+    <option key={index} value={item.training_plan_id}>
+      {`${item.category} - ${item.name}`}
     </option>
   ));
 
@@ -49,6 +52,15 @@ function ClientPlan(props) {
     console.log("SELECTED clientIdTrainer: " + clientIdTrainer);
   }, [clientIdTrainer]);
 
+  const handleDateChange = (event) => {
+    setDate(event.target.value);
+  };
+
+  const handleTimeChange = (event) => {
+    setTime(event.target.value);
+  };
+
+
   // useEffect(() => {
   //   fetch("http://127.0.0.1:8000/client_trainings_plans/" + String(clientIdTrainer))
   //     .then((response) => response.json())
@@ -61,6 +73,20 @@ function ClientPlan(props) {
   //       console.error("Błąd przy pobieraniu danych:", error);
   //     });
   // }, []);
+
+
+    useEffect(() => {
+    fetch("http://127.0.0.1:8000/training-plans/")
+      .then((response) => response.json())
+      .then((training_plans) => {
+        setTrainingPlans(training_plans);
+        console.log("PLANY TRENINGOWE: " + training_plans);
+      })
+      .catch((error) => {
+        console.log(training_plans);
+        console.error("Błąd przy pobieraniu danych:", error);
+      });
+  }, []);
 
 
 
@@ -89,7 +115,7 @@ function ClientPlan(props) {
           header="Plan treningów"
           selectItems={[]}
           scrollId="clientsPlanTrainer"
-          items={clients_plan_trainer}
+          items={clients_plan_trainer || []}
           clientIdTrainer={clientIdTrainer}
         />
       </div>
@@ -108,6 +134,12 @@ function ClientPlan(props) {
               aria-describedby="emailHelp"
             />
           </div>
+          <div class="mb-3 col-md-6">
+                <label for="time" class="form-label">
+                  Godzina
+                </label>
+                <input type="time" class="form-control" id="time" value={time} onChange={handleTimeChange}/>
+              </div>
           <div class="mb-3 col-md-5">
             <label for="exampleInputPassword1" class="form-label">
               Plan ćwiczeń

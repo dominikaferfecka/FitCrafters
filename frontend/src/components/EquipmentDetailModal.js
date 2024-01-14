@@ -9,6 +9,7 @@ function EquipmentDetailModal(props) {
   const [serialNumbers, setSerialNumbers] = useState([]);
   const [selectedSerialNumber, setSelectedSerialNumber] = useState("");
   const [selectedAvailable, setSelectedAvailable] = useState(-1);
+  const [refreshData, setRefreshData] = useState(true);
 
   useEffect(() => {
     if (props.selectedEquipment) {
@@ -71,6 +72,7 @@ function EquipmentDetailModal(props) {
           serial_numbers.push(equipmentData[i].serial_number);
         }
         setSerialNumbers(serial_numbers);
+        setSelectedAvailable(1);
         console.log(equipmentData);
         console.log(selectedGym);
         console.log(serial_numbers);
@@ -78,45 +80,93 @@ function EquipmentDetailModal(props) {
       .catch((error) => {
         console.log(equipmentData);
         console.error("Błąd przy pobieraniu danych:", error);
+      })
+      .finally(() => {
+        setRefreshData(false);
       });
     console.log(selectedGym);
-  }, [props.selectedGym, equipmentId]);
+  }, [props.selectedGym, equipmentId, refreshData]);
 
   const handleDeleteEquipment = (e) => {
     e.preventDefault();
+    if (!selectedSerialNumber) {
+      alert("Wybierz konkretny numer seryjny do usunięcia");
+    } else {
+      const requestData = {
+        equipmentSerialNumber: selectedSerialNumber,
+      };
+      if (
+        window.confirm(
+          "Czy jesteś pewny, że chcesz usunąć ten sprzęt? \n będzie to oznaczało usunięcie wszystkich powiązanych z nim obiektów"
+        )
+      ) {
+        // send data as JSON
+        fetch("http://127.0.0.1:8000/deleteEquipment/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestData),
+        })
+          .then((response) => response.json())
+          .then((result) => {
+            if (result.status === "success") {
+              console.log(result);
+              //   alert about successfull delete
+              alert("Pomyślnie usunięto sprzęt");
+              e.target.value = null;
+            } else if (result.status === "equipmentDeleted") {
+              alert("Ten sprzęt został usunięty, odśwież stronę!");
+            } else {
+              // alert about error while deleting
+              alert("Nastąpił błąd przy usuwaniu, spróbuj ponownie.");
+              console.log(result.message);
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
+    }
+  };
+
+  const handleModifyEquipment = (e) => {
+    e.preventDefault();
+    console.log(equipmentData);
     const requestData = {
+      gymSelected: selectedGym,
+      equipmentAvailable: selectedAvailable,
       equipmentSerialNumber: selectedSerialNumber,
     };
-    if (
-      window.confirm(
-        "Czy jesteś pewny, że chcesz usunąć ten sprzęt? \n będzie to oznaczało usunięcie wszystkich powiązanych z nim obiektów"
-      )
-    ) {
-      // send data as JSON
-      fetch("http://127.0.0.1:8000/deleteEquipment/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestData),
-      })
-        .then((response) => response.json())
-        .then((result) => {
-          if (result.status === "success") {
-            console.log(result);
-            //   alert about successfull delete
-            alert("Pomyślnie usunięto sprzęt");
-            e.target.value = null;
-          } else if (result.status === "equipmentDeleted") {
-            alert("Ten sprzęt został usunięty, odśwież stronę!");
-          } else {
-            // alert about error while deleting
-            alert("Nastąpił błąd przy usuwaniu, spróbuj ponownie.");
+    fetch("http://127.0.0.1:8000/modifyEquipment/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestData),
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        // if status is success clear form
+        if (result.status === "success") {
+          console.log(result);
+          //   alert about successfull changes
+          alert("Dokonano zmian w sprzęcie o numerze " + selectedSerialNumber);
+          setRefreshData(true);
+          // setSelectedAvailable(0);
+          setSelectedSerialNumber("");
+          e.target.value = null;
+        } else {
+          // alert about error while modifying
+          alert(
+            "Nastąpił błąd przy modyfikacji, spróbuj ponownie z uwagą na rodzaj wprowadzanych danych."
+          );
+          if (result.message) {
             console.log(result.message);
           }
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
-    }
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+    // }
+    // }
   };
 
   return (
@@ -228,13 +278,15 @@ function EquipmentDetailModal(props) {
             <button
               class="btn btn-success m-2"
               type="submit"
-              // onClick={handleModifyGym}
+              data-bs-dismiss="modal"
+              onClick={handleModifyEquipment}
             >
               Modyfikuj sprzęt
             </button>
             <button
               class="btn btn-success m-2"
               type="submit"
+              data-bs-dismiss="modal"
               onClick={handleDeleteEquipment}
             >
               Usuń sprzęt

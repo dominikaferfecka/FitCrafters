@@ -107,7 +107,7 @@ class DataBaseAPIView(APIView):
             training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
             if training_data['end_time']:
                 training_data['end_time'] = parser.parse(training_data['end_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
-            print("HISTORY" + training_data)
+            # print("HISTORY" + training_data)
             data_with_localtime.append(training_data)
 
         return Response(data_with_localtime)
@@ -130,7 +130,7 @@ class DataBaseAPIView(APIView):
             training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
             if training_data['end_time']:
                 training_data['end_time'] = parser.parse(training_data['end_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
-            print("NEW" + training_data)
+            # print("NEW" + training_data)
             data_with_localtime.append(training_data)
 
         return Response(data_with_localtime)
@@ -335,7 +335,7 @@ class DataBaseAPIView(APIView):
             # return success
             return JsonResponse({"status": "success"})
         except Gyms.DoesNotExist:
-            return JsonResponse({"status": "gymDeleted"})
+            return JsonResponse({"status": "gymDeleted"}, status=501)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
 
@@ -487,6 +487,36 @@ class DataBaseAPIView(APIView):
             return JsonResponse({"message": str(e)}, status=500)
         
     @csrf_exempt
+    def modifyEquipment(request):
+        """
+        params: request [json]
+        return: status of operation [JSONResoponse]
+        method extracts received data and saves modified equipment to db
+        """
+
+        # load data
+        equipment_data = json.loads(request.body)
+        # extract data
+        equipment_serial_no = equipment_data.get("equipmentSerialNumber")
+        gym_selected = equipment_data.get("gymSelected")
+        equipment_available = equipment_data.get("equipmentAvailable")
+
+        try:
+            equipment = GymsEquipmentType.objects.get(serial_number = equipment_serial_no)
+            # save modified data to equipment object
+            equipment.gym = Gyms.objects.get(gym_id = gym_selected)
+            equipment.available = equipment_available
+
+            # save equipment with modified data
+            equipment.save()
+            # return success
+            return JsonResponse({"status": "success"})
+        except GymsEquipmentType.DoesNotExist:
+            return JsonResponse({"status": "equipmentDeleted"}, status=501)
+        except Exception as e:
+            return JsonResponse({"message": str(e)}, status=500)
+        
+    @csrf_exempt
     def deleteEquipment(request):
         """
         params: request [json]
@@ -498,15 +528,18 @@ class DataBaseAPIView(APIView):
         equipment_data = json.loads(request.body.decode("utf-8"))
         # extract data
         equipment_serial_number = equipment_data.get("equipmentSerialNumber")
-        print(equipment_serial_number)
+        if not equipment_serial_number:
+            return JsonResponse({"message": "Give equipmentSerialNumber"}, status=500)
         try:
-            # atomic transaction of deleting gym and all connected objects
+            # get equipment to delete
+            equipment = GymsEquipmentType.objects.get(serial_number = equipment_serial_number)
+            # atomic transaction of deleting equipment and all connected objects
             with transaction.atomic():
-                GymsEquipmentType.objects.filter(serial_number = equipment_serial_number).delete()
+                equipment.delete()
             # return success
             return JsonResponse({"status": "success"})
-        except Gyms.DoesNotExist:
-            return JsonResponse({"status": "equipmentDeleted"})
+        except GymsEquipmentType.DoesNotExist:
+            return JsonResponse({"status": "equipmentDeleted"}, status=501)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
 

@@ -124,6 +124,114 @@ class AddGymAsManagerTest(TestCase):
         # assert adding gym wasn't successfull
         self.assertEqual(response.status_code, 500)
 
+class ModifyGymViewTest(TestCase):
+    def setUp(self):
+        # set up data
+        self.manager = Managers.objects.create(
+            manager_id = 1,
+            name = "Jan",
+            surname = "Kowalski",
+            phone_number = "123456789",
+            email = "jan.kowalski@gmail.com",
+            hash_pass = "hash_haslo",
+        )
+
+        self.gym = Gyms.objects.create(
+            gym_id=1,
+            city="Kraków",
+            postal_code="12-345",
+            street="Sezamkowa",
+            street_number="1",
+            building_number="1",
+            phone_number="123456789",
+            manager_id=1,
+        )
+
+    def test_modify_gym_view(self):
+        modify_data = {
+            "gymId": 1,
+            "gymPhone": "987654321",
+            "gymCity": "Warszawa",
+            "gymPostalCode": "54-321",
+            "gymStreet": "Złota",
+            "gymStreetNumber": 2,
+            "gymBuildingNumber": 4,
+        }
+        # process modify operation
+        response = self.client.post(reverse("modifyGym"), json.dumps(modify_data), content_type="application/json")
+
+        # assert operation was successful
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["status"], "success")
+
+        # assert gym was modified
+        updated_gym = Gyms.objects.get(gym_id=1)
+        self.assertEqual(updated_gym.phone_number, "987654321")
+        self.assertEqual(updated_gym.city, "Warszawa")
+        self.assertEqual(updated_gym.postal_code, "54-321")
+        self.assertEqual(updated_gym.street, "Złota")
+        self.assertEqual(updated_gym.street_number, 2)
+        self.assertEqual(updated_gym.building_number, 4)
+
+    def test_modify_gym_view_failure(self):
+        # set up wrong data
+        modify_data = {
+            "gymId": 99, # wrong ID
+            "gymPhone": "987654321",
+            "gymCity": "Warszawa",
+            "gymPostalCode": "54-321",
+            "gymStreet": "Złota",
+            "gymStreetNumber": "2",
+            "gymBuildingNumber": "4",
+        }
+
+        # process modify operation
+        response = self.client.post(reverse("modifyGym"), json.dumps(modify_data), content_type="application/json")
+
+        # assert operation ended with error
+        self.assertEqual(response.status_code, 501)
+        self.assertEqual(response.json()["status"], "gymDeleted")
+
+class DeleteGymViewTest(TestCase):
+
+    def setUp(self):
+        # set up data
+        self.manager = Managers.objects.create(
+            manager_id = 1,
+            name = "Jan",
+            surname = "Kowalski",
+            phone_number = "123456789",
+            email = "jan.kowalski@gmail.com",
+            hash_pass = "hash_haslo",
+        )
+
+        self.gym = Gyms.objects.create(
+            gym_id=1,
+            city="Kraków",
+            postal_code="12-345",
+            street="Sezamkowa",
+            street_number="1",
+            building_number="1",
+            phone_number="123456789",
+            manager_id=1,
+        )
+
+    def test_delete_gym_successfully(self):
+        # proccess operation
+        response = self.client.post('/deleteGym/', json.dumps({"gymId": 1}), content_type='application/json')
+        # check if operation was successful
+        self.assertEqual(response.status_code, 200)
+        # assert correct messagge was returned
+        self.assertEqual(response.json(), {"status": "success"})
+        # check that gym was deleted
+        self.assertFalse(Gyms.objects.filter(gym_id=1).exists())
+
+    def test_delete_nonexistent_gym(self):
+        # process operation with nonexistant gym
+        response = self.client.post('/deleteGym/', json.dumps({"gymId": 999}), content_type='application/json')
+        # assert that it failed with correct status
+        self.assertEqual(response.status_code, 501)
+        self.assertEqual(response.json(), {"status": "gymDeleted"})
 
 class AddTrainerViewTest(TestCase):
     def setUp(self):
@@ -406,10 +514,10 @@ class AddEquipmentViewTest(TestCase):
         # assert adding resulted in failure
         self.assertEqual(response.status_code, 500)
 
+class ModifyEquipmentViewTest(TestCase):
 
-class ModifyGymViewTest(TestCase):
     def setUp(self):
-        # set up data
+        # set up data for modifying test
         self.manager = Managers.objects.create(
             manager_id = 1,
             name = "Jan",
@@ -421,59 +529,140 @@ class ModifyGymViewTest(TestCase):
 
         self.gym = Gyms.objects.create(
             gym_id=1,
-            city="Kraków",
-            postal_code="12-345",
-            street="Sezamkowa",
-            street_number="1",
-            building_number="1",
-            phone_number="123456789",
+            city='Test City',
+            postal_code='00-000',
+            street='Test Street',
+            street_number='123',
+            building_number=1,
             manager_id=1,
+            phone_number='123456789'
+        )
+        self.equipment_type = EquipmentType.objects.create(
+            equipment_id=17, 
+            category='Cardio', 
+            name='Orbitrek'   
         )
 
-    def test_modify_gym_view(self):
-        modify_data = {
-            "gymId": 1,
-            "gymPhone": "987654321",
-            "gymCity": "Warszawa",
-            "gymPostalCode": "54-321",
-            "gymStreet": "Złota",
-            "gymStreetNumber": 2,
-            "gymBuildingNumber": 4,
+        self.gyms_equipment_type = GymsEquipmentType.objects.create(
+            gym = self.gym,
+            equipment = self.equipment_type,
+            available = 1,
+            used = 0,
+            serial_number = "1234",
+        )
+
+    def test_modify_equipment_successfully(self):
+        # set up data to create gym_equipment_type
+        data = {
+            "gymSelected": 1,
+            "equipmentAvailable": False,
+            "equipmentSerialNumber": "1234",
         }
-        # process modify operation
-        response = self.client.post(reverse("modifyGym"), json.dumps(modify_data), content_type="application/json")
+
+        # process modifying operation
+        response = self.client.post('/modifyEquipment/', json.dumps(data), content_type='application/json')
 
         # assert operation was successful
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["status"], "success")
+        self.assertEqual(response.json(), {"status": "success"})
+        # check if gyms_equipment_type object was modified
+        self.gyms_equipment_type.refresh_from_db()
+        self.assertEqual(self.gyms_equipment_type.gym.gym_id, 1)
+        self.assertFalse(self.gyms_equipment_type.available)
 
-        # assert gym was modified
-        updated_gym = Gyms.objects.get(gym_id=1)
-        self.assertEqual(updated_gym.phone_number, "987654321")
-        self.assertEqual(updated_gym.city, "Warszawa")
-        self.assertEqual(updated_gym.postal_code, "54-321")
-        self.assertEqual(updated_gym.street, "Złota")
-        self.assertEqual(updated_gym.street_number, 2)
-        self.assertEqual(updated_gym.building_number, 4)
-
-    def test_modify_gym_view_failure(self):
-        # set up wrong data
-        modify_data = {
-            "gymId": 99, # wrong ID
-            "gymPhone": "987654321",
-            "gymCity": "Warszawa",
-            "gymPostalCode": "54-321",
-            "gymStreet": "Złota",
-            "gymStreetNumber": "2",
-            "gymBuildingNumber": "4",
+    def test_modify_nonexistent_equipment(self):
+        # set up data to create gym_equipment_type
+        data = {
+            "equipmentSerialNumber": "999",
+            "gymSelected": 1,
+            "equipmentAvailable": False,
         }
+        
+        # process modifying operation - incorrect data
+        response = self.client.post('/modifyEquipment/', json.dumps(data), content_type='application/json')
 
-        # process modify operation
-        response = self.client.post(reverse("modifyGym"), json.dumps(modify_data), content_type="application/json")
-
-        # assert operation ended with error
+        # check if status is correct
         self.assertEqual(response.status_code, 501)
-        self.assertEqual(response.json()["status"], "gymDeleted")
+        self.assertEqual(response.json(), {"status": "equipmentDeleted"})
+
+    def test_invalid_request(self):
+        # process operation without needed data
+        response = self.client.post('/modifyEquipment/', json.dumps({
+            "equipmentSerialNumber": "1234",
+            "gymSelected": 1,
+        }), content_type='application/json')
+
+        # assert status is correct
+        self.assertEqual(response.status_code, 500)
+        self.assertIn("available", response.json()["message"])
+
+class DeleteEquipmentViewTest(TestCase):
+
+    def setUp(self):
+        # set up data for delete test
+        self.manager = Managers.objects.create(
+            manager_id = 1,
+            name = "Jan",
+            surname = "Kowalski",
+            phone_number = "123456789",
+            email = "jan.kowalski@gmail.com",
+            hash_pass = "hash_haslo",
+        )
+
+        self.gym = Gyms.objects.create(
+            gym_id=1,
+            city='Test City',
+            postal_code='00-000',
+            street='Test Street',
+            street_number='123',
+            building_number=1,
+            manager_id=1,
+            phone_number='123456789'
+        )
+        self.equipment_type = EquipmentType.objects.create(
+            equipment_id=17, 
+            category='Cardio', 
+            name='Orbitrek'   
+        )
+
+        self.gyms_equipment_type = GymsEquipmentType.objects.create(
+            gym = self.gym,
+            equipment = self.equipment_type,
+            available = 1,
+            used = 0,
+            serial_number = "1234",
+        )
+
+
+    def test_delete_equipment_successfully(self):
+        # process deleting operation
+        response = self.client.post('/deleteEquipment/', json.dumps({
+            "equipmentSerialNumber": "1234"
+        }), content_type='application/json')
+
+        # check if status is correct
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"status": "success"})
+        # check if equipment was deleted from database
+        self.assertFalse(GymsEquipmentType.objects.filter(serial_number="1234").exists())
+
+    def test_delete_nonexistent_equipment(self):
+        # process deleting operation with incorrect equipment serial no
+        response = self.client.post('/deleteEquipment/', json.dumps({
+            "equipmentSerialNumber": "9999"
+        }), content_type='application/json')
+
+        # check if status is correct
+        self.assertEqual(response.status_code, 501)
+        self.assertEqual(response.json(), {"status": "equipmentDeleted"})
+
+    def test_invalid_request(self):
+        # process operation with incorrect data
+        response = self.client.post('/deleteEquipment/', json.dumps({}), content_type='application/json')
+
+        # check if status is correct for failure
+        self.assertEqual(response.status_code, 500)
+        self.assertIn("equipmentSerialNumber", response.json()["message"])
 
 class ModifyClientTestCase(TestCase):
 
@@ -548,7 +737,6 @@ class ModifyClientTestCase(TestCase):
         # assert that operation failed with correct status_code
         self.assertEqual(response.status_code, 500)
 
-
 class TrainerClientsTestCase(TestCase):
     def setUp(self):
         manager = Managers.objects.create( manager_id = 1, name = "Jan", surname = "Kowalski", phone_number = "123456789", email = "jan.kowalski@gmail.com", hash_pass = "hash_haslo")
@@ -605,7 +793,7 @@ class ClientTrainingsTestCase(TestCase):
                 'end_time': None,    
             }
         ]
-        actual_data = response.json()
+        actual_data = response
 
         self.assertEqual(actual_data, expected_data)
 

@@ -5,7 +5,7 @@ import List from "./List";
 
 function ClientPlan(props) {
   const clientId = 1; // change later for real
-  const [clients_plan, setClientsPlan] = useState(null);
+  const [clients_plan_trainer, setClientsPlanTrainer] = useState(null);
 
   const columns = ["#", "First", "Last", "Handle"];
   const plans = ["planA", "planB", "planC", "planD", "planE"];
@@ -40,18 +40,29 @@ function ClientPlan(props) {
     </option>
   ));
 
+  const [clientIdTrainer, setClientIdTrainer] = useState("");
+
+  const handleSelectChange = (event) => {
+    setClientIdTrainer(event.target.value);
+  };
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/client_trainings_plans/" + String(clientId))
-      .then((response) => response.json())
-      .then((clients_plan) => {
-        setClientsPlan(clients_plan);
-        console.log("CLIENTS PLAN: " + clients_plan);
-      })
-      .catch((error) => {
-        console.log(clients_plan);
-        console.error("Błąd przy pobieraniu danych:", error);
-      });
-  }, []);
+    console.log("SELECTED clientIdTrainer: " + clientIdTrainer);
+  }, [clientIdTrainer]);
+
+  // useEffect(() => {
+  //   fetch("http://127.0.0.1:8000/client_trainings_plans/" + String(clientIdTrainer))
+  //     .then((response) => response.json())
+  //     .then((clients_plan_trainer) => {
+  //       setClientsPlanTrainer(clients_plan_trainer);
+  //       console.log("CLIENTS PLAN AA: " + clients_plan_trainer);
+  //     })
+  //     .catch((error) => {
+  //       console.log(clients_plan_trainer);
+  //       console.error("Błąd przy pobieraniu danych:", error);
+  //     });
+  // }, []);
+
+
 
 
   return (
@@ -68,7 +79,7 @@ function ClientPlan(props) {
               alignItems: "center",
             }}
           >
-            <select className="form-select w-50" aria-label="Select">
+            <select className="form-select w-50" aria-label="Select" onChange={handleSelectChange}>
               <option value="0">Wybierz klienta</option>
               {mappedSelectItems}
             </select>
@@ -77,8 +88,9 @@ function ClientPlan(props) {
         <List
           header="Plan treningów"
           selectItems={[]}
-          scrollId="clientsPlan"
-          items={clients_plan}
+          scrollId="clientsPlanTrainer"
+          items={clients_plan_trainer}
+          clientIdTrainer={clientIdTrainer}
         />
       </div>
 

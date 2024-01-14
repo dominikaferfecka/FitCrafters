@@ -14,6 +14,9 @@ function List(props) {
 
   const [selectedGymDetails, setSelectedGymDetails] = useState(null);
 
+  const [clients_plan, setClientsPlan] = useState(null);
+  const [clients_plan_trainer, setClientsPlanTrainer] = useState(null);
+
   const [selectedTrainer, setSelectedTrainer] = useState(0);
 
   const [selectedTrainingDetails, setSelectedTrainingDetails] = useState(null);
@@ -48,6 +51,20 @@ function List(props) {
           console.error("Błąd przy pobieraniu danych:", error);
         });
   }, [selectedGym]);
+
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/client_trainings_plans/" + String(props.clientIdTrainer))
+      .then((response) => response.json())
+      .then((clients_plan_trainer) => {
+        setClientsPlanTrainer(clients_plan_trainer);
+        console.log("CLIENTS PLAN TRAINER: " + clients_plan_trainer);
+      })
+      .catch((error) => {
+        console.log(clients_plan_trainer);
+        console.log("selectedGym" + selectedGym);
+        console.error("Błąd przy pobieraniu danych:", error);
+      });
+  }, [props.clientIdTrainer]);
 
   var columns = ["#", "First", "Last", "Handle"];
 
@@ -91,6 +108,16 @@ function List(props) {
   }
   console.log(props.scrollId);
   if (props.scrollId === "clientsPlan") {
+    columns = [
+      "#",
+      "Nazwa treningu",
+      "Kategoria",
+      "Początek treningu",
+      "Czas trwania (min)",
+      "Trener",
+    ];
+  }
+  if (props.scrollId === "clientsPlanTrainer") {
     columns = [
       "#",
       "Nazwa treningu",
@@ -331,6 +358,33 @@ function List(props) {
               ))}
               {props.scrollId === "clientsPlan" && props.items &&
               props.items.map((element) => (
+                <tr>
+                  <th scope="row">{element.training_id}</th>
+                  <>
+                    <td>
+                      {element.training_plan_name
+                        ? element.training_plan_name
+                        : "Custom training"}
+                    </td>
+                    <td>
+                      {element.training_plan_category
+                        ? element.training_plan_category
+                        : "-"}
+                    </td>
+                    <td>{element.start_time}</td>
+                    <td>
+                      {element.training_plan_time
+                        ? element.training_plan_time
+                        : "-"}
+                    </td>
+                    <td>
+                      {element.trainer_name} {element.trainer_surname}
+                    </td>
+                  </>
+                </tr>
+              ))}
+              {props.scrollId === "clientsPlanTrainer" && clients_plan_trainer &&
+              clients_plan_trainer.map((element) => (
                 <tr>
                   <th scope="row">{element.training_id}</th>
                   <>

@@ -107,7 +107,6 @@ class DataBaseAPIView(APIView):
             training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
             if training_data['end_time']:
                 training_data['end_time'] = parser.parse(training_data['end_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
-            print("HISTORY" + training_data)
             data_with_localtime.append(training_data)
 
         return Response(data_with_localtime)
@@ -130,7 +129,6 @@ class DataBaseAPIView(APIView):
             training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
             if training_data['end_time']:
                 training_data['end_time'] = parser.parse(training_data['end_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
-            print("NEW" + training_data)
             data_with_localtime.append(training_data)
 
         return Response(data_with_localtime)

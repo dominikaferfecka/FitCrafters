@@ -131,7 +131,7 @@ class DataBaseAPIView(APIView):
 
         data_with_localtime = []
         for training_data in serializer.data:
-            training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(timezone.get_current_timezone()).strftime('%Y-%m-%d %H:%M')
+            training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
             if training_data['end_time']:
                 training_data['end_time'] = parser.parse(training_data['end_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
             # print("NEW" + training_data)
@@ -169,15 +169,14 @@ class DataBaseAPIView(APIView):
         exercises = TrainingsExercises.objects.filter(training=training)
         data = TrainingsExercisesSerializer(exercises, many=True).data
         data_with_localtime = []
-        for exercise_data in data:
-            exercise_data['start_time'] = parser.parse(exercise_data['start_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
-            print(exercise_data['start_time'])
-            if exercise_data['end_time']:
-                exercise_data['end_time'] = parser.parse(exercise_data['end_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
-            print("Ćwiczenie", exercise_data)
-            data_with_localtime.append(exercise_data)
+        for training_data in data:
+            training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
+            if training_data['end_time']:
+                training_data['end_time'] = parser.parse(training_data['end_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
+            # print("NEW" + training_data)
+            data_with_localtime.append(training_data)
 
-        return JsonResponse(data, safe=False)
+        return JsonResponse(data_with_localtime, safe=False)
     
 
     @api_view(['GET'])
@@ -218,6 +217,7 @@ class DataBaseAPIView(APIView):
         
         start_datetime = datetime.strptime(date + ' ' + time, '%Y-%m-%d %H:%M')
         start_datetime = timezone.make_aware(start_datetime, tz)
+        print(start_datetime)
         end_datetime = start_datetime + timedelta(hours=1)
 
         conflicting_trainings = Trainings.objects.filter(
@@ -229,6 +229,8 @@ class DataBaseAPIView(APIView):
         if conflicting_trainings.exists():
             return JsonResponse({'status': 'error', 'message': 'Wybrany trener już ma zaplanowany trening na wtedy'})
 
+        print("do zapisania")
+        print(start_datetime)
         training = Trainings(
             start_time=start_datetime,
             end_time=end_datetime,

@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 function TrainerSignUpModal(props) {
-
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
-  const [notification, setNotification] = useState({ type: '', message: '' });
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+  const [notification, setNotification] = useState({ type: "", message: "" });
 
   const handleDateChange = (event) => {
     setDate(event.target.value);
@@ -14,35 +13,36 @@ function TrainerSignUpModal(props) {
     setTime(event.target.value);
   };
 
-  const handleSave = () => {    
+  const handleSave = () => {
     const data = {
       date: date,
       time: time,
       trainer_id: props.trainer.trainer_id,
-      client_id: 1 //TO DO
+      client_id: 1, //TO DO
     };
 
-    fetch('http://127.0.0.1:8000/signToTrainer/', {
-      method: 'POST',
+    fetch("http://127.0.0.1:8000/signToTrainer/", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     })
-      .then(response => response.json())
+      .then((response) => response.json())
       .then((result) => {
-        if (result.status === 'success') {
+        if (result.status === "success") {
           alert("Zapisano się pomyślnie do trenera!");
+          console.log(date, time);
         } else {
           alert("Nie udało się zapisać do trenera :( - " + result.message);
         }
       })
       .catch((error) => {
-        console.error('Error:', error);
-        alert('Nie udało się zapisać do trenera :(');
+        console.error("Error:", error);
+        alert("Nie udało się zapisać do trenera :(");
       });
   };
-  
+
   return (
     <div
       class="modal fade"
@@ -55,7 +55,7 @@ function TrainerSignUpModal(props) {
         <div class="modal-content">
           <div class="modal-header">
             <h1 class="modal-title fs-5" id="exampleModalLabel">
-            Zapisz się do {props.trainer.name} {props.trainer.surname}
+              Zapisz się do {props.trainer.name} {props.trainer.surname}
             </h1>
             <button
               type="button"
@@ -70,13 +70,25 @@ function TrainerSignUpModal(props) {
                 <label for="date" class="form-label">
                   Data
                 </label>
-                <input type="date" class="form-control" id="date" value={date} onChange={handleDateChange}/>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="date"
+                  value={date}
+                  onChange={handleDateChange}
+                />
               </div>
               <div class="mb-3 col-md-6">
                 <label for="time" class="form-label">
                   Godzina
                 </label>
-                <input type="time" class="form-control" id="time" value={time} onChange={handleTimeChange}/>
+                <input
+                  type="time"
+                  class="form-control"
+                  id="time"
+                  value={time}
+                  onChange={handleTimeChange}
+                />
               </div>
             </form>
           </div>
@@ -88,7 +100,12 @@ function TrainerSignUpModal(props) {
             >
               Anuluj
             </button>
-            <button type="button" class="btn btn-success"  data-bs-dismiss="modal" onClick={handleSave}>
+            <button
+              type="button"
+              class="btn btn-success"
+              data-bs-dismiss="modal"
+              onClick={handleSave}
+            >
               Zapisz się
             </button>
           </div>

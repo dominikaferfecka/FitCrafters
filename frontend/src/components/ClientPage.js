@@ -86,7 +86,7 @@ function ClientPage() {
           stats={selectStats}
           scrollId="statsTraining"
         />
-        {/* <ClientPlan selectItems={[]} scrollId="clientsPlan" items={clients_plan}/> */}
+        <ClientPlan selectItems={[]} scrollId="clientsPlan" items={clients_plan}/>
         <List
           header="Plan treningów"
           selectItems={[]}

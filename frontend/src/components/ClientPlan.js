@@ -1,6 +1,12 @@
 import { Container } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import List from "./List";
+
 
 function ClientPlan(props) {
+  const clientId = 1; // change later for real
+  const [clients_plan, setClientsPlan] = useState(null);
+
   const columns = ["#", "First", "Last", "Handle"];
   const plans = ["planA", "planB", "planC", "planD", "planE"];
   const exercises = [
@@ -34,6 +40,20 @@ function ClientPlan(props) {
     </option>
   ));
 
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/client_trainings_plans/" + String(clientId))
+      .then((response) => response.json())
+      .then((clients_plan) => {
+        setClientsPlan(clients_plan);
+        console.log("CLIENTS PLAN: " + clients_plan);
+      })
+      .catch((error) => {
+        console.log(clients_plan);
+        console.error("Błąd przy pobieraniu danych:", error);
+      });
+  }, []);
+
+
   return (
     <Container className="w-75 mb-5" id={props.scrollId}>
       <div id="tableClientPlan">
@@ -54,19 +74,12 @@ function ClientPlan(props) {
             </select>
           </div>
         )}
-        <table className="table table-bordered border-success m-5">
-          <thead>
-            <tr>{listItems}</tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">1</th>
-              <td>Mark</td>
-              <td>Otto</td>
-              <td>@mdo</td>
-            </tr>
-          </tbody>
-        </table>
+        <List
+          header="Plan treningów"
+          selectItems={[]}
+          scrollId="clientsPlan"
+          items={clients_plan}
+        />
       </div>
 
       <h5 className="text-center m-4">Dodaj plan treningowy</h5>

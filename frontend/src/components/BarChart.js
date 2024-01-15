@@ -39,6 +39,9 @@ function BarChart(props) {
       case "2":
         stat = "duration";
         break;
+      case "3":
+          stat = "category";
+          break;
       default:
         stat = "";
     }
@@ -139,6 +142,13 @@ function BarChart(props) {
     },
     {
       label: "Długość treningów",
+      data: caloriesData.data,
+      labels: caloriesData.labels,
+      borderWidth: 1,
+      backgroundColor: "#198754",
+    },
+    {
+      label: "Kategorie planów treningowych",
       data: caloriesData.data,
       labels: caloriesData.labels,
       borderWidth: 1,

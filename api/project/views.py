@@ -722,6 +722,34 @@ class DataBaseAPIView(APIView):
         return Response({'labels': labels, 'data': data})
 
 
+    from django.db.models import Count
+
+    @api_view(['GET'])
+    def getClientStatsPlansCategoryCount(request, client_id):
+        start_date_str = request.query_params.get('startDate', None)
+        end_date_str = request.query_params.get('endDate', None)
+
+        start_date = parse_datetime(start_date_str) if start_date_str else None
+        end_date = parse_datetime(end_date_str) if end_date_str else None
+
+        # Pobierz treningi w określonym zakresie dat
+        trainings = Trainings.objects.filter(client_id=client_id, start_time__gte=start_date, end_time__lte=end_date).order_by('start_time')
+
+        # Zlicz treningi w każdej kategorii planu treningowego
+        training_counts = Trainings.objects.filter(
+            client_id=client_id,
+            start_time__gte=start_date,
+            end_time__lte=end_date
+        ).values('training_plan__category').annotate(count=Count('training_plan__category'))
+
+        # Przygotuj dane dla statystyk
+        labels = [count['training_plan__category'] for count in training_counts]
+        data = [count['count'] for count in training_counts]
+
+        return Response({'labels': labels, 'data': data})
+
+
+
 
 def index(request):
     manager = Managers.objects.first()

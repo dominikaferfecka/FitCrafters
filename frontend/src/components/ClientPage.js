@@ -15,7 +15,7 @@ function ClientPage() {
   const selectStats = [
     "Spalone kalorie",
     "Długość treningów",
-    "statystyka3",
+    "Kategorie planów treningowych",
     "statystyka4",
     "statystyka5",
   ];

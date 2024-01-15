@@ -1,10 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import DateRangeSelector from "./DateRangeSelector";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-import { DateRangePicker } from "react-date-range";
 import { addDays } from "date-fns";
 
 function BarChart(props) {
@@ -29,6 +27,7 @@ function BarChart(props) {
     </option>
   ));
 
+    // select statistics
   const handleStatChange = (event) => {
     setSelectedStat(event.target.value);
     let stat;
@@ -61,14 +60,14 @@ function BarChart(props) {
   };
 
   useEffect(() => {
-    // Ładuj skrypt Chart.js
+    // Load script Chart.js
     const script = document.createElement("script");
     script.src = "https://cdn.jsdelivr.net/npm/chart.js";
     script.async = true;
     document.body.appendChild(script);
 
     script.onload = () => {
-      // Poczekaj na załadowanie skryptu Chart.js, a następnie utwórz wykres
+      // wait for loading Chart.js, and next create base chart
       const ctx = document.getElementById("myChart");
       const chartInstance = new window.Chart(ctx, {
         type: "bar",
@@ -136,43 +135,33 @@ function BarChart(props) {
       label: "Wybierz statystyke",
       data: [0],
       labels: [""],
-      borderWidth: 1,
-      backgroundColor: "#198754",
+      // borderWidth: 1,
+      // backgroundColor: "#198754",
     },
     {
       label: "Spalone kalorie",
       data: caloriesData.data,
       labels: caloriesData.labels,
-      borderWidth: 1,
-      backgroundColor: "#198754",
     },
     {
       label: "Długość treningów",
       data: caloriesData.data,
       labels: caloriesData.labels,
-      borderWidth: 1,
-      backgroundColor: "#198754",
     },
     {
       label: "Ilość treningów z danej kategorii",
       data: caloriesData.data,
       labels: caloriesData.labels,
-      borderWidth: 1,
-      backgroundColor: "#198754",
     },
     {
       label: "Ilość treningów z danego planu treningowego",
       data: caloriesData.data,
       labels: caloriesData.labels,
-      borderWidth: 1,
-      backgroundColor: "#198754",
     },
     {
       label: "Ilość treningów z danym trenerem",
       data: caloriesData.data,
       labels: caloriesData.labels,
-      borderWidth: 1,
-      backgroundColor: "#198754",
     },
   ];
 

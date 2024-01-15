@@ -15,9 +15,9 @@ function ClientPage() {
   const selectStats = [
     "Spalone kalorie",
     "Długość treningów",
-    "Kategorie planów treningowych",
-    "statystyka4",
-    "statystyka5",
+    "Ilość treningów z danej kategorii",
+    "Ilość treningów z danego planu treningowego",
+    "Ilość treningów z danym trenerem",
   ];
 
   const clientId = 1; // change later for real

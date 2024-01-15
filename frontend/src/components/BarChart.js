@@ -42,6 +42,12 @@ function BarChart(props) {
       case "3":
           stat = "category";
           break;
+      case "4":
+        stat = "name";
+        break;
+      case "5":
+        stat = "trainer";
+        break;
       default:
         stat = "";
     }
@@ -148,7 +154,21 @@ function BarChart(props) {
       backgroundColor: "#198754",
     },
     {
-      label: "Kategorie planów treningowych",
+      label: "Ilość treningów z danej kategorii",
+      data: caloriesData.data,
+      labels: caloriesData.labels,
+      borderWidth: 1,
+      backgroundColor: "#198754",
+    },
+    {
+      label: "Ilość treningów z danego planu treningowego",
+      data: caloriesData.data,
+      labels: caloriesData.labels,
+      borderWidth: 1,
+      backgroundColor: "#198754",
+    },
+    {
+      label: "Ilość treningów z danym trenerem",
       data: caloriesData.data,
       labels: caloriesData.labels,
       borderWidth: 1,

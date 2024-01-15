@@ -639,39 +639,7 @@ class DataBaseAPIView(APIView):
             return Response({"message": str(e)}, status=500)
         
 
-    # statystyki
-        
-
-    # @api_view(['GET'])
-    # def getClientTrainings(request, client_id):
-    #     # Pobierz daty z parametrów zapytania
-    #     start_date_str = request.query_params.get('startDate', None)
-    #     end_date_str = request.query_params.get('endDate', None)
-
-    #     # Parsuj daty, jeśli zostały dostarczone
-    #     start_date = parse_datetime(start_date_str) if start_date_str else None
-    #     end_date = parse_datetime(end_date_str) if end_date_str else None
-
-    #     # Pobierz treningi w określonym zakresie dat
-    #     trainings = Trainings.objects.filter(client_id=client_id, start_time__gte=start_date, end_time__lte=end_date).select_related('training_plan', 'trainer')
-
-    #     done_trainings = []
-    #     for training in trainings:
-    #         does_exist = TrainingsExercises.objects.filter(training=training)
-    #         if does_exist:
-    #             done_trainings.append(training)
-
-    #     serializer = ClientTrainingsSerializer(done_trainings, many=True)
-
-    #     # Uwzględnij strefę czasową przed wysłaniem odpowiedzi
-    #     data_with_localtime = []
-    #     for training_data in serializer.data:
-    #         training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
-    #         if training_data['end_time']:
-    #             training_data['end_time'] = parser.parse(training_data['end_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
-    #         data_with_localtime.append(training_data)
-
-    #     return Response(data_with_localtime)
+    # Statistics
 
     @api_view(['GET'])
     def getClientTrainingStatsCalories(request, client_id):
@@ -681,10 +649,10 @@ class DataBaseAPIView(APIView):
         start_date = parse_datetime(start_date_str) if start_date_str else None
         end_date = parse_datetime(end_date_str) if end_date_str else None
 
-        # Pobierz treningi w określonym zakresie dat
+        # get trainings in date time range
         trainings = Trainings.objects.filter(client_id=client_id, start_time__gte=start_date, end_time__lte=end_date).order_by('start_time')
 
-        # Przygotuj dane dla statystyk
+        # prepare data for statistics
         labels = []
         data = []
 
@@ -705,10 +673,10 @@ class DataBaseAPIView(APIView):
         start_date = parse_datetime(start_date_str) if start_date_str else None
         end_date = parse_datetime(end_date_str) if end_date_str else None
 
-        # Pobierz treningi w określonym zakresie dat
+        # get trainings in date time range
         trainings = Trainings.objects.filter(client_id=client_id, start_time__gte=start_date, end_time__lte=end_date).order_by('start_time')
 
-        # Przygotuj dane dla statystyk
+        # prepare data for statistics
         labels = []
         data = []
 
@@ -732,22 +700,69 @@ class DataBaseAPIView(APIView):
         start_date = parse_datetime(start_date_str) if start_date_str else None
         end_date = parse_datetime(end_date_str) if end_date_str else None
 
-        # Pobierz treningi w określonym zakresie dat
+        # get trainings in date time range
         trainings = Trainings.objects.filter(client_id=client_id, start_time__gte=start_date, end_time__lte=end_date).order_by('start_time')
 
-        # Zlicz treningi w każdej kategorii planu treningowego
+        # count trainings for each category of training plans
         training_counts = Trainings.objects.filter(
             client_id=client_id,
             start_time__gte=start_date,
             end_time__lte=end_date
         ).values('training_plan__category').annotate(count=Count('training_plan__category'))
 
-        # Przygotuj dane dla statystyk
+        # prepare data for statistics
         labels = [count['training_plan__category'] for count in training_counts]
         data = [count['count'] for count in training_counts]
 
         return Response({'labels': labels, 'data': data})
 
+    @api_view(['GET'])
+    def getClientStatsPlansNameCount(request, client_id):
+        start_date_str = request.query_params.get('startDate', None)
+        end_date_str = request.query_params.get('endDate', None)
+
+        start_date = parse_datetime(start_date_str) if start_date_str else None
+        end_date = parse_datetime(end_date_str) if end_date_str else None
+
+        # get trainings in date time range
+        trainings = Trainings.objects.filter(client_id=client_id, start_time__gte=start_date, end_time__lte=end_date).order_by('start_time')
+
+        # count trainings for each training plan (name)
+        training_counts = Trainings.objects.filter(
+            client_id=client_id,
+            start_time__gte=start_date,
+            end_time__lte=end_date
+        ).values('training_plan__name').annotate(count=Count('training_plan__name'))
+
+        # prepare data for statistics
+        labels = [count['training_plan__name'] for count in training_counts]
+        data = [count['count'] for count in training_counts]
+
+        return Response({'labels': labels, 'data': data})
+
+    @api_view(['GET'])
+    def getClientStatsTrainerCount(request, client_id):
+        start_date_str = request.query_params.get('startDate', None)
+        end_date_str = request.query_params.get('endDate', None)
+
+        start_date = parse_datetime(start_date_str) if start_date_str else None
+        end_date = parse_datetime(end_date_str) if end_date_str else None
+
+        # get trainings in date time range
+        trainings = Trainings.objects.filter(client_id=client_id, start_time__gte=start_date, end_time__lte=end_date).order_by('start_time')
+
+        # count trainings for each trainer)
+        training_counts = Trainings.objects.filter(
+            client_id=client_id,
+            start_time__gte=start_date,
+            end_time__lte=end_date
+        ).values('trainer__name', 'trainer__surname').annotate(count=Count('trainer'))
+
+        # prepare data for statistics
+        labels = [f"{count['trainer__name']} {count['trainer__surname']}" for count in training_counts]
+        data = [count['count'] for count in training_counts]
+
+        return Response({'labels': labels, 'data': data})
 
 
 

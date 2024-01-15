@@ -1,9 +1,19 @@
 import React, { useEffect, useState, useRef } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import DateRangeSelector from "./DateRangeSelector"; 
+import 'react-date-range/dist/styles.css'
+import 'react-date-range/dist/theme/default.css'
+import format from 'date-fns/format'
+import { DateRangePicker } from 'react-date-range'
+import { addDays } from 'date-fns'
 
 function BarChart(props) {
   const [selectedStat, setSelectedStat] = useState(props.stats[0]);
+  const [selectedDate, setSelectedDate] = useState({
+    startDate: new Date(),
+    endDate: addDays(new Date(), 7),
+  });
   const chartRef = useRef(null);
 
   const mappedSelectGyms = props.firstSelect.map((item, index) => (
@@ -20,6 +30,14 @@ function BarChart(props) {
 
   const handleStatChange = (event) => {
     setSelectedStat(event.target.value);
+  };
+
+  const handleDateChange = ({ startDate, endDate }) => {
+    setSelectedDate({ startDate, endDate });
+    console.log('Start Date in BarChart:', startDate);
+    console.log('End Date in BarChart:', endDate);
+
+    // Tutaj możesz dokonać odpowiednich aktualizacji związków z datą w komponencie BarChart
   };
 
   // Załaduj wykres bazowy
@@ -48,8 +66,14 @@ function BarChart(props) {
           ],
           datasets: [
             {
-              label: "",
-              data: [],
+              label: "aaa",
+              data: [2,2,2,2,2,2,2],
+              borderWidth: 1,
+              backgroundColor: "#198754",
+            },
+            {
+              label: "bbb",
+              data: [3,3,3,3,3,3,3],
               borderWidth: 1,
               backgroundColor: "#198754",
             },
@@ -99,13 +123,27 @@ function BarChart(props) {
     if (chartRef.current) {
       const chartInstance = chartRef.current;
 
+      chartInstance.data.labels = ["aaaaPoniedziałek","Wtorek",
+        "Środa",
+        "Czwartek",
+        "Piątek",
+        "Sobota",
+        "Niedziela",
+      ]
       chartInstance.data.datasets[0].label = client_datasets[selectedStat].label;
       chartInstance.data.datasets[0].data = client_datasets[selectedStat].data;
+      // chartInstance.data.datasets[1].label = client_datasets[selectedStat].label;
+      // chartInstance.data.datasets[1].data = [20, 19, 3, 5, 10, 3, 20],
       
       chartInstance.update();
       console.log("Statystyka :" + selectedStat)
     }
   }, [selectedStat]);
+
+  // const handleDateChange = (date) => {
+  //   setSelectedDate(date);
+  //   console.log(selectedDate)
+  // };
 
 
 
@@ -120,6 +158,7 @@ function BarChart(props) {
           alignItems: "center",
         }}
       >
+        <DateRangeSelector onDateChange={handleDateChange} />
         {props.firstSelectTitle && (
           <select className="form-select col m-3" aria-label="Select">
             <option value="0">{props.firstSelectTitle}</option>
@@ -132,6 +171,7 @@ function BarChart(props) {
           {mappedSelectStats}
         </select>
       </form>
+      {/* <DateRangeSelector/> */}
       <canvas id="myChart"></canvas>
     </div>
   );

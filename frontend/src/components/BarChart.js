@@ -1,17 +1,15 @@
 import React, { useEffect, useState, useRef } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import DateRangeSelector from "./DateRangeSelector"; 
-import 'react-date-range/dist/styles.css'
-import 'react-date-range/dist/theme/default.css'
-import format from 'date-fns/format'
-import { DateRangePicker } from 'react-date-range'
-import { addDays } from 'date-fns'
+import DateRangeSelector from "./DateRangeSelector";
+import "react-date-range/dist/styles.css";
+import "react-date-range/dist/theme/default.css";
+import { DateRangePicker } from "react-date-range";
+import { addDays } from "date-fns";
 
 function BarChart(props) {
   const [selectedStat, setSelectedStat] = useState(props.stats[0]);
-  const [calories_data, setCaloriesData] = useState([]);
-  const [newCaloriesData, setNewCaloriesData] = useState([]);
+  const [caloriesData, setCaloriesData] = useState([]);
   const [selectedDate, setSelectedDate] = useState({
     startDate: new Date(),
     endDate: addDays(new Date(), 7),
@@ -36,38 +34,10 @@ function BarChart(props) {
 
   const handleDateChange = ({ startDate, endDate }) => {
     setSelectedDate({ startDate, endDate });
-    console.log('Start Date in BarChart:', startDate);
-    console.log('End Date in BarChart:', endDate);
-
-    // Tutaj możesz dokonać odpowiednich aktualizacji związków z datą w komponencie BarChart
+    console.log("Start Date in BarChart:", startDate);
+    console.log("End Date in BarChart:", endDate);
   };
 
-
-
-  useEffect(() => {
-    const url = `http://127.0.0.1:8000/training-stats-calories/1/?startDate=${selectedDate.startDate.toISOString()}&endDate=${selectedDate.endDate.toISOString()}`;
-    
-    fetch(url)
-      .then((response) => response.json())
-      .then((calories_data) => {
-        setCaloriesData(calories_data);
-        console.log(calories_data.data);
-        console.log(calories_data.labels);
-      })
-      .catch((error) => {
-        console.error("Błąd przy pobieraniu danych:", error);
-      });
-  }, [selectedStat, selectedDate]);
-  // console.log(calories_data);
-
-  useEffect(() => {
-    if (chartRef.current && newCaloriesData.length > 0) {
-      const chartInstance = chartRef.current;
-      // ... pozostała część kodu ...
-    }
-  }, [selectedStat, newCaloriesData]);
-
-  // Załaduj wykres bazowy
   useEffect(() => {
     // Ładuj skrypt Chart.js
     const script = document.createElement("script");
@@ -75,35 +45,20 @@ function BarChart(props) {
     script.async = true;
     document.body.appendChild(script);
 
-    // Poczekaj na załadowanie skryptu Chart.js, a następnie utwórz wykres
     script.onload = () => {
+      // Poczekaj na załadowanie skryptu Chart.js, a następnie utwórz wykres
       const ctx = document.getElementById("myChart");
-
       const chartInstance = new window.Chart(ctx, {
         type: "bar",
         data: {
-          labels: [
-            "Poniedziałek",
-            "Wtorek",
-            "Środa",
-            "Czwartek",
-            "Piątek",
-            "Sobota",
-            "Niedziela",
-          ],
+          labels: [],
           datasets: [
             {
-              label: "aaa",
-              data: [2,2,2,2,2,2,2],
+              label: "",
+              data: [],
               borderWidth: 1,
               backgroundColor: "#198754",
             },
-            // {
-            //   label: "bbb",
-            //   data: [3,3,3,3,3,3,3],
-            //   borderWidth: 1,
-            //   backgroundColor: "#198754",
-            // },
           ],
         },
         options: {
@@ -116,25 +71,55 @@ function BarChart(props) {
       });
       chartRef.current = chartInstance;
     };
-
-    return () => {
-      // Oczekaj na odmontowanie komponentu i usuń skrypt
-      document.body.removeChild(script);
-    };
   }, []);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const url = `http://127.0.0.1:8000/training-stats-calories/1/?startDate=${selectedDate.startDate.toISOString()}&endDate=${selectedDate.endDate.toISOString()}`;
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        setCaloriesData({
+          data: data.data,
+          labels: data.labels,
+        });
+      } catch (error) {
+        console.error("Błąd przy pobieraniu danych:", error);
+      }
+    };
+
+    fetchData();
+  }, [selectedStat, selectedDate]);
+
+  useEffect(() => {
+    if (chartRef.current && caloriesData.data.length > 0) {
+      const chartInstance = chartRef.current;
+      const selectedDataset = client_datasets[selectedStat];
+
+      if (selectedDataset && selectedDataset.label) {
+        chartInstance.data.labels = selectedDataset.labels;
+        chartInstance.data.datasets[0].label = selectedDataset.label;
+        chartInstance.data.datasets[0].data = selectedDataset.data;
+
+        chartInstance.update();
+        console.log("Statystyka :" + selectedStat);
+      }
+    }
+  }, [selectedStat, caloriesData]);
 
   const client_datasets = [
-    { 
-      label: "",
-      data: [],
+    {
+      label: "Wybierz statystyke",
+      data: [0],
+      labels: [""],
       borderWidth: 1,
       backgroundColor: "#198754",
     },
-    { 
+    {
       label: "Spalone kalorie",
-      data: calories_data.data,
-      labels: calories_data.labels,
+      data: caloriesData.data,
+      labels: caloriesData.labels,
       borderWidth: 1,
       backgroundColor: "#198754",
     },
@@ -144,37 +129,7 @@ function BarChart(props) {
       borderWidth: 1,
       backgroundColor: "#198754",
     },
-  ]
-
-  // Aktualizuj wykres
-  useEffect(() => {
-    if (chartRef.current) {
-      const chartInstance = chartRef.current;
-
-      chartInstance.data.labels = ["aaaaPoniedziałek","Wtorek",
-        "Środa",
-        "Czwartek",
-        "Piątek",
-        "Sobota",
-        "Niedziela",
-      ]
-      chartInstance.data.datasets[0].label = client_datasets[selectedStat].label;
-      chartInstance.data.datasets[0].data = client_datasets[selectedStat].data;
-      chartInstance.data.labels = client_datasets[selectedStat].labels;
-      // chartInstance.data.datasets[0].label = client_datasets[selectedStat].label;
-      // chartInstance.data.datasets[0].data = [20, 19, 3, 5, 10, 3, 20];
-      
-      chartInstance.update();
-      console.log("Statystyka :" + selectedStat)
-    }
-  }, [selectedStat]);
-
-  // const handleDateChange = (date) => {
-  //   setSelectedDate(date);
-  //   console.log(selectedDate)
-  // };
-
-
+  ];
 
   return (
     <div className="w-75 p-3 m-auto" id={props.scrollId}>
@@ -195,12 +150,15 @@ function BarChart(props) {
           </select>
         )}
 
-        <select className="form-select col m-3" aria-label="Select" onChange={handleStatChange}>
+        <select
+          className="form-select col m-3"
+          aria-label="Select"
+          onChange={handleStatChange}
+        >
           <option value="0">Wybierz statystykę</option>
           {mappedSelectStats}
         </select>
       </form>
-      {/* <DateRangeSelector/> */}
       <canvas id="myChart"></canvas>
     </div>
   );

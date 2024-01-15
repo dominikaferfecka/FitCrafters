@@ -13,8 +13,8 @@ function ClientPage() {
   const [trainings_data, setTrainingsData] = useState([]);
   const [clients_plan, setClientsPlan] = useState(null);
   const selectStats = [
-    "statystyka1",
-    "statystyka2",
+    "Spalone kalorie",
+    "Długość treningów",
     "statystyka3",
     "statystyka4",
     "statystyka5",
@@ -86,7 +86,7 @@ function ClientPage() {
           stats={selectStats}
           scrollId="statsTraining"
         />
-        <ClientPlan selectItems={[]} scrollId="clientsPlan" items={clients_plan}/>
+        {/* <ClientPlan selectItems={[]} scrollId="clientsPlan" items={clients_plan}/> */}
         <List
           header="Plan treningów"
           selectItems={[]}

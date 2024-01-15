@@ -1,6 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 function BarChart(props) {
+  const [selectedStat, setSelectedStat] = useState(props.stats[0]);
+  const chartRef = useRef(null);
+
   const mappedSelectGyms = props.firstSelect.map((item, index) => (
     <option key={index} value={index + 1}>
       {item}
@@ -12,6 +17,12 @@ function BarChart(props) {
       {item}
     </option>
   ));
+
+  const handleStatChange = (event) => {
+    setSelectedStat(event.target.value);
+  };
+
+  // Załaduj wykres bazowy
   useEffect(() => {
     // Ładuj skrypt Chart.js
     const script = document.createElement("script");
@@ -23,7 +34,7 @@ function BarChart(props) {
     script.onload = () => {
       const ctx = document.getElementById("myChart");
 
-      new window.Chart(ctx, {
+      const chartInstance = new window.Chart(ctx, {
         type: "bar",
         data: {
           labels: [
@@ -37,8 +48,8 @@ function BarChart(props) {
           ],
           datasets: [
             {
-              label: "Ilość klientów x100",
-              data: [12, 19, 3, 5, 2, 3, 8],
+              label: "",
+              data: [],
               borderWidth: 1,
               backgroundColor: "#198754",
             },
@@ -52,13 +63,51 @@ function BarChart(props) {
           },
         },
       });
+      chartRef.current = chartInstance;
     };
 
     return () => {
       // Oczekaj na odmontowanie komponentu i usuń skrypt
       document.body.removeChild(script);
     };
-  }, []); // Pusta tablica oznacza, że ten efekt będzie wywołany tylko raz po zamontowaniu komponentu
+  }, []);
+
+
+  const client_datasets = [
+    { 
+      label: "",
+      data: [],
+      borderWidth: 1,
+      backgroundColor: "#198754",
+    },
+    { 
+      label: "Spalone kalorie",
+      data: [12, 19, 3, 5, 10, 3, 8],
+      borderWidth: 1,
+      backgroundColor: "#198754",
+    },
+    {
+      label: "Długość treningów",
+      data: [20, 19, 3, 5, 10, 3, 20],
+      borderWidth: 1,
+      backgroundColor: "#198754",
+    },
+  ]
+
+  // Aktualizuj wykres
+  useEffect(() => {
+    if (chartRef.current) {
+      const chartInstance = chartRef.current;
+
+      chartInstance.data.datasets[0].label = client_datasets[selectedStat].label;
+      chartInstance.data.datasets[0].data = client_datasets[selectedStat].data;
+      
+      chartInstance.update();
+      console.log("Statystyka :" + selectedStat)
+    }
+  }, [selectedStat]);
+
+
 
   return (
     <div className="w-75 p-3 m-auto" id={props.scrollId}>
@@ -78,7 +127,7 @@ function BarChart(props) {
           </select>
         )}
 
-        <select className="form-select col m-3" aria-label="Select">
+        <select className="form-select col m-3" aria-label="Select" onChange={handleStatChange}>
           <option value="0">Wybierz statystykę</option>
           {mappedSelectStats}
         </select>

@@ -682,7 +682,7 @@ class DataBaseAPIView(APIView):
         end_date = parse_datetime(end_date_str) if end_date_str else None
 
         # Pobierz treningi w określonym zakresie dat
-        trainings = Trainings.objects.filter(client_id=client_id, start_time__gte=start_date, end_time__lte=end_date)
+        trainings = Trainings.objects.filter(client_id=client_id, start_time__gte=start_date, end_time__lte=end_date).order_by('start_time')
 
         # Przygotuj dane dla statystyk
         labels = []

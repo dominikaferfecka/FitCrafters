@@ -696,6 +696,30 @@ class DataBaseAPIView(APIView):
                 data.append(total_calories)
 
         return Response({'labels': labels, 'data': data})
+    
+    @api_view(['GET'])
+    def getClientTrainingStatsDuration(request, client_id):
+        start_date_str = request.query_params.get('startDate', None)
+        end_date_str = request.query_params.get('endDate', None)
+
+        start_date = parse_datetime(start_date_str) if start_date_str else None
+        end_date = parse_datetime(end_date_str) if end_date_str else None
+
+        # Pobierz treningi w określonym zakresie dat
+        trainings = Trainings.objects.filter(client_id=client_id, start_time__gte=start_date, end_time__lte=end_date).order_by('start_time')
+
+        # Przygotuj dane dla statystyk
+        labels = []
+        data = []
+
+        for training in trainings:
+            does_exist = TrainingsExercises.objects.filter(training=training)
+            if does_exist:
+                total_duration = sum((exercise.end_time - exercise.start_time).seconds for exercise in does_exist)
+                labels.append(training.start_time.strftime('%Y-%m-%d'))
+                data.append(total_duration)
+
+        return Response({'labels': labels, 'data': data})
 
 
 

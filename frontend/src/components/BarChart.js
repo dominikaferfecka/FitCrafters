@@ -9,6 +9,7 @@ import { addDays } from "date-fns";
 
 function BarChart(props) {
   const [selectedStat, setSelectedStat] = useState(props.stats[0]);
+  const [statistics, setStatistics] = useState("");
   const [caloriesData, setCaloriesData] = useState([]);
   const [selectedDate, setSelectedDate] = useState({
     startDate: new Date(),
@@ -30,6 +31,18 @@ function BarChart(props) {
 
   const handleStatChange = (event) => {
     setSelectedStat(event.target.value);
+    let stat;
+    switch(event.target.value) {
+      case "1":
+        stat = "calories";
+        break;
+      case "2":
+        stat = "duration";
+        break;
+      default:
+        stat = "";
+    }
+    setStatistics(stat);
   };
 
   const handleDateChange = ({ startDate, endDate }) => {
@@ -74,8 +87,9 @@ function BarChart(props) {
   }, []);
 
   useEffect(() => {
+
     const fetchData = async () => {
-      const url = `http://127.0.0.1:8000/training-stats-calories/1/?startDate=${selectedDate.startDate.toISOString()}&endDate=${selectedDate.endDate.toISOString()}`;
+      const url = `http://127.0.0.1:8000/training-stats-${statistics}/1/?startDate=${selectedDate.startDate.toISOString()}&endDate=${selectedDate.endDate.toISOString()}`;
 
       try {
         const response = await fetch(url);
@@ -93,7 +107,7 @@ function BarChart(props) {
   }, [selectedStat, selectedDate]);
 
   useEffect(() => {
-    if (chartRef.current && caloriesData.data.length > 0) {
+    if (chartRef.current && caloriesData.data && caloriesData.data.length > 0) {
       const chartInstance = chartRef.current;
       const selectedDataset = client_datasets[selectedStat];
 
@@ -125,7 +139,8 @@ function BarChart(props) {
     },
     {
       label: "Długość treningów",
-      data: [20, 19, 3, 5, 10, 3, 20],
+      data: caloriesData.data,
+      labels: caloriesData.labels,
       borderWidth: 1,
       backgroundColor: "#198754",
     },

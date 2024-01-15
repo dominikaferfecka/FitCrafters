@@ -25,15 +25,15 @@ const DateRangeSelector = ({ onDateChange }) => {
   };
 
 
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(true) //false
   const refOne = useRef(null)
 
   // hide window when clicked outside
   const hideOnClickOutside = (e) => {
     if( refOne.current && !refOne.current.contains(e.target) ) {
-      setOpen(false)
+      setOpen(true)
     }
-  }
+  } // false
 
   useEffect(() => {
     document.addEventListener("click", hideOnClickOutside, true)

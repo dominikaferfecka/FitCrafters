@@ -10,6 +10,8 @@ import { addDays } from 'date-fns'
 
 function BarChart(props) {
   const [selectedStat, setSelectedStat] = useState(props.stats[0]);
+  const [calories_data, setCaloriesData] = useState([]);
+  const [newCaloriesData, setNewCaloriesData] = useState([]);
   const [selectedDate, setSelectedDate] = useState({
     startDate: new Date(),
     endDate: addDays(new Date(), 7),
@@ -39,6 +41,31 @@ function BarChart(props) {
 
     // Tutaj możesz dokonać odpowiednich aktualizacji związków z datą w komponencie BarChart
   };
+
+
+
+  useEffect(() => {
+    const url = `http://127.0.0.1:8000/training-stats-calories/1/?startDate=${selectedDate.startDate.toISOString()}&endDate=${selectedDate.endDate.toISOString()}`;
+    
+    fetch(url)
+      .then((response) => response.json())
+      .then((calories_data) => {
+        setCaloriesData(calories_data);
+        console.log(calories_data.data);
+        console.log(calories_data.labels);
+      })
+      .catch((error) => {
+        console.error("Błąd przy pobieraniu danych:", error);
+      });
+  }, [selectedStat, selectedDate]);
+  // console.log(calories_data);
+
+  useEffect(() => {
+    if (chartRef.current && newCaloriesData.length > 0) {
+      const chartInstance = chartRef.current;
+      // ... pozostała część kodu ...
+    }
+  }, [selectedStat, newCaloriesData]);
 
   // Załaduj wykres bazowy
   useEffect(() => {
@@ -71,12 +98,12 @@ function BarChart(props) {
               borderWidth: 1,
               backgroundColor: "#198754",
             },
-            {
-              label: "bbb",
-              data: [3,3,3,3,3,3,3],
-              borderWidth: 1,
-              backgroundColor: "#198754",
-            },
+            // {
+            //   label: "bbb",
+            //   data: [3,3,3,3,3,3,3],
+            //   borderWidth: 1,
+            //   backgroundColor: "#198754",
+            // },
           ],
         },
         options: {
@@ -106,7 +133,8 @@ function BarChart(props) {
     },
     { 
       label: "Spalone kalorie",
-      data: [12, 19, 3, 5, 10, 3, 8],
+      data: calories_data.data,
+      labels: calories_data.labels,
       borderWidth: 1,
       backgroundColor: "#198754",
     },
@@ -132,8 +160,9 @@ function BarChart(props) {
       ]
       chartInstance.data.datasets[0].label = client_datasets[selectedStat].label;
       chartInstance.data.datasets[0].data = client_datasets[selectedStat].data;
-      // chartInstance.data.datasets[1].label = client_datasets[selectedStat].label;
-      // chartInstance.data.datasets[1].data = [20, 19, 3, 5, 10, 3, 20],
+      chartInstance.data.labels = client_datasets[selectedStat].labels;
+      // chartInstance.data.datasets[0].label = client_datasets[selectedStat].label;
+      // chartInstance.data.datasets[0].data = [20, 19, 3, 5, 10, 3, 20];
       
       chartInstance.update();
       console.log("Statystyka :" + selectedStat)

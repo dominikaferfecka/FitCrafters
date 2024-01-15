@@ -13,6 +13,7 @@ import json
 from django.utils import timezone
 from dateutil import parser
 import pytz
+from django.utils.dateparse import parse_datetime
 tz = pytz.timezone('Europe/Warsaw')
 
 class DataBaseAPIView(APIView):
@@ -636,6 +637,67 @@ class DataBaseAPIView(APIView):
         except Exception as e:
             # Return an error message if an exception occurs
             return Response({"message": str(e)}, status=500)
+        
+
+    # statystyki
+        
+
+    # @api_view(['GET'])
+    # def getClientTrainings(request, client_id):
+    #     # Pobierz daty z parametrów zapytania
+    #     start_date_str = request.query_params.get('startDate', None)
+    #     end_date_str = request.query_params.get('endDate', None)
+
+    #     # Parsuj daty, jeśli zostały dostarczone
+    #     start_date = parse_datetime(start_date_str) if start_date_str else None
+    #     end_date = parse_datetime(end_date_str) if end_date_str else None
+
+    #     # Pobierz treningi w określonym zakresie dat
+    #     trainings = Trainings.objects.filter(client_id=client_id, start_time__gte=start_date, end_time__lte=end_date).select_related('training_plan', 'trainer')
+
+    #     done_trainings = []
+    #     for training in trainings:
+    #         does_exist = TrainingsExercises.objects.filter(training=training)
+    #         if does_exist:
+    #             done_trainings.append(training)
+
+    #     serializer = ClientTrainingsSerializer(done_trainings, many=True)
+
+    #     # Uwzględnij strefę czasową przed wysłaniem odpowiedzi
+    #     data_with_localtime = []
+    #     for training_data in serializer.data:
+    #         training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
+    #         if training_data['end_time']:
+    #             training_data['end_time'] = parser.parse(training_data['end_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
+    #         data_with_localtime.append(training_data)
+
+    #     return Response(data_with_localtime)
+
+    @api_view(['GET'])
+    def getClientTrainingStatsCalories(request, client_id):
+        start_date_str = request.query_params.get('startDate', None)
+        end_date_str = request.query_params.get('endDate', None)
+
+        start_date = parse_datetime(start_date_str) if start_date_str else None
+        end_date = parse_datetime(end_date_str) if end_date_str else None
+
+        # Pobierz treningi w określonym zakresie dat
+        trainings = Trainings.objects.filter(client_id=client_id, start_time__gte=start_date, end_time__lte=end_date)
+
+        # Przygotuj dane dla statystyk
+        labels = []
+        data = []
+
+        for training in trainings:
+            does_exist = TrainingsExercises.objects.filter(training=training)
+            if does_exist:
+                total_calories = sum(exercise.calories for exercise in does_exist)
+                labels.append(training.start_time.strftime('%Y-%m-%d'))
+                data.append(total_calories)
+
+        return Response({'labels': labels, 'data': data})
+
+
 
 def index(request):
     manager = Managers.objects.first()

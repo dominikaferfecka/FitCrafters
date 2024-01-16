@@ -9,6 +9,7 @@ function TrainerPage() {
   const trainerId = 1; // change later for real
   const selectClients = ["klient1", "klient2", "klient3", "klient4", "klient5"];
   const [clients_data, setClientsData] = useState([]);
+  console.log(trainerId);
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/trainer_clients/" + String(trainerId))

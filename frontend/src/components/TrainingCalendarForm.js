@@ -17,7 +17,14 @@ function TrainingCalendarForm({trainerId, title, button_name, mappedItems}){
             try{
                 fetch(
                     `http://127.0.0.1:8000/delete_training/?training_id=${selectedValue}`
-                );
+                )
+                .then((response) => response.json())
+                .then((result) => {
+                    if (result.status === "success") {
+                        alert("Usunięto trening");
+                        setSelectedValue(null);
+                    }
+                })
             } catch (error) {
                 console.error("Cannot delete training", error);
             }

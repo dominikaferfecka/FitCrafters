@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Managers, Gyms, EquipmentType, Trainers, GymsEquipmentType, Clients, Trainings, TrainingPlans, TrainingsExercises, Exercises
+from .models import Managers, Gyms, EquipmentType, Trainers, GymsEquipmentType, Clients, Trainings, TrainingPlans, TrainingsExercises, Exercises, ExercisesTrainingPlans
 from django.utils import timezone
 
 class ManagerSerializer(serializers.ModelSerializer):
@@ -45,6 +45,7 @@ class ClientsSerializer(serializers.ModelSerializer):
 
 
 class ClientTrainingsSerializer(serializers.Serializer):
+    training_plan_id = serializers.IntegerField(source='training_plan.training_plan_id',allow_null=True)
     training_plan_name = serializers.CharField(source='training_plan.name',allow_null=True)
     training_plan_category = serializers.CharField(source='training_plan.category',allow_null=True)
     training_plan_time = serializers.IntegerField(source='training_plan.time',allow_null=True)
@@ -55,7 +56,7 @@ class ClientTrainingsSerializer(serializers.Serializer):
     training_id = serializers.IntegerField()
 
     class Meta:
-        fields = ('training_id','training_plan_name', 'training_plan_category', 'training_plan_time', 'trainer_name', 'trainer_surname', 'start_time', 'end_time')
+        fields = ('trainig_plan_id', 'training_id','training_plan_name', 'training_plan_category', 'training_plan_time', 'trainer_name', 'trainer_surname', 'start_time', 'end_time')
 
 
 class ExerciseSerializer(serializers.ModelSerializer):
@@ -87,6 +88,14 @@ class TrainingPlansSerializer(serializers.ModelSerializer):
     class Meta:
         model = TrainingPlans
         fields = ('training_plan_id', 'category', 'name', 'time')
+
+class ExercisesTrainingPlansSerializer(serializers.ModelSerializer):
+    exercise = serializers.CharField(source='exercise.name',allow_null=True)
+    category = serializers.CharField(source='exercise.category',allow_null=True)
+    equipment = serializers.CharField(source='exercise.equipment',allow_null=True)
+    class Meta:
+        model = ExercisesTrainingPlans
+        fields = ('exercise', 'category', 'repeats', 'time', 'load', 'equipment')
 
 
 # class ClientTrainingsWithTrainingPlan(serializers.ModelSerializer):

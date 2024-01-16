@@ -8,8 +8,8 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from django.db.models import Count
 from django.db import transaction
-from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer, ClientsSerializer,  ClientTrainingsSerializer, EquipmentAllSerializer, TrainingsExercisesSerializer, GymsEquipmentTypeSerializer, TrainingPlansSerializer, TrainerTrainingsSerializer
-from .models import Managers, Gyms, EquipmentType, Trainers, Trainings, GymsEquipmentType, Clients, TrainingsExercises, TrainingPlans, Tokens
+from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer, ClientsSerializer,  ClientTrainingsSerializer, EquipmentAllSerializer, TrainingsExercisesSerializer, GymsEquipmentTypeSerializer, TrainingPlansSerializer, TrainerTrainingsSerializer, ExercisesTrainingPlansSerializer
+from .models import Managers, Gyms, EquipmentType, Trainers, Trainings, GymsEquipmentType, Clients, TrainingsExercises, TrainingPlans, Tokens, ExercisesTrainingPlans, Exercises
 import json
 from django.utils import timezone
 from dateutil import parser
@@ -894,6 +894,25 @@ class DataBaseAPIView(APIView):
         data = [count['count'] for count in training_counts]
 
         return Response({'labels': labels, 'data': data})
+    
+    @api_view(['GET'])
+    def getDetailedTrainingPlans(request):
+        """
+        params: request [json]
+        return: detailed info about training plan[JSONResoponse]
+        method extracts received data and returns detailed info about training plan"""
+        # load data
+        if request.method == "POST":
+            v_training_plan_data = json.loads(request.body.decode("utf-8"))
+        else:
+            v_training_plan_data = request.GET
+        
+        v_training_plan_id = v_training_plan_data.get("training_plan_id")
+        # extract data
+
+        training_plans = ExercisesTrainingPlans.objects.filter(training_plan=v_training_plan_id).select_related('exercise')
+        data = ExercisesTrainingPlansSerializer(training_plans, many=True).data
+        return JsonResponse(data, safe=False)
 
 
 

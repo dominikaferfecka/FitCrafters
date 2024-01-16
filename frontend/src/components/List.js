@@ -4,6 +4,7 @@ import GymDetailModal from "./GymDetailModal";
 import TrainerDetailModal from "./TrainerDetailModal";
 import TrainingDetailModal from "./TrainingDetailModal";
 import EquipmentDetailModal from "./EquipmentDetailModal";
+import TrainingPlanDetailModal from "./TrainingPlanDetailModal";
 
 function List(props) {
   const [equipment_data, setEquipmentData] = useState([]);
@@ -15,6 +16,7 @@ function List(props) {
   const [selectedGymDetails, setSelectedGymDetails] = useState(null);
 
   const [clients_plan, setClientsPlan] = useState(null);
+
   const [clients_plan_trainer, setClientsPlanTrainer] = useState(null);
 
   const [selectedTrainer, setSelectedTrainer] = useState(0);
@@ -22,6 +24,8 @@ function List(props) {
   const [selectedTrainingDetails, setSelectedTrainingDetails] = useState(null);
 
   const [selectedEquipment, setSelectedEquipment] = useState(null);
+
+  const [trainingPlanId, setTrainingPlanId] = useState(null);
 
   useEffect(() => {
     props.scrollId === "equipmentList" &&
@@ -65,6 +69,7 @@ function List(props) {
         console.error("Błąd przy pobieraniu danych:", error);
       });
   }, [props.clientIdTrainer]);
+
 
   var columns = ["#", "First", "Last", "Handle"];
 
@@ -115,6 +120,7 @@ function List(props) {
       "Początek treningu",
       "Czas trwania (min)",
       "Trener",
+      "Szczegóły",
     ];
   }
   if (props.scrollId === "clientsPlanTrainer") {
@@ -125,6 +131,7 @@ function List(props) {
       "Początek treningu",
       "Czas trwania (min)",
       "Trener",
+      "Szczegóły",
     ];
   }
   const listItems = columns.map((col, index) => (
@@ -159,6 +166,11 @@ function List(props) {
     setSelectedEquipment(equipmentDetails);
   };
 
+  const handleClientPlanClick = (clientPlan) => {
+    setClientsPlan(clientPlan);
+    setTrainingPlanId(clientPlan.training_plan_id);
+  };
+
   return (
     <>
       {props.scrollId === "gymList" && (
@@ -172,6 +184,11 @@ function List(props) {
       )}
       {props.scrollId === "trainingHistory" && (
         <TrainingDetailModal trainingDetails={selectedTrainingDetails} />
+      )}
+
+      {props.scrollId === "clientsPlan" ||
+      (props.scrollId === "clientsPlanTrainer" && clients_plan_trainer ) && (
+        <TrainingPlanDetailModal trainingPlanId={trainingPlanId} />
       )}
 
       {props.scrollId === "equipmentList" && (
@@ -380,6 +397,23 @@ function List(props) {
                     <td>
                       {element.trainer_name} {element.trainer_surname}
                     </td>
+                    <td
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <button
+                        class="btn btn-success btn-sm"
+                        type="submit"
+                        data-bs-toggle="modal"
+                        data-bs-target="#TrainingPlanDetailModal"
+                        onClick={() => handleClientPlanClick(element)}
+                      >
+                        +
+                      </button>
+                    </td>
                   </>
                 </tr>
               ))}
@@ -406,6 +440,26 @@ function List(props) {
                     </td>
                     <td>
                       {element.trainer_name} {element.trainer_surname}
+                    </td>
+                    <td>
+                      {element.trainer_name} {element.trainer_surname}
+                    </td>
+                    <td
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <button
+                        class="btn btn-success btn-sm"
+                        type="submit"
+                        data-bs-toggle="modal"
+                        data-bs-target="#TrainingPlanDetailModal"
+                        onClick={() => handleClientPlanClick(element)}
+                      >
+                        +
+                      </button>
                     </td>
                   </>
                 </tr>

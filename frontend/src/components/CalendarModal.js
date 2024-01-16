@@ -42,6 +42,7 @@ function CalendarModal({onClose, trainerId}) {
   const closeModal = () => {
     onClose(); // Call the onClose prop function to update the state in the parent component
   };
+  console.log(trainerId);
 
   const [trainings_data, setTrainingsData] = useState([]);
 
@@ -73,14 +74,14 @@ function CalendarModal({onClose, trainerId}) {
 
   //prepare events
   const mappedEvents = trainings_data.map((training) => ({
-    start: moment(training.start_time).toDate(),
-    end: moment(training.end_time).toDate(),
+    start: moment.utc(training.start_time).toDate(),
+    end: moment.utc(training.end_time).toDate(),
     title: training.client_name + " " + training.client_surname,
   }));
 
   const mappedTrainings = trainings_data.map((training, index) => (
     <option key={training.training_id} value={training.training_id}>
-      {moment(training.start_time).format('MMM DD HH:mm') + "-" + moment(training.end_time).format('HH:mm') + " " + training.client_name + " " + training.client_surname}
+      {training.client_name + " " + training.client_surname + " " + moment(training.start_time).format('MMM DD HH:mm') + "-" + moment(training.end_time).format('HH:mm')}
     </option>
     ));
 
@@ -92,7 +93,7 @@ function CalendarModal({onClose, trainerId}) {
 
     return (
       <div class="modal fade bd-example-modal-lg" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" >
-        {/* <div class="modal-dialog modal-lg" style={{ height: 700, width: 900}}> */}
+        <div class="modal-dialog modal-lg" style={{ height: 700, width: 900}}>
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="exampleModalLabel"><b>Twój Kalendarz</b></h5>
@@ -115,11 +116,11 @@ function CalendarModal({onClose, trainerId}) {
             <TrainingCalendarForm title="Usuń trening z klientem" button_name="Usuń" mappedItems={mappedTrainings} />
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal" onClick={closeModal}>Zamknij</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close" onClick={closeModal}>Zamknij</button>
             </div>
           </div>
         </div>
-      // </div>
+       </div>
     );
 }
 

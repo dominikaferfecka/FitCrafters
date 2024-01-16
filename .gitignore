@@ -1,2 +1,4 @@
 /api/project/__pycache__/
-/project/db.sqlite3
+/api/db.sqlite3
+/api/.coverage/
+/api/django_logs.txt/

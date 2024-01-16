@@ -28,7 +28,7 @@ function TrainerPage({ onLogout }) {
         console.log(trainer_data);
         console.error("Błąd przy pobieraniu danych:", error);
       });
-  }, [trainer_data]);
+  }, [trainer_data, token]);
 
   useEffect(() => {
     fetch(
@@ -62,7 +62,11 @@ function TrainerPage({ onLogout }) {
           scrollId="clientList"
           items={clients_data}
         />
-        <ClientPlan selectItems={selectClients2} scrollId="clientPlan" />
+        <ClientPlan
+          selectItems={selectClients2}
+          scrollId="clientPlan"
+          trainer_id={trainer_data.trainer_id}
+        />
         <Footer />
       </div>
     </>

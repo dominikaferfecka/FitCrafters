@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from datetime import datetime, timedelta
 from project.models import Managers
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view, authentication_classes
+from rest_framework.decorators import api_view
 from django.contrib.auth.hashers import make_password, check_password
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
@@ -48,7 +48,7 @@ class AuthAPIView(APIView):
                     # save client to db
                     client.save()
                     # create token for client
-                    client_token, client_token_created = Tokens.objects.get_or_create(client=client, manager=None, trainer=None)
+                    client_token, client_token_created = Tokens.objects.create(client=client, manager=None, trainer=None)
                 return Response({"token": client_token.key, "client": serializer.data}, status=201)
             else:
                 return Response(serializer.errors, status=400)
@@ -468,7 +468,7 @@ class DataBaseAPIView(APIView):
         trainer_pass = trainer_data.get("trainerPass")
     
         try:
-            trainer_id = Trainers.objects.order_by('-trainer_id').first().trainer_id_id + 1
+            trainer_id = Trainers.objects.order_by('-trainer_id').first().trainer_id + 1
         except Exception:
             trainer_id = 1
 

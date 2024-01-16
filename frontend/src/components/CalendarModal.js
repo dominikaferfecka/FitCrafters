@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import moment from 'moment';
 import 'moment/locale/pl'
+import TrainingCalendarForm from "./TrainingCalendarForm";
 
 moment.locale('pl');
 const localizer = momentLocalizer(moment);
@@ -21,7 +22,6 @@ const CustomToolbar = (toolbar) => {
   return (
     <div className="rbc-toolbar">
       <span className="rbc-btn-group">
-        {/* Przycisk tygodnia */}
         <button type="button" onClick={goToPrev}>
           Poprzedni
         </button>
@@ -36,47 +36,65 @@ const CustomToolbar = (toolbar) => {
   );
 };
 
-function CalendarModal({onClose, TrainerId}) {
+function CalendarModal({onClose, trainerId}) {
 
   const closeModal = () => {
     onClose(); // Call the onClose prop function to update the state in the parent component
   };
 
   const [trainings_data, setTrainingsData] = useState([]);
+
+  const [trainers_clients_data, setTrainersClientsData] = useState([]);
+
   useEffect(() => {
-      fetch(`http://127.0.0.1:8000/get-trainer_trainings/?trainer_id=${TrainerId}`)
+      fetch(`http://127.0.0.1:8000/get-trainer_trainings/?trainer_id=${trainerId}`)
         .then((response) => response.json())
         .then((trainings_data) => {
           setTrainingsData(trainings_data);
-          console.log(trainings_data);
         })
         .catch((error) => {
           console.log(trainings_data);
           console.error("Błąd przy pobieraniu danych:", error);
         });
-  }, []);
-  
+  }, [trainerId]);
 
-  const events = trainings_data.map((training) => ({
-    start: moment.utc(training.start_time).toDate(),
+  useEffect(() => {
+    fetch(`http://127.0.0.1:8000/trainer_clients/${trainerId}/`)
+      .then((response) => response.json())  
+      .then((trainers_clients_data) => {  
+        setTrainersClientsData(trainers_clients_data);
+      })
+      .catch((error) => {
+        console.error("Błąd przy pobieraniu danych:", error);
+      });
+}, [trainerId]); 
+
+
+  //prepare events
+  const mappedEvents = trainings_data.map((training) => ({
+    start: moment(training.start_time).toDate(),
     end: moment(training.end_time).toDate(),
     title: training.client_name + " " + training.client_surname,
   }));
-  console.log(events);
+
+  const mappedTrainings = trainings_data.map((training, index) => (
+    <option key={training.training_id} value={training.training_id}>
+      {moment(training.start_time).format('MMM DD HH:mm') + "-" + moment(training.end_time).format('HH:mm') + " " + training.client_name + " " + training.client_surname}
+    </option>
+    ));
+
+
 
   const now = new Date();
-  const minTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0); // Ustaw godzinę rozpoczęcia (np. 8:00 AM)
-  const maxTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 21, 0, 0); // Ustaw godzinę zakończenia (np. 5:00 PM)
+  const minTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0); // Set the minimum time to 8:00 AM
+  const maxTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 21, 0, 0); // Set the maximum time to 9:00 PM
 
     return (
       <div class="modal fade bd-example-modal-lg" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" >
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg" style={{ height: 600, width: 800}}>
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="exampleModalLabel"><b>Twój Kalendarz</b></h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
             </div>
             <div class="modal-body">
             <Calendar
@@ -84,20 +102,19 @@ function CalendarModal({onClose, TrainerId}) {
               views={['week']} 
               defaultView={'week'}
               components={{
-                toolbar: CustomToolbar, // Użyj niestandardowego komponentu Toolbar
+                toolbar: CustomToolbar, 
               }}
               min={minTime}
               max={maxTime}
-              events={events} 
-              style={{ height: 550, width: 750 }}
+              events={mappedEvents} 
+              // style={{ height: 550, width: 750 }}
               startAccessor="start"
               endAccessor="end"
-              
             />
+            <TrainingCalendarForm title="Usuń trening z klientem" button_name="Usuń" mappedItems={mappedTrainings} />
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal" onClick={closeModal}>Zamknij</button>
-              <button type="button" class="btn btn-successs">OK</button>
             </div>
           </div>
         </div>

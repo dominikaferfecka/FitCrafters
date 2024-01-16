@@ -215,6 +215,10 @@ class DataBaseAPIView(APIView):
                 
     @csrf_exempt
     def getTrainerTrainings(request):
+        """
+        params: request [json]
+        return: info about trainer's trainings  [JSONResoponse]
+        method extracts received data and returns info about trainer's trainings"""
         # load data
         if request.method == "POST":
             v_trainer_data = json.loads(request.body.decode("utf-8"))
@@ -229,6 +233,28 @@ class DataBaseAPIView(APIView):
             serializer = TrainerTrainingsSerializer(trainings, many=True)
             # return success
             return JsonResponse(serializer.data, safe=False)
+        except Exception as e:
+            return JsonResponse({"message": str(e)}, status=500)
+        
+    
+    @csrf_exempt
+    def deleteTraining(request):
+        """
+        params: request [json]
+        return: status of operation [JSONResoponse]
+        method delete trainings with given training_id"""
+        # load data
+        if request.method == "POST":
+            v_training_data = json.loads(request.body.decode("utf-8"))
+        else:
+            v_training_data = request.GET
+        
+        v_training_id = v_training_data.get("training_id")
+        # extract data
+        try:
+            trainings = Trainings.objects.filter(training_id=v_training_id).delete()
+            # return success
+            return JsonResponse({"status": "success"})
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
 

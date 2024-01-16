@@ -59,7 +59,7 @@ function SideBarTrainer({trainerId}) {
           </div>
         </div>
       </div>
-      <CalendarModal onClose={handleCloseModal} TrainerId={trainerId} />
+      <CalendarModal onClose={handleCloseModal} trainerId={trainerId} />
     </>
   );
 }

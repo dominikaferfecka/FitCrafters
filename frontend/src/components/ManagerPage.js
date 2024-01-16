@@ -47,7 +47,7 @@ function ManagerPage() {
       .then((response) => response.json())
       .then((gym_data) => {
         setgymData(gym_data);
-        console.log(gym_data);
+        // console.log(gym_data);
       })
       .catch((error) => {
         console.log(gym_data);

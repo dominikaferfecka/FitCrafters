@@ -32,8 +32,10 @@ function LogIn(props) {
       .then((response) => response.json())
       .then((data) => {
         if (data.token) {
+          localStorage.setItem("token", data.token);
           console.log(data.status);
           console.log(data.token);
+          console.log(props.accountType);
           // Jeśli logowanie powiodło się, przechodź do odpowiedniej ścieżki
           if (props.accountType === "klient") {
             navigate("/client");
@@ -52,15 +54,6 @@ function LogIn(props) {
         console.error("Błąd podczas logowania", error);
       });
   };
-  // function handleLogInClick() {
-  //   if (props.accountType === "klient") {
-  //     navigate("/client");
-  //   } else if (props.accountType === "trener") {
-  //     navigate("/trainer");
-  //   } else if (props.accountType === "menadżer") {
-  //     navigate("/manager");
-  //   }
-  // }
 
   return (
     <div

@@ -229,7 +229,9 @@ class DataBaseAPIView(APIView):
 
 
     @api_view(['GET'])
-    def getClient(request, client_id):
+    def getClient(request, token):
+        client_id = Tokens.objects.get(key = token).client_id
+        print(client_id)
         client = Clients.objects.get(client_id = client_id)
         data= ClientsSerializer(client).data
         return JsonResponse(data)

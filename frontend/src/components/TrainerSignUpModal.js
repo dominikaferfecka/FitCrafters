@@ -18,7 +18,7 @@ function TrainerSignUpModal(props) {
       date: date,
       time: time,
       trainer_id: props.trainer.trainer_id,
-      client_id: 1, //TO DO
+      client_id: props.client_id,
     };
 
     fetch("http://127.0.0.1:8000/signToTrainer/", {

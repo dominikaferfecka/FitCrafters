@@ -1,4 +1,11 @@
+import { useNavigate } from "react-router-dom";
+
 function SideBarClient() {
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+  };
   return (
     <>
       <div className="d-flex fixed-top" id="wrapper">
@@ -43,7 +50,7 @@ function SideBarClient() {
             </a>
             <a
               className="list-group-item list-group-item-action list-group-item-success p-3"
-              href="/"
+              onClick={handleLogout}
             >
               Wyloguj się
             </a>

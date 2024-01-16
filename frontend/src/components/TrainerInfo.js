@@ -30,10 +30,11 @@ function TrainerInfo(props) {
   }, []);
 
   const handleTrainerSelect = (trainerId) => {
-    const selected = trainers.find((trainer) => trainer.trainer_id === trainerId);
+    const selected = trainers.find(
+      (trainer) => trainer.trainer_id === trainerId
+    );
     setSelectedTrainer(selected);
   };
-  
 
   return (
     <Container id={props.scrollId}>
@@ -45,11 +46,16 @@ function TrainerInfo(props) {
           alignItems: "center",
         }}
       >
-        <select className="form-select w-50 mb-5" aria-label="Select" onChange={(e) => handleTrainerSelect(Number(e.target.value))}>
+        <select
+          className="form-select w-50 mb-5"
+          aria-label="Select"
+          onChange={(e) => handleTrainerSelect(Number(e.target.value))}
+        >
           <option value="0">Wybierz trenera</option>
           {trainers.map((trainer) => (
             <option key={trainer.trainer_id} value={trainer.trainer_id}>
-              { trainer.id }{ trainer.name } { trainer.surname }
+              {trainer.id}
+              {trainer.name} {trainer.surname}
             </option>
           ))}
         </select>
@@ -58,20 +64,25 @@ function TrainerInfo(props) {
       <div class="card w-50 m-auto mb-5">
         <div class="card-header">Trener</div>
         <div class="card-body">
-        <h5 class="card-title">{selectedTrainer ? `${selectedTrainer.name} ${selectedTrainer.surname}` : 'Jan Kowalski'}</h5>
+          <h5 class="card-title">
+            {selectedTrainer
+              ? `${selectedTrainer.name} ${selectedTrainer.surname}`
+              : "Jan Kowalski"}
+          </h5>
           <p class="card-text">
-            {selectedTrainer ? `${selectedTrainer.info}` :
-            "To doświadczony trener personalny, z pasją wspierający innych w osiąganiu celów zdrowotnych. Jego podejście opiera się na spersonalizowanych programach treningowych i dietetycznych, dostosowanych do indywidualnych potrzeb klientów. Zawsze pełen energii i motywacji, Jan inspiruje do zmiany stylu życia, dbając o zdrowie fizyczne i psychiczne podopiecznych. Jego profesjonalizm, empatia i skuteczność przyciągają osoby pragnące transformacji."}
-      
-          
+            {selectedTrainer
+              ? `${selectedTrainer.info}`
+              : "To doświadczony trener personalny, z pasją wspierający innych w osiąganiu celów zdrowotnych. Jego podejście opiera się na spersonalizowanych programach treningowych i dietetycznych, dostosowanych do indywidualnych potrzeb klientów. Zawsze pełen energii i motywacji, Jan inspiruje do zmiany stylu życia, dbając o zdrowie fizyczne i psychiczne podopiecznych. Jego profesjonalizm, empatia i skuteczność przyciągają osoby pragnące transformacji."}
           </p>
           {/* <TrainerSignUpModal trainer={selectedTrainer ? `${selectedTrainer.name} ${selectedTrainer.surname}` : 'Jan Kowalski'}/> */}
-          <TrainerSignUpModal   trainer={{ 
-            name: selectedTrainer ? selectedTrainer.name : '', 
-            surname: selectedTrainer ? selectedTrainer.surname : '', 
-            trainer_id: selectedTrainer ? selectedTrainer.trainer_id : 0 
-          }}/>
-        
+          <TrainerSignUpModal
+            trainer={{
+              name: selectedTrainer ? selectedTrainer.name : "",
+              surname: selectedTrainer ? selectedTrainer.surname : "",
+              trainer_id: selectedTrainer ? selectedTrainer.trainer_id : 0,
+            }}
+            client_id={props.client_id}
+          />
 
           <button
             class="btn btn-success"

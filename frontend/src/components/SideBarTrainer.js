@@ -1,8 +1,9 @@
 import CalendarModal from "./CalendarModal";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function SideBarTrainer() {
-
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
 
   const handleOpenModal = () => {
@@ -11,6 +12,11 @@ function SideBarTrainer() {
 
   const handleCloseModal = () => {
     setShowModal(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
   };
   return (
     <>
@@ -42,24 +48,26 @@ function SideBarTrainer() {
               Plany ćwiczeń klienta
             </a>
 
-            <button 
+            <button
               type="button"
               className="list-group-item list-group-item-action list-group-item-success p-3"
               onClick={() => handleOpenModal()}
-              data-toggle="modal" data-target="#exampleModal">
+              data-toggle="modal"
+              data-target="#exampleModal"
+            >
               Kalendarz
             </button>
-      
+
             <a
               className="list-group-item list-group-item-action list-group-item-success p-3"
-              href="/"
+              onClick={handleLogout}
             >
               Wyloguj się
             </a>
           </div>
         </div>
       </div>
-      <CalendarModal  />
+      <CalendarModal />
       {/* onClose={() => handleCloseModal()} */}
     </>
   );

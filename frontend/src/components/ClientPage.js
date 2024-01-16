@@ -12,6 +12,7 @@ function ClientPage() {
   const [clientData, setClientData] = useState(null);
   const [trainings_data, setTrainingsData] = useState([]);
   const [clients_plan, setClientsPlan] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem("token"));
   const selectStats = [
     "Spalone kalorie",
     "Długość treningów",
@@ -20,14 +21,16 @@ function ClientPage() {
     "Ilość treningów z danym trenerem",
   ];
 
-  const clientId = 1; // change later for real
+  // console.log(localStorage.getItem("token"));
+  // const token = localStorage.getItem("token");
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/getClient/` + String(clientId))
+    fetch(`http://127.0.0.1:8000/getClient/` + token)
       .then((response) => response.json())
       .then((clientData) => {
         setClientData(clientData);
         console.log(clientData);
+        console.log(clientData.client_id);
       })
       .catch((error) => {
         console.log(clientData);
@@ -36,30 +39,39 @@ function ClientPage() {
   }, []);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/client_trainings/" + String(clientId))
-      .then((response) => response.json())
-      .then((trainings_data) => {
-        setTrainingsData(trainings_data);
-        console.log(trainings_data);
-      })
-      .catch((error) => {
-        console.log(trainings_data);
-        console.error("Błąd przy pobieraniu danych:", error);
-      });
-  }, []);
+    if (clientData) {
+      fetch(
+        "http://127.0.0.1:8000/client_trainings/" + String(clientData.client_id)
+      )
+        .then((response) => response.json())
+        .then((trainings_data) => {
+          setTrainingsData(trainings_data);
+          console.log(trainings_data);
+        })
+        .catch((error) => {
+          console.log(trainings_data);
+          console.error("Błąd przy pobieraniu danych:", error);
+        });
+    }
+  }, [clientData]);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/client_trainings_plans/" + String(clientId))
-      .then((response) => response.json())
-      .then((clients_plan) => {
-        setClientsPlan(clients_plan);
-        console.log("CLIENTS PLAN: " + clients_plan);
-      })
-      .catch((error) => {
-        console.log(clients_plan);
-        console.error("Błąd przy pobieraniu danych:", error);
-      });
-  }, []);
+    if (clientData) {
+      fetch(
+        "http://127.0.0.1:8000/client_trainings_plans/" +
+          String(clientData.client_id)
+      )
+        .then((response) => response.json())
+        .then((clients_plan) => {
+          setClientsPlan(clients_plan);
+          console.log("CLIENTS PLAN: " + clients_plan);
+        })
+        .catch((error) => {
+          console.log(clients_plan);
+          console.error("Błąd przy pobieraniu danych:", error);
+        });
+    }
+  }, [clientData]);
 
   return (
     <>
@@ -79,23 +91,34 @@ function ClientPage() {
           scrollId="trainingHistory"
           items={trainings_data}
         />
-        <BarChart
-          header="Statystyki treningów"
-          firstSelectTitle=""
-          firstSelect={[]}
-          stats={selectStats}
-          scrollId="statsTraining"
-          clientId={clientId}
-        />
+        {clientData && (
+          <BarChart
+            header="Statystyki treningów"
+            firstSelectTitle=""
+            firstSelect={[]}
+            stats={selectStats}
+            scrollId="statsTraining"
+            clientId={clientData.client_id}
+          />
+        )}
         {/* <ClientPlan selectItems={[]} scrollId="clientsPlan" items={clients_plan}/> */}
-        <List
-          header="Plan treningów"
-          selectItems={[]}
-          scrollId="clientsPlan"
-          items={clients_plan}
-        />
-        <TrainerInfo scrollId="trainersInfo" />
-        <ClientInfo scrollId="clientInfo" clientData={clientData} />
+        {clientData && (
+          <List
+            header="Plan treningów"
+            selectItems={[]}
+            scrollId="clientsPlan"
+            items={clients_plan}
+          />
+        )}
+        {clientData && (
+          <TrainerInfo
+            scrollId="trainersInfo"
+            client_id={clientData.client_id}
+          />
+        )}
+        {clientData && (
+          <ClientInfo scrollId="clientInfo" clientData={clientData} />
+        )}
         <Footer />
       </div>
     </>

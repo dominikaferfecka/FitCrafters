@@ -1,8 +1,6 @@
-import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 
 function Register(props) {
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     surname: "",

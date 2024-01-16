@@ -28,7 +28,7 @@ function TrainerPage({ onLogout }) {
         console.log(trainer_data);
         console.error("Błąd przy pobieraniu danych:", error);
       });
-  }, [trainer_data]);
+  }, [trainer_data, token]);
 
   useEffect(() => {
     fetch(

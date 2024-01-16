@@ -65,11 +65,7 @@ function TrainerPage({ onLogout }) {
           scrollId="clientList"
           items={clients_data}
         />
-        <ClientPlan
-          selectItems={selectClients2}
-          scrollId="clientPlan"
-          trainer_id={trainer_data.trainer_id}
-        />
+        <ClientPlan selectItems={selectClients2} scrollId="clientPlan" trainer_data={trainer_data}/>
         <Footer />
       </div>
     </>

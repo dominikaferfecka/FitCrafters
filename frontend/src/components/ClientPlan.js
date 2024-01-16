@@ -37,8 +37,8 @@ function ClientPlan(props) {
   ));
 
   const mappedSelectItems = props.selectItems.map((item, index) => (
-    <option key={index} value={index + 1}>
-      {item}
+    <option key={index} value={item.clientId}>
+      {item.name} {item.surname}
     </option>
   ));
 
@@ -73,7 +73,7 @@ function ClientPlan(props) {
   };
 
   // useEffect(() => {
-  //   fetch("http://127.0.0.1:8000/client_trainings_plans/" + String(clientIdTrainer))
+  //   fetch("http://127.0.0.1:8000/client_trainings_plans/a" + String(3))
   //     .then((response) => response.json())
   //     .then((clients_plan_trainer) => {
   //       setClientsPlanTrainer(clients_plan_trainer);

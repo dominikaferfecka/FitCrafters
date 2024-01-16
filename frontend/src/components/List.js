@@ -50,7 +50,7 @@ function List(props) {
     fetch(
       "http://127.0.0.1:8000/client_trainings_plans/" +
         String(props.clientIdTrainer) +
-        "/?trainer_id=1"
+        "/?trainer_id=2"
     )
       .then((response) => response.json())
       .then((clients_plan_trainer) => {

@@ -45,9 +45,12 @@ function TrainerPage({ onLogout }) {
       });
   }, [clients_data, trainer_data]);
 
-  const selectClients2 = clients_data.map(
-    (element) => element.name + " " + element.surname
-  );
+  const selectClients2 = clients_data.map((element) => ({
+    clientId: element.client_id,
+    name: element.name,
+    surname: element.surname,
+  }));
+
   console.log(selectClients2);
   return (
     <>

@@ -1,5 +1,9 @@
 import { Container } from "react-bootstrap";
 import React, { useState, useEffect } from "react";
+import GymDetailModal from "./GymDetailModal";
+import TrainerDetailModal from "./TrainerDetailModal";
+import TrainingDetailModal from "./TrainingDetailModal";
+import EquipmentDetailModal from "./EquipmentDetailModal";
 
 function List(props) {
   const [equipment_data, setEquipmentData] = useState([]);
@@ -7,6 +11,17 @@ function List(props) {
   const [trainers_data, setgymTrainersData] = useState([]);
 
   const [selectedGym, setSelectedGym] = useState("");
+
+  const [selectedGymDetails, setSelectedGymDetails] = useState(null);
+
+  const [clients_plan, setClientsPlan] = useState(null);
+  const [clients_plan_trainer, setClientsPlanTrainer] = useState(null);
+
+  const [selectedTrainer, setSelectedTrainer] = useState(0);
+
+  const [selectedTrainingDetails, setSelectedTrainingDetails] = useState(null);
+
+  const [selectedEquipment, setSelectedEquipment] = useState(null);
 
   useEffect(() => {
     props.scrollId === "equipmentList" &&
@@ -37,16 +52,37 @@ function List(props) {
         });
   }, [selectedGym]);
 
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/client_trainings_plans/" + String(props.clientIdTrainer) + "/?trainer_id=1")
+      .then((response) => response.json())
+      .then((clients_plan_trainer) => {
+        setClientsPlanTrainer(clients_plan_trainer);
+        console.log("CLIENTS PLAN TRAINER: " + clients_plan_trainer);
+      })
+      .catch((error) => {
+        console.log(clients_plan_trainer);
+        console.log("selectedGym" + selectedGym);
+        console.error("Błąd przy pobieraniu danych:", error);
+      });
+  }, [props.clientIdTrainer]);
+
   var columns = ["#", "First", "Last", "Handle"];
+
   if (props.scrollId === "gymList") {
-    columns = ["#", "Nazwa", "Ulica", "Numer telefonu"];
+    columns = ["#", "Nazwa", "Ulica", "Numer telefonu", "Szczegóły"];
   }
   if (props.scrollId === "equipmentList") {
     columns = ["#", "Kategoria", "Nazwa", "Ilość"];
+    if (selectedGym) {
+      columns.push("Szczegóły");
+    }
   }
   if (props.scrollId === "trainerList") {
-    columns = ["#", "Imię", "Nazwisko", "Numer telefonu"];
+    columns = ["#", "Imię", "Nazwisko", "Numer telefonu", "Szczegóły"];
   }
+
+  console.log(columns);
+  console.log(props);
   if (props.scrollId === "clientList") {
     columns = [
       "#",
@@ -57,6 +93,38 @@ function List(props) {
       "Wiek",
       "Waga",
       "Wzrost",
+    ];
+  }
+  if (props.scrollId === "trainingHistory") {
+    columns = [
+      "#",
+      "Nazwa treningu",
+      "Kategoria",
+      "Początek treningu",
+      "Czas trwania (min)",
+      "Trener",
+      "Sprawdź ćwiczenia",
+    ];
+  }
+  console.log(props.scrollId);
+  if (props.scrollId === "clientsPlan") {
+    columns = [
+      "#",
+      "Nazwa treningu",
+      "Kategoria",
+      "Początek treningu",
+      "Czas trwania (min)",
+      "Trener",
+    ];
+  }
+  if (props.scrollId === "clientsPlanTrainer") {
+    columns = [
+      "#",
+      "Nazwa treningu",
+      "Kategoria",
+      "Początek treningu",
+      "Czas trwania (min)",
+      "Trener",
     ];
   }
   const listItems = columns.map((col, index) => (
@@ -75,88 +143,277 @@ function List(props) {
     setSelectedGym(event.target.value);
   };
 
+  const handleGymDetailsClick = (gymDetails) => {
+    // console.log(gymDetails);
+    setSelectedGymDetails(gymDetails);
+  };
+
+  const handleTrainerClick = (trainer) => {
+    setSelectedTrainer(trainer);
+  };
+  const handleTrainingDetailsClick = (trainingDetails) => {
+    setSelectedTrainingDetails(trainingDetails);
+  };
+
+  const handleEquipmentClick = (equipmentDetails) => {
+    setSelectedEquipment(equipmentDetails);
+  };
+
   return (
-    <Container className="w-75" id={props.scrollId}>
-      <h1 className="text-center m-5">{props.header}</h1>
-      {props.showSelect && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <select
-            className="form-select w-50"
-            aria-label="Select"
-            onChange={handleSelectChange}
-          >
-            <option value="0">{props.firstSelectTitle}</option>
-
-            {mappedSelectItems}
-          </select>
-        </div>
+    <>
+      {props.scrollId === "gymList" && (
+        <GymDetailModal gymDetails={selectedGymDetails} />
       )}
-      <table className="table table-bordered border-success m-5">
-        <thead>
-          <tr>{listItems}</tr>
-        </thead>
-        <tbody>
-          {props.scrollId === "gymList" &&
-            props.items.map((element) => (
-              <tr>
-                <th scope="row">{element.gym_id}</th>
+      {props.scrollId === "trainerList" && (
+        <TrainerDetailModal
+          trainerDetails={selectedTrainer}
+          mappedGyms={mappedSelectItems}
+        />
+      )}
+      {props.scrollId === "trainingHistory" && (
+        <TrainingDetailModal trainingDetails={selectedTrainingDetails} />
+      )}
 
-                <>
-                  <td>{element.city}</td>
-                  <td>{element.street}</td>
-                  <td>{element.phone_number}</td>
-                </>
-              </tr>
-            ))}
-          {props.scrollId === "equipmentList" &&
-            equipment_data.map((element) => (
-              <tr>
-                <th scope="row">{element.equipment_id}</th>
+      {props.scrollId === "equipmentList" && (
+        <EquipmentDetailModal
+          selectedGym={selectedGym}
+          mappedGyms={mappedSelectItems}
+          selectedEquipment={selectedEquipment}
+        />
+      )}
+      <Container className="w-75" id={props.scrollId}>
+        <h1 className="text-center m-5">{props.header}</h1>
+        {props.showSelect && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <select
+              className="form-select w-50"
+              aria-label="Select"
+              onChange={handleSelectChange}
+            >
+              <option value="0">{props.firstSelectTitle}</option>
 
-                <>
-                  <td>{element.category}</td>
-                  <td>{element.name}</td>
-                  <td>{element.quantity}</td>
-                </>
-              </tr>
-            ))}
-          {props.scrollId === "trainerList" &&
-            trainers_data.map((element) => (
-              <tr>
-                <th scope="row">{element.trainer_id}</th>
+              {mappedSelectItems}
+            </select>
+          </div>
+        )}
+        <table className="table table-bordered border-success m-5">
+          <thead>
+            <tr>{listItems}</tr>
+          </thead>
+          <tbody>
+            {props.scrollId === "gymList" &&
+              props.items.map((element) => (
+                <tr>
+                  <th scope="row">{element.gym_id}</th>
 
-                <>
-                  <td>{element.name}</td>
-                  <td>{element.surname}</td>
-                  <td>{element.phone_number}</td>
-                </>
-              </tr>
-            ))}
-          {props.scrollId === "clientList" &&
-            props.items.map((element) => (
-              <tr>
-                <th scope="row">{element.client_id}</th>
+                  <>
+                    <td>{element.city}</td>
+                    <td>{element.street}</td>
+                    <td>{element.phone_number}</td>
+                    <td
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <button
+                        className="btn btn-success btn-sm"
+                        type="submit"
+                        data-bs-toggle="modal"
+                        data-bs-target="#GymDetailModal"
+                        onClick={() => handleGymDetailsClick(element)}
+                      >
+                        +
+                      </button>
+                    </td>
+                  </>
+                </tr>
+              ))}
+            {props.scrollId === "equipmentList" &&
+              equipment_data.map((element) => (
+                <tr>
+                  <th scope="row">{element.equipment_id}</th>
 
-                <>
-                  <td>{element.name}</td>
-                  <td>{element.surname}</td>
-                  <td>{element.phone_number}</td>
-                  <td>{element.email}</td>
-                  <td>{element.age}</td>
-                  <td>{element.weight}</td>
-                  <td>{element.height}</td>
-                </>
-              </tr>
-            ))}
-        </tbody>
-      </table>
-    </Container>
+                  <>
+                    <td>{element.category}</td>
+                    <td>{element.name}</td>
+                    <td>{element.quantity}</td>
+                    {selectedGym && (
+                      <td
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <button
+                          class="btn btn-success btn-sm"
+                          type="submit"
+                          data-bs-toggle="modal"
+                          data-bs-target="#EquipmentDetailModal"
+                          onClick={() => handleEquipmentClick(element)}
+                        >
+                          +
+                        </button>
+                      </td>
+                    )}
+                  </>
+                </tr>
+              ))}
+            {props.scrollId === "trainerList" &&
+              trainers_data.map((element) => (
+                <tr>
+                  <th scope="row">{element.trainer_id}</th>
+
+                  <>
+                    <td>{element.name}</td>
+                    <td>{element.surname}</td>
+                    <td>{element.phone_number}</td>
+                    <td
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <button
+                        class="btn btn-success btn-sm"
+                        type="submit"
+                        data-bs-toggle="modal"
+                        data-bs-target="#TrainerDetailModal"
+                        onClick={() => handleTrainerClick(element)}
+                      >
+                        +
+                      </button>
+                    </td>
+                  </>
+                </tr>
+              ))}
+            {props.scrollId === "clientList" &&
+              props.items.map((element) => (
+                <tr>
+                  <th scope="row">{element.client_id}</th>
+
+                  <>
+                    <td>{element.name}</td>
+                    <td>{element.surname}</td>
+                    <td>{element.phone_number}</td>
+                    <td>{element.email}</td>
+                    <td>{element.age}</td>
+                    <td>{element.weight}</td>
+                    <td>{element.height}</td>
+                  </>
+                </tr>
+              ))}
+            {props.scrollId === "trainingHistory" && props.items &&
+              props.items.map((element) => (
+                <tr>
+                  <th scope="row">{element.training_id}</th>
+                  <>
+                    <td>
+                      {element.training_plan_name
+                        ? element.training_plan_name
+                        : "Custom training"}
+                    </td>
+                    <td>
+                      {element.training_plan_category
+                        ? element.training_plan_category
+                        : "-"}
+                    </td>
+                    <td>{element.start_time}</td>
+                    <td>
+                      {element.training_plan_time
+                        ? element.training_plan_time
+                        : "-"}
+                    </td>
+                    <td>
+                      {element.trainer_name} {element.trainer_surname}
+                    </td>
+                    <td
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <button
+                        className="btn btn-success btn-sm"
+                        type="submit"
+                        data-bs-toggle="modal"
+                        data-bs-target="#TrainingDetailModal"
+                        onClick={() => handleTrainingDetailsClick(element)}
+                      >
+                        +
+                      </button>
+                    </td>
+                  </>
+                </tr>
+              ))}
+              {props.scrollId === "clientsPlan" && props.items &&
+              props.items.map((element) => (
+                <tr>
+                  <th scope="row">{element.training_id}</th>
+                  <>
+                    <td>
+                      {element.training_plan_name
+                        ? element.training_plan_name
+                        : "Custom training"}
+                    </td>
+                    <td>
+                      {element.training_plan_category
+                        ? element.training_plan_category
+                        : "-"}
+                    </td>
+                    <td>{element.start_time}</td>
+                    <td>
+                      {element.training_plan_time
+                        ? element.training_plan_time
+                        : "-"}
+                    </td>
+                    <td>
+                      {element.trainer_name} {element.trainer_surname}
+                    </td>
+                  </>
+                </tr>
+              ))}
+              {props.scrollId === "clientsPlanTrainer" && clients_plan_trainer &&
+              clients_plan_trainer.map((element) => (
+                <tr>
+                  <th scope="row">{element.training_id}</th>
+                  <>
+                    <td>
+                      {element.training_plan_name
+                        ? element.training_plan_name
+                        : "Custom training"}
+                    </td>
+                    <td>
+                      {element.training_plan_category
+                        ? element.training_plan_category
+                        : "-"}
+                    </td>
+                    <td>{element.start_time}</td>
+                    <td>
+                      {element.training_plan_time
+                        ? element.training_plan_time
+                        : "-"}
+                    </td>
+                    <td>
+                      {element.trainer_name} {element.trainer_surname}
+                    </td>
+                  </>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </Container>
+    </>
   );
 }
 

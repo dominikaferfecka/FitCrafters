@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils import timezone
+from django.utils.crypto import get_random_string
 
 
 class Clients(models.Model):
@@ -10,13 +12,31 @@ class Clients(models.Model):
     age = models.IntegerField(blank=True, null=True)
     weight = models.IntegerField(blank=True, null=True)
     height = models.IntegerField(blank=True, null=True)
-    hash_pass = models.CharField(max_length=40)
+    hash_pass = models.CharField(max_length=512)
 
     def __str__(self):
         return f"{self.name} {self.surname}"
 
     class Meta:
         db_table = 'clients'
+
+class Tokens(models.Model):
+    key = models.CharField(max_length=40, primary_key=True)
+    client = models.ForeignKey('Clients', null=True, blank=True, related_name='auth_tokens', on_delete=models.CASCADE, default=None)
+    manager = models.ForeignKey('Managers', null=True, blank=True, related_name='auth_tokens', on_delete=models.CASCADE, default=None)
+    trainer = models.ForeignKey('Trainers', null=True, blank=True, related_name='auth_tokens', on_delete=models.CASCADE, default=None)
+    created = models.DateTimeField(default=timezone.now)
+
+    def save(self, *args, **kwargs):
+        if not self.key:
+            self.key = self.generate_key()
+        return super().save(*args, **kwargs)
+
+    def generate_key(self):
+        return get_random_string(40)
+
+    class Meta:
+        db_table = 'tokens'
 
 
 class EquipmentType(models.Model):
@@ -90,7 +110,7 @@ class Managers(models.Model):
     surname = models.TextField()
     phone_number = models.CharField(max_length=20, unique=True)
     email = models.TextField()
-    hash_pass = models.CharField(max_length=40)
+    hash_pass = models.CharField(max_length=512)
 
     def __str__(self):
         return f"{self.name} {self.surname}"
@@ -107,7 +127,7 @@ class Trainers(models.Model):
     email = models.TextField()
     hour_salary = models.IntegerField(blank=True, null=True)
     gym = models.ForeignKey(Gyms, models.DO_NOTHING)
-    hash_pass = models.CharField(max_length=40)
+    hash_pass = models.CharField(max_length=512)
     info = models.TextField()
 
     def __str__(self):
@@ -120,8 +140,8 @@ class Trainers(models.Model):
 
 class TrainingPlans(models.Model):
     training_plan_id = models.IntegerField(primary_key=True)
-    category = models.IntegerField()
-    name = models.IntegerField()
+    category = models.TextField()
+    name = models.TextField()
     time = models.IntegerField(blank=True, null=True)
 
     class Meta:

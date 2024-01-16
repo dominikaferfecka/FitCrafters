@@ -1,23 +1,24 @@
 import React from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
-import { useEffect, useState } from "react";
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import moment from 'moment';
 import 'moment/locale/pl'
 import TrainingCalendarForm from "./TrainingCalendarForm";
+import { useEffect, useState } from "react";
 
-moment.locale('pl');
+
+moment.locale("pl");
 const localizer = momentLocalizer(moment);
 
 const CustomToolbar = (toolbar) => {
   const goToPrev = () => {
-    const newDate = moment(toolbar.date).subtract(1, 'week').toDate();
-    toolbar.onNavigate('prev', newDate);
+    const newDate = moment(toolbar.date).subtract(1, "week").toDate();
+    toolbar.onNavigate("prev", newDate);
   };
 
   const goToNext = () => {
-    const newDate = moment(toolbar.date).add(1, 'week').toDate();
-    toolbar.onNavigate('next', newDate);
+    const newDate = moment(toolbar.date).add(1, "week").toDate();
+    toolbar.onNavigate("next", newDate);
   };
   return (
     <div className="rbc-toolbar">
@@ -25,7 +26,7 @@ const CustomToolbar = (toolbar) => {
         <button type="button" onClick={goToPrev}>
           Poprzedni
         </button>
-        <button type="button" onClick={() => toolbar.onView('week')}>
+        <button type="button" onClick={() => toolbar.onView("week")}>
           Tydzień
         </button>
         <button type="button" onClick={goToNext}>
@@ -91,7 +92,7 @@ function CalendarModal({onClose, trainerId}) {
 
     return (
       <div class="modal fade bd-example-modal-lg" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" >
-        <div class="modal-dialog modal-lg" style={{ height: 600, width: 800}}>
+        {/* <div class="modal-dialog modal-lg" style={{ height: 700, width: 900}}> */}
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="exampleModalLabel"><b>Twój Kalendarz</b></h5>
@@ -99,15 +100,15 @@ function CalendarModal({onClose, trainerId}) {
             <div class="modal-body">
             <Calendar
               localizer={localizer}
-              views={['week']} 
-              defaultView={'week'}
+              views={["week"]}
+              defaultView={"week"}
               components={{
                 toolbar: CustomToolbar, 
               }}
               min={minTime}
               max={maxTime}
               events={mappedEvents} 
-              // style={{ height: 550, width: 750 }}
+              // style={{ height: 600, width: 800 }}
               startAccessor="start"
               endAccessor="end"
             />
@@ -118,8 +119,7 @@ function CalendarModal({onClose, trainerId}) {
             </div>
           </div>
         </div>
-      </div>
-
+      // </div>
     );
 }
 

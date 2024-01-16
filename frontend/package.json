@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@syncfusion/ej2-base": "^24.1.42",
+    "@syncfusion/ej2-buttons": "^24.1.45",
+    "@syncfusion/ej2-calendars": "^24.1.44",
+    "@syncfusion/ej2-dropdowns": "^24.1.45",
+    "@syncfusion/ej2-react-schedule": "^24.1.41",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -16,7 +21,6 @@
     "react-bootstrap": "^2.9.1",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.0",
-    "react-scripts": "^5.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -46,5 +50,9 @@
   "overrides": {
     "nth-check": "$nth-check",
     "postcss": "$postcss"
+  },
+  "devDependencies": {
+    "react-scripts": "^5.0.1",
+    "webpack": "^5.89.0"
   }
 }

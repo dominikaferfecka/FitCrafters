@@ -1,9 +1,11 @@
 from celery import shared_task
 from django.utils import timezone
+from datetime import datetime, timedelta
 from .models import Trainings, ExercisesTrainingPlans, ExercisesTrainingPlans
 from .serializers import TrainingsExercisesSerializer, ExercisesTrainingPlansSerializer
 import random
 from django.http import JsonResponse
+import pytz
 
 @shared_task
 def check_training_start():
@@ -11,9 +13,10 @@ def check_training_start():
     Function calls task generate_exercise_task
     for every training which started after last check (5 minutes ago)
     """
-    timezone="+01:00"
-    last_check_time = (timezone.localtime(timezone.now()) - timezone.timedelta(minutes=5)).strftime('%Y-%m-%d %H:%M:%S'+timezone)
-    unow = timezone.localtime(timezone.now()).strftime('%Y-%m-%d %H:%M:%S'+timezone)
+    tz = pytz.timezone("Europe/Warsaw") 
+    last_check_time = datetime.strftime(timezone.make_aware(datetime.now() - timedelta(minutes=5), tz), '%Y-%m-%d %H:%M %z')
+    unow = datetime.strftime(timezone.make_aware(datetime.now(), tz), '%Y-%m-%d %H:%M %z')
+    print(last_check_time, unow)
     # Filter trainings by start_time from last check
     new_trainings = Trainings.objects.filter(start_time__range=(last_check_time, unow))
     for training in new_trainings:
@@ -44,6 +47,7 @@ def generate_exercise_task(training_id):
     exercises_id = get_exercises_for_training(training)
     # time_delay keeps delay between doing next exercises
     time_delay = 0
+    exercise_training_log={}
     for exercise_id in exercises_id:
         exercise_training_plan= ExercisesTrainingPlans.objects.get(training_plan=training.training_plan, exercise=exercise_id)
         # get data about planned exercise

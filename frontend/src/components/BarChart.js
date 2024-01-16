@@ -6,6 +6,7 @@ import "react-date-range/dist/theme/default.css";
 import { addDays } from "date-fns";
 
 function BarChart(props) {
+  const clientId = props.clientId 
   const [selectedStat, setSelectedStat] = useState(props.stats[0]);
   const [statistics, setStatistics] = useState("");
   const [caloriesData, setCaloriesData] = useState([]);
@@ -97,7 +98,7 @@ function BarChart(props) {
   useEffect(() => {
 
     const fetchData = async () => {
-      const url = `http://127.0.0.1:8000/training-stats-${statistics}/1/?startDate=${selectedDate.startDate.toISOString()}&endDate=${selectedDate.endDate.toISOString()}`;
+      const url = `http://127.0.0.1:8000/training-stats-${statistics}/${clientId}/?startDate=${selectedDate.startDate.toISOString()}&endDate=${selectedDate.endDate.toISOString()}`;
 
       try {
         const response = await fetch(url);

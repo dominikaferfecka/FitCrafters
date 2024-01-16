@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 
-function Register() {
+function Register(props) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
@@ -50,12 +50,13 @@ function Register() {
       })
         .then((response) => response.json())
         .then((data) => {
-          if (data.message) {
-            console.log(data.message);
-          } else {
+          if (data.token) {
             console.log("Rejestracja udana");
             console.log(data);
-            navigate("/client");
+            console.log(data.message);
+            alert("Twoje konto zostało utworzone!");
+          } else {
+            alert("Rejestracja nieudana");
           }
         })
         .catch((error) => {

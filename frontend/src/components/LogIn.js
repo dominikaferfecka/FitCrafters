@@ -31,18 +31,29 @@ function LogIn(props) {
     })
       .then((response) => response.json())
       .then((data) => {
-        if (data.token) {
-          localStorage.setItem("token", data.token);
+        if (data.token_key) {
           console.log(data.status);
-          console.log(data.token);
+          console.log(data.token_key);
           console.log(props.accountType);
+          console.log(data.token_client_id);
+          props.setIsLoggedIn(true);
           // Jeśli logowanie powiodło się, przechodź do odpowiedniej ścieżki
           if (props.accountType === "klient") {
-            navigate("/client");
+            if (data.token_client_id) {
+              localStorage.setItem("token", data.token_key);
+              console.log("Navigating to /client");
+              navigate("/client");
+            }
           } else if (props.accountType === "trener") {
-            navigate("/trainer");
+            if (data.token_trainer_id) {
+              localStorage.setItem("token", data.token_key);
+              navigate("/trainer");
+            }
           } else if (props.accountType === "menadżer") {
-            navigate("/manager");
+            if (data.token_manager_id) {
+              localStorage.setItem("token", data.token_key);
+              navigate("/manager");
+            }
           }
         } else {
           // Logowanie nieudane - obsłuż odpowiednio

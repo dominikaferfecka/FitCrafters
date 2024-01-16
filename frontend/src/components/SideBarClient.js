@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
 
-function SideBarClient() {
+function SideBarClient({ onLogout }) {
   const navigate = useNavigate();
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    onLogout();
     navigate("/");
   };
   return (
@@ -48,12 +48,12 @@ function SideBarClient() {
             >
               Modyfikuj swoje dane
             </a>
-            <a
+            <div
               className="list-group-item list-group-item-action list-group-item-success p-3"
               onClick={handleLogout}
             >
               Wyloguj się
-            </a>
+            </div>
           </div>
         </div>
       </div>

@@ -1,6 +1,5 @@
 import BarChart from "./BarChart";
 import ClientInfo from "./ClientInfo";
-import ClientPlan from "./ClientPlan";
 import List from "./List";
 import SideBarClient from "./SideBarClient";
 import TrainerInfo from "./TrainerInfo";
@@ -8,11 +7,11 @@ import UserHeader from "./UserHeader";
 import Footer from "./Footer";
 import React, { useEffect, useState } from "react";
 
-function ClientPage() {
+function ClientPage({ onLogout }) {
   const [clientData, setClientData] = useState(null);
   const [trainings_data, setTrainingsData] = useState([]);
   const [clients_plan, setClientsPlan] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [token] = useState(localStorage.getItem("token"));
   const selectStats = [
     "Spalone kalorie",
     "Długość treningów",
@@ -21,22 +20,16 @@ function ClientPage() {
     "Ilość treningów z danym trenerem",
   ];
 
-  // console.log(localStorage.getItem("token"));
-  // const token = localStorage.getItem("token");
-
   useEffect(() => {
     fetch(`http://127.0.0.1:8000/getClient/` + token)
       .then((response) => response.json())
       .then((clientData) => {
         setClientData(clientData);
-        console.log(clientData);
-        console.log(clientData.client_id);
       })
       .catch((error) => {
-        console.log(clientData);
         console.error("Błąd przy pobieraniu danych:", error);
       });
-  }, []);
+  }, [clientData, token]);
 
   useEffect(() => {
     if (clientData) {
@@ -46,14 +39,12 @@ function ClientPage() {
         .then((response) => response.json())
         .then((trainings_data) => {
           setTrainingsData(trainings_data);
-          console.log(trainings_data);
         })
         .catch((error) => {
-          console.log(trainings_data);
           console.error("Błąd przy pobieraniu danych:", error);
         });
     }
-  }, [clientData]);
+  }, [clientData, trainings_data]);
 
   useEffect(() => {
     if (clientData) {
@@ -64,19 +55,17 @@ function ClientPage() {
         .then((response) => response.json())
         .then((clients_plan) => {
           setClientsPlan(clients_plan);
-          console.log("CLIENTS PLAN: " + clients_plan);
         })
         .catch((error) => {
-          console.log(clients_plan);
           console.error("Błąd przy pobieraniu danych:", error);
         });
     }
-  }, [clientData]);
+  }, [clientData, clients_plan]);
 
   return (
     <>
       <div style={{ width: "250px", float: "left" }}>
-        <SideBarClient />
+        <SideBarClient onLogout={onLogout} />
       </div>
       <div style={{ marginLeft: "230px" }}>
         {clientData ? (

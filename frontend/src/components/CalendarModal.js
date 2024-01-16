@@ -35,10 +35,7 @@ const CustomToolbar = (toolbar) => {
   );
 };
 
-function CalendarModal({ onClose }) {
-  const closeModal = () => {
-    onClose(); // Call the onClose prop function to update the state in the parent component
-  };
+function CalendarModal() {
   const now = new Date();
   const minTime = new Date(
     now.getFullYear(),
@@ -74,12 +71,10 @@ function CalendarModal({ onClose }) {
             </h5>
             <button
               type="button"
-              class="close"
-              data-dismiss="modal"
+              class="btn-close"
+              data-bs-dismiss="modal"
               aria-label="Close"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
+            ></button>
           </div>
           <div class="modal-body">
             <Calendar
@@ -100,11 +95,15 @@ function CalendarModal({ onClose }) {
             <button
               type="button"
               class="btn btn-secondary"
-              data-dismiss="modal"
+              data-bs-dismiss="modal"
             >
               Zamknij
             </button>
-            <button type="button" class="btn btn-primary">
+            <button
+              type="button"
+              class="btn btn-success"
+              data-bs-dismiss="modal"
+            >
               OK
             </button>
           </div>

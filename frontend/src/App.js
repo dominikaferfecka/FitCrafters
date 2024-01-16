@@ -12,26 +12,47 @@ import TrainerPage from "./components/TrainerPage";
 import ManagerPage from "./components/ManagerPage";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    localStorage.getItem("token") !== null
+  );
 
-  // Check the local storage on component mount
   useEffect(() => {
     setIsLoggedIn(localStorage.getItem("token") !== null);
-  }, [localStorage]);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsLoggedIn(false); // Update the login state
+  };
 
   return (
     <>
       <Router>
         {isLoggedIn ? (
           <Routes>
-            <Route path="/" element={<FrontPage />} />
-            <Route path="/client" element={<ClientPage />} />
-            <Route path="/trainer" element={<TrainerPage />} />
-            <Route path="/manager" element={<ManagerPage />} />
+            <Route
+              path="/"
+              element={<FrontPage setIsLoggedIn={setIsLoggedIn} />}
+            />
+            <Route
+              path="/client"
+              element={<ClientPage onLogout={handleLogout} />}
+            />
+            <Route
+              path="/trainer"
+              element={<TrainerPage onLogout={handleLogout} />}
+            />
+            <Route
+              path="/manager"
+              element={<ManagerPage onLogout={handleLogout} />}
+            />
           </Routes>
         ) : (
           <Routes>
-            <Route path="/" element={<FrontPage />} />
+            <Route
+              path="/"
+              element={<FrontPage setIsLoggedIn={setIsLoggedIn} />}
+            />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         )}

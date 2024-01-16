@@ -29,13 +29,10 @@ function List(props) {
         .then((response) => response.json())
         .then((equipment_data) => {
           setEquipmentData(equipment_data);
-          console.log(equipment_data);
         })
         .catch((error) => {
-          console.log(equipment_data);
           console.error("Błąd przy pobieraniu danych:", error);
         });
-    console.log(selectedGym);
   }, [selectedGym]);
 
   useEffect(() => {
@@ -44,24 +41,23 @@ function List(props) {
         .then((response) => response.json())
         .then((trainers_data) => {
           setgymTrainersData(trainers_data);
-          console.log(trainers_data);
         })
         .catch((error) => {
-          console.log(trainers_data);
           console.error("Błąd przy pobieraniu danych:", error);
         });
   }, [selectedGym]);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/client_trainings_plans/" + String(props.clientIdTrainer) + "/?trainer_id=1")
+    fetch(
+      "http://127.0.0.1:8000/client_trainings_plans/" +
+        String(props.clientIdTrainer) +
+        "/?trainer_id=1"
+    )
       .then((response) => response.json())
       .then((clients_plan_trainer) => {
         setClientsPlanTrainer(clients_plan_trainer);
-        console.log("CLIENTS PLAN TRAINER: " + clients_plan_trainer);
       })
       .catch((error) => {
-        console.log(clients_plan_trainer);
-        console.log("selectedGym" + selectedGym);
         console.error("Błąd przy pobieraniu danych:", error);
       });
   }, [props.clientIdTrainer]);
@@ -81,8 +77,6 @@ function List(props) {
     columns = ["#", "Imię", "Nazwisko", "Numer telefonu", "Szczegóły"];
   }
 
-  console.log(columns);
-  console.log(props);
   if (props.scrollId === "clientList") {
     columns = [
       "#",
@@ -106,7 +100,7 @@ function List(props) {
       "Sprawdź ćwiczenia",
     ];
   }
-  console.log(props.scrollId);
+
   if (props.scrollId === "clientsPlan") {
     columns = [
       "#",
@@ -144,7 +138,6 @@ function List(props) {
   };
 
   const handleGymDetailsClick = (gymDetails) => {
-    // console.log(gymDetails);
     setSelectedGymDetails(gymDetails);
   };
 
@@ -312,7 +305,8 @@ function List(props) {
                   </>
                 </tr>
               ))}
-            {props.scrollId === "trainingHistory" && props.items &&
+            {props.scrollId === "trainingHistory" &&
+              props.items &&
               props.items.map((element) => (
                 <tr>
                   <th scope="row">{element.training_id}</th>
@@ -356,7 +350,8 @@ function List(props) {
                   </>
                 </tr>
               ))}
-              {props.scrollId === "clientsPlan" && props.items &&
+            {props.scrollId === "clientsPlan" &&
+              props.items &&
               props.items.map((element) => (
                 <tr>
                   <th scope="row">{element.training_id}</th>
@@ -383,7 +378,8 @@ function List(props) {
                   </>
                 </tr>
               ))}
-              {props.scrollId === "clientsPlanTrainer" && clients_plan_trainer &&
+            {props.scrollId === "clientsPlanTrainer" &&
+              clients_plan_trainer &&
               clients_plan_trainer.map((element) => (
                 <tr>
                   <th scope="row">{element.training_id}</th>

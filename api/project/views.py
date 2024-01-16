@@ -84,7 +84,7 @@ class AuthAPIView(APIView):
                     token, created = Tokens.objects.get_or_create(trainer=user, client=None, manager=None)
                     serializer = TrainersSerializer(user)
                 # return token and user data
-                return Response({"token": token.key, "user": serializer.data, "role": user_role}, status=200)
+                return Response({"token_key":  token.key, "token_client_id": token.client_id, "token_trainer_id": token.trainer_id, "token_manager_id": token.manager_id, "user": serializer.data, "role": user_role}, status=200)
             else:
                 # password incorrect
                 return Response({"detail": "Invalid credentials."}, status=401)
@@ -135,7 +135,7 @@ class DataBaseAPIView(APIView):
             data = EquipmentAllSerializer(equipment, many=True).data
         return JsonResponse(data, safe=False)
     
-    @api_view(['GET'])
+    @csrf_exempt
     def getTrainer(request):
         if request.method == "POST":
             data = json.loads(request.body.decode("utf-8"))
@@ -144,6 +144,13 @@ class DataBaseAPIView(APIView):
         if data.get("gym"):
             v_gym_id = data.get("gym")
             trainers = Trainers.objects.filter(gym=v_gym_id)
+        elif data.get("token"):
+            token = data.get("token")
+            trainer_id = Tokens.objects.get(key=token).trainer_id
+            trainers = Trainers.objects.get(trainer_id = trainer_id)
+            data = TrainersSerializer(trainers).data
+            return JsonResponse(data)
+
         else:
             trainers = Trainers.objects.all()
         data = TrainersSerializer(trainers, many=True).data

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function SideBarManager() {
@@ -60,12 +59,12 @@ function SideBarManager() {
             >
               Siłownie
             </a>
-            <a
+            <div
               className="list-group-item list-group-item-action list-group-item-success p-3"
               onClick={handleLogout}
             >
               Wyloguj się
-            </a>
+            </div>
           </div>
         </div>
       </div>

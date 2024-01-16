@@ -3,7 +3,6 @@ import React, { useState } from "react";
 function TrainerSignUpModal(props) {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
-  const [notification, setNotification] = useState({ type: "", message: "" });
 
   const handleDateChange = (event) => {
     setDate(event.target.value);

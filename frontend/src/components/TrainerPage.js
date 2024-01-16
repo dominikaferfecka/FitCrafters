@@ -5,14 +5,35 @@ import UserHeader from "./UserHeader";
 import ClientPlan from "./ClientPlan";
 import React, { useEffect, useState } from "react";
 
-function TrainerPage() {
-  const trainerId = 1; // change later for real
-  const selectClients = ["klient1", "klient2", "klient3", "klient4", "klient5"];
+function TrainerPage({ onLogout }) {
   const [clients_data, setClientsData] = useState([]);
-  console.log(trainerId);
+  const [trainer_data, setTrainerData] = useState([]);
+  const [token] = useState(localStorage.getItem("token"));
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/trainer-endpoint/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token: token,
+      }),
+    })
+      .then((response) => response.json())
+      .then((trainer_data) => {
+        setTrainerData(trainer_data);
+        console.log(trainer_data);
+      })
+      .catch((error) => {
+        console.log(trainer_data);
+        console.error("Błąd przy pobieraniu danych:", error);
+      });
+  }, [trainer_data]);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/trainer_clients/" + String(trainerId))
+    fetch(
+      "http://127.0.0.1:8000/trainer_clients/" + String(trainer_data.trainer_id)
+    )
       .then((response) => response.json())
       .then((clients_data) => {
         setClientsData(clients_data);
@@ -22,20 +43,22 @@ function TrainerPage() {
         console.log(clients_data);
         console.error("Błąd przy pobieraniu danych:", error);
       });
-  }, [clients_data]);
-  console.log(clients_data);
+  }, [clients_data, trainer_data]);
 
-  const selectClients2 = clients_data.map(
-    (element) => element.name + " " + element.surname
-  );
+  const selectClients2 = clients_data.map((element) => ({
+    clientId: element.client_id,
+    name: element.name,
+    surname: element.surname,
+  }));
+
   console.log(selectClients2);
   return (
     <>
       <div style={{ width: "250px", float: "left" }}>
-        <SideBarTrainer trainerId={trainerId}/>
+        <SideBarTrainer onLogout={onLogout} trainerId={trainerId} />
       </div>
       <div style={{ marginLeft: "230px" }}>
-        <UserHeader roleTitle="trenera" />
+        <UserHeader roleTitle="trenera" name={trainer_data.name} />
         <List
           header="Klienci"
           selectItems={[]}

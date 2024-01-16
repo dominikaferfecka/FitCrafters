@@ -1,4 +1,11 @@
-function SideBarClient() {
+import { useNavigate } from "react-router-dom";
+
+function SideBarClient({ onLogout }) {
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    onLogout();
+    navigate("/");
+  };
   return (
     <>
       <div className="d-flex fixed-top" id="wrapper">
@@ -41,12 +48,12 @@ function SideBarClient() {
             >
               Modyfikuj swoje dane
             </a>
-            <a
+            <div
               className="list-group-item list-group-item-action list-group-item-success p-3"
-              href="/"
+              onClick={handleLogout}
             >
               Wyloguj się
-            </a>
+            </div>
           </div>
         </div>
       </div>

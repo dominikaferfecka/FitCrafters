@@ -55,7 +55,8 @@ function List(props) {
     fetch(
       "http://127.0.0.1:8000/client_trainings_plans/" +
         String(props.clientIdTrainer) +
-        "/?trainer_id=" + String(props.trainerId)
+        "/?trainer_id=" +
+        String(props.trainerId)
     )
       .then((response) => response.json())
       .then((clients_plan_trainer) => {
@@ -65,7 +66,6 @@ function List(props) {
         console.error("Błąd przy pobieraniu danych:", error);
       });
   }, [props.clientIdTrainer]);
-
 
   var columns = ["#", "First", "Last", "Handle"];
 
@@ -179,8 +179,10 @@ function List(props) {
         <TrainingDetailModal trainingDetails={selectedTrainingDetails} />
       )}
 
-      {props.scrollId === "clientsPlan" ||
-      (props.scrollId === "clientsPlanTrainer" && clients_plan_trainer ) && (
+      {props.scrollId === "clientsPlan" && (
+        <TrainingPlanDetailModal trainingPlanId={trainingPlanId} />
+      )}
+      {props.scrollId === "clientsPlanTrainer" && clients_plan_trainer && (
         <TrainingPlanDetailModal trainingPlanId={trainingPlanId} />
       )}
 
@@ -433,9 +435,6 @@ function List(props) {
                       {element.training_plan_time
                         ? element.training_plan_time
                         : "-"}
-                    </td>
-                    <td>
-                      {element.trainer_name} {element.trainer_surname}
                     </td>
                     <td>
                       {element.trainer_name} {element.trainer_surname}

@@ -1,34 +1,41 @@
 import { useState, useEffect } from "react";
 
-
 function TrainingDetailModal(props) {
-    const [exercisesDetails, setExercisesDetails] = useState([]);
-    const [trainingId, setTrainingId] = useState("");
+  const [exercisesDetails, setExercisesDetails] = useState([]);
+  const [trainingId, setTrainingId] = useState("");
 
+  useEffect(() => {
+    if (props.trainingDetails) {
+      console.log(props.trainingDetails);
+      if (props.trainingDetails) {
+        setTrainingId(props.trainingDetails.training_id || "");
+      } else {
+        setTrainingId("");
+      }
+    }
+  }, [props.trainingDetails]);
 
-    useEffect(() => {
-        if (props.trainingDetails) {
-            console.log(props.trainingDetails);
-            setTrainingId(props.trainingDetails.training_id || "");
-        }
-        }, [props.trainingDetails]);
+  useEffect(() => {
+    if (trainingId !== null) {
+      fetch("http://127.0.0.1:8000/training_exercises/" + String(trainingId))
+        .then((response) => response.json())
+        .then((exercises_data) => {
+          setExercisesDetails(exercises_data);
+          console.log(exercises_data);
+        })
+        .catch((error) =>
+          console.error("Błąd przy pobieraniu danych ćwiczeń:", error)
+        );
+      console.log(exercisesDetails);
+    } else {
+      setExercisesDetails([]);
+    }
+  }, [trainingId]);
 
-    useEffect(() => {
-        if (trainingId) {
-            fetch('http://127.0.0.1:8000/training_exercises/' + String(trainingId))
-            .then(response => response.json())
-            .then(exercises_data => {
-                setExercisesDetails(exercises_data);
-                console.log(exercises_data);
-            })
-            .catch(error => console.error('Błąd przy pobieraniu danych ćwiczeń:', error));
-            console.log(exercisesDetails);
-        }
-        }, [trainingId]);
+  const handleCloseModal = () => {
+    setExercisesDetails([]);
+  };
 
-          
-
-  
   return (
     <div class="modal" id="TrainingDetailModal" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
@@ -61,10 +68,10 @@ function TrainingDetailModal(props) {
                                 </li>
                             ))}
         </ul> */}
-        <div className="table-responsive">
+            <div className="table-responsive">
               <table className="table table-bordered table-hover">
                 <thead>
-                    <tr>
+                  <tr>
                     <th>Ćwiczenie</th>
                     <th>Kategoria</th>
                     <th>Sprzęt</th>
@@ -73,23 +80,24 @@ function TrainingDetailModal(props) {
                     <th>Powtórzenia</th>
                     <th>Obciążenie</th>
                     <th>Kalorie</th>
-                    </tr>
+                  </tr>
                 </thead>
                 <tbody>
-                    {exercisesDetails.map((exercise, index) => (
-                    <tr key={index}>
+                  {exercisesDetails &&
+                    exercisesDetails.map((exercise, index) => (
+                      <tr key={index}>
                         <td>{exercise.exercise.name}</td>
                         <td>{exercise.exercise.category}</td>
                         <td>{exercise.equipment_name}</td>
                         <td>{exercise.start_time}</td>
                         <td>{exercise.end_time}</td>
-                        <td>{exercise.repeats ? exercise.repeats : '-'}</td>
-                        <td>{exercise.load ? exercise.load : '-'}</td>
+                        <td>{exercise.repeats ? exercise.repeats : "-"}</td>
+                        <td>{exercise.load ? exercise.load : "-"}</td>
                         <td>{exercise.calories}</td>
-                    </tr>
+                      </tr>
                     ))}
                 </tbody>
-            </table>
+              </table>
             </div>
           </div>
           <div class="modal-footer">
@@ -97,6 +105,7 @@ function TrainingDetailModal(props) {
               type="button"
               class="btn btn-secondary"
               data-bs-dismiss="modal"
+              onClick={handleCloseModal}
             >
               Zamknij
             </button>

@@ -6,7 +6,7 @@ import "react-date-range/dist/theme/default.css";
 import { addDays } from "date-fns";
 
 function BarChart(props) {
-  const clientId = props.clientId 
+  const clientId = props.clientId;
   const [selectedStat, setSelectedStat] = useState(props.stats[0]);
   const [statistics, setStatistics] = useState("");
   const [caloriesData, setCaloriesData] = useState([]);
@@ -28,11 +28,11 @@ function BarChart(props) {
     </option>
   ));
 
-    // select statistics
+  // select statistics
   const handleStatChange = (event) => {
     setSelectedStat(event.target.value);
     let stat;
-    switch(event.target.value) {
+    switch (event.target.value) {
       case "1":
         stat = "calories";
         break;
@@ -40,8 +40,8 @@ function BarChart(props) {
         stat = "duration";
         break;
       case "3":
-          stat = "category";
-          break;
+        stat = "category";
+        break;
       case "4":
         stat = "name";
         break;
@@ -96,7 +96,6 @@ function BarChart(props) {
   }, []);
 
   useEffect(() => {
-
     const fetchData = async () => {
       const url = `http://127.0.0.1:8000/training-stats-${statistics}/${clientId}/?startDate=${selectedDate.startDate.toISOString()}&endDate=${selectedDate.endDate.toISOString()}`;
 
@@ -168,7 +167,7 @@ function BarChart(props) {
 
   return (
     <div className="w-75 p-3 m-auto" id={props.scrollId}>
-      <h1 className="text-center">{props.header}</h1>
+      <h1 className="text-center m-4">{props.header}</h1>
       <form
         className="row"
         style={{

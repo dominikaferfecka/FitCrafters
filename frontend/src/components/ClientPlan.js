@@ -4,8 +4,8 @@ import List from "./List";
 import BarChart from "./BarChart";
 
 function ClientPlan(props) {
-  const clientId = 1; // change later for real
-  const trainerId = 2; // change later for real
+  // const clientId = 1; // change later for real
+  const trainerId = props.trainer_data.trainer_id; // change later for real
   const [clients_plan_trainer, setClientsPlanTrainer] = useState(null);
   const [training_plans, setTrainingPlans] = useState(null);
   const [date, setDate] = useState("");
@@ -58,6 +58,7 @@ function ClientPlan(props) {
 
   const handleSelectChange = (event) => {
     setClientIdTrainer(event.target.value);
+    console.log("Selected Client ID: " + clientIdTrainer);
   };
   useEffect(() => {
     console.log("SELECTED clientIdTrainer: " + clientIdTrainer);
@@ -153,6 +154,7 @@ function ClientPlan(props) {
           scrollId="clientsPlanTrainer"
           items={clients_plan_trainer || []}
           clientIdTrainer={clientIdTrainer}
+          trainerId={trainerId}
         />
       </div>
 

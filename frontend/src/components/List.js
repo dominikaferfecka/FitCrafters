@@ -37,7 +37,7 @@ function List(props) {
         .catch((error) => {
           console.error("Błąd przy pobieraniu danych:", error);
         });
-  }, [selectedGym]);
+  }, [selectedGym, props.scrollId]);
 
   useEffect(() => {
     props.scrollId === "trainerList" &&
@@ -49,7 +49,7 @@ function List(props) {
         .catch((error) => {
           console.error("Błąd przy pobieraniu danych:", error);
         });
-  }, [selectedGym]);
+  }, [selectedGym, props.scrollId]);
 
   useEffect(() => {
     fetch(

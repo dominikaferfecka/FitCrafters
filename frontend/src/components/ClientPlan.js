@@ -8,8 +8,8 @@ function ClientPlan(props) {
   const trainerId = 1; // change later for real
   const [clients_plan_trainer, setClientsPlanTrainer] = useState(null);
   const [training_plans, setTrainingPlans] = useState(null);
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
 
   const columns = ["#", "First", "Last", "Handle"];
   const plans = ["planA", "planB", "planC", "planD", "planE"];
@@ -72,7 +72,6 @@ function ClientPlan(props) {
     setTime(event.target.value);
   };
 
-
   // useEffect(() => {
   //   fetch("http://127.0.0.1:8000/client_trainings_plans/" + String(clientIdTrainer))
   //     .then((response) => response.json())
@@ -86,8 +85,7 @@ function ClientPlan(props) {
   //     });
   // }, []);
 
-
-    useEffect(() => {
+  useEffect(() => {
     fetch("http://127.0.0.1:8000/training-plans/")
       .then((response) => response.json())
       .then((training_plans) => {
@@ -125,11 +123,8 @@ function ClientPlan(props) {
       });
   };
 
-
-
-
   return (
-    <Container className="w-75 mb-5" id={props.scrollId}>
+    <Container className="w-100 mb-5" id={props.scrollId}>
       <div id="tableClientPlan">
         <h1 className="text-center m-5">Plan ćwiczeń klienta</h1>
         {props.selectItems.length === 0 ? (
@@ -142,7 +137,11 @@ function ClientPlan(props) {
               alignItems: "center",
             }}
           >
-            <select className="form-select w-50" aria-label="Select" onChange={handleSelectChange}>
+            <select
+              className="form-select w-50"
+              aria-label="Select"
+              onChange={handleSelectChange}
+            >
               <option value="0">Wybierz klienta</option>
               {mappedSelectItems}
             </select>
@@ -174,11 +173,17 @@ function ClientPlan(props) {
             />
           </div>
           <div class="mb-3 col-md-6">
-                <label for="time" class="form-label">
-                  Godzina
-                </label>
-                <input type="time" class="form-control" id="time" value={time} onChange={handleTimeChange}/>
-              </div>
+            <label for="time" class="form-label">
+              Godzina
+            </label>
+            <input
+              type="time"
+              class="form-control"
+              id="time"
+              value={time}
+              onChange={handleTimeChange}
+            />
+          </div>
           <div class="mb-3 col-md-5">
             <label for="exampleInputPassword1" class="form-label">
               Plan ćwiczeń
@@ -194,24 +199,24 @@ function ClientPlan(props) {
             </select>
           </div>
           <div class="col-md-1 d-flex align-items-center">
-          <button
-            className="btn btn-success"
-            type="button"
-            onClick={handleAddTrainingPlan}
-          >
+            <button
+              className="btn btn-success"
+              type="button"
+              onClick={handleAddTrainingPlan}
+            >
               Dodaj
             </button>
           </div>
         </div>
       </form>
       <BarChart
-          header="Statystyki treningów"
-          firstSelectTitle=""
-          firstSelect={[]}
-          stats={selectStats}
-          scrollId="statsTraining"
-          clientId={clientIdTrainer}
-        />
+        header="Statystyki treningów"
+        firstSelectTitle=""
+        firstSelect={[]}
+        stats={selectStats}
+        scrollId="statsTraining"
+        clientId={clientIdTrainer}
+      />
       {/* <h5 className="text-center m-4">Dodaj ćwiczenie</h5>
       <form>
         <div class="row flex-d justify-content-center" id="formClientPlan">
@@ -265,7 +270,6 @@ function ClientPlan(props) {
         </div>
       </form> */}
     </Container>
-    
   );
 }
 

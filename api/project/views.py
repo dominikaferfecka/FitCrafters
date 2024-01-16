@@ -3,18 +3,104 @@ from datetime import datetime, timedelta
 from project.models import Managers
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, authentication_classes
+from django.contrib.auth.hashers import make_password, check_password
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from django.db.models import Count
 from django.db import transaction
 from .serializers import ManagerSerializer, GymSerializer, EquipmentSerializer, TrainersSerializer, ClientsSerializer,  ClientTrainingsSerializer, EquipmentAllSerializer, TrainingsExercisesSerializer, GymsEquipmentTypeSerializer, TrainingPlansSerializer
-from .models import Managers, Gyms, EquipmentType, Trainers, Trainings, GymsEquipmentType, Clients, TrainingsExercises, TrainingPlans
+from .models import Managers, Gyms, EquipmentType, Trainers, Trainings, GymsEquipmentType, Clients, TrainingsExercises, TrainingPlans, Tokens
 import json
 from django.utils import timezone
 from dateutil import parser
 import pytz
 from django.utils.dateparse import parse_datetime
 tz = pytz.timezone('Europe/Warsaw')
+
+class AuthAPIView(APIView):
+    @api_view(['POST'])
+    def signup(request):
+        try:
+            data = request.data
+            # get next id (or 1 if Clients is empty)
+            try:
+                client_id = Clients.objects.order_by('-client_id').first().client_id + 1
+            except Exception:
+                client_id = 1
+            data["client_id"] = client_id
+            serializer = ClientsSerializer(data=data)
+            if serializer.is_valid():
+                # Create client with request data
+                client = Clients.objects.create(
+                    client_id=client_id,
+                    name=request.data['name'],
+                    surname=request.data['surname'],
+                    phone_number=request.data['phone_number'],
+                    email=request.data['email'],
+                    age=request.data['age'],
+                    weight=request.data['weight'],
+                    height=request.data['height'],
+                    # hash password
+                    hash_pass=make_password(request.data['hash_pass'])
+                )
+                # create user and user token as atomic transaction
+                with transaction.atomic():
+                    # save client to db
+                    client.save()
+                    # create token for client
+                    client_token, client_token_created = Tokens.objects.get_or_create(client=client, manager=None, trainer=None)
+                return Response({"token": client_token.key, "client": serializer.data}, status=201)
+            else:
+                return Response(serializer.errors, status=400)
+        except Exception as e:
+            return Response({"message": str(e)}, status=500)
+
+    @api_view(['POST'])
+    def login(request):
+        try:
+            # get data to log in
+            email = request.data.get('email')
+            password = request.data.get('hash_pass')
+            user_role = request.data.get('user')
+
+            # get user depending on role
+            if user_role == "klient":
+                user = Clients.objects.get(email=email)
+            elif user_role == "menadżer":
+                user = Managers.objects.get(email=email)
+            elif user_role == "trener":
+                user = Trainers.objects.get(email=email)
+
+            # check if given password was correct
+            if check_password(password, user.hash_pass):
+                # get / create tokens for users if password is correct
+                if user_role == "klient":
+                    token, created = Tokens.objects.get_or_create(client=user, manager=None, trainer=None)
+                    serializer = ClientsSerializer(user)
+                elif user_role == "menadżer":
+                    token, created = Tokens.objects.get_or_create(manager=user, trainer=None, client=None)
+                    serializer = ManagerSerializer(user)
+                elif user_role == "trener":
+                    token, created = Tokens.objects.get_or_create(trainer=user, client=None, manager=None)
+                    serializer = TrainersSerializer(user)
+                # return token and user data
+                return Response({"token_key":  token.key, "token_client_id": token.client_id, "token_trainer_id": token.trainer_id, "token_manager_id": token.manager_id, "user": serializer.data, "role": user_role}, status=200)
+            else:
+                # password incorrect
+                return Response({"detail": "Invalid credentials."}, status=401)
+        except Clients.DoesNotExist:
+            # client with given email address was not found
+            return Response({"detail": "User not found."}, status=404)
+        except Trainers.DoesNotExist:
+            # trainer with given email address was not found
+            return Response({"detail": "User not found."}, status=404)
+        except Managers.DoesNotExist:
+            # manager with given email address was not found
+            return Response({"detail": "User not found."}, status=404)
+        except Exception as e:
+            # other errors
+            return Response({"message": str(e)}, status=500)
+        
 
 class DataBaseAPIView(APIView):
     @api_view(['GET'])
@@ -49,7 +135,7 @@ class DataBaseAPIView(APIView):
             data = EquipmentAllSerializer(equipment, many=True).data
         return JsonResponse(data, safe=False)
     
-    @api_view(['GET'])
+    @csrf_exempt
     def getTrainer(request):
         if request.method == "POST":
             data = json.loads(request.body.decode("utf-8"))
@@ -58,6 +144,13 @@ class DataBaseAPIView(APIView):
         if data.get("gym"):
             v_gym_id = data.get("gym")
             trainers = Trainers.objects.filter(gym=v_gym_id)
+        elif data.get("token"):
+            token = data.get("token")
+            trainer_id = Tokens.objects.get(key=token).trainer_id
+            trainers = Trainers.objects.get(trainer_id = trainer_id)
+            data = TrainersSerializer(trainers).data
+            return JsonResponse(data)
+
         else:
             trainers = Trainers.objects.all()
         data = TrainersSerializer(trainers, many=True).data
@@ -143,7 +236,9 @@ class DataBaseAPIView(APIView):
 
 
     @api_view(['GET'])
-    def getClient(request, client_id):
+    def getClient(request, token):
+        client_id = Tokens.objects.get(key = token).client_id
+        print(client_id)
         client = Clients.objects.get(client_id = client_id)
         data= ClientsSerializer(client).data
         return JsonResponse(data)
@@ -388,7 +483,7 @@ class DataBaseAPIView(APIView):
                 email = trainer_email,
                 hour_salary = trainer_salary,
                 gym = Gyms.objects.get(gym_id = gym_selected),
-                hash_pass = trainer_pass,
+                hash_pass = make_password(trainer_pass),
                 info = "",
             )
             # save new gym to db

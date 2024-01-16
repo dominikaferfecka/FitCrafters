@@ -1,4 +1,3 @@
-import BarChart from "./BarChart";
 import Footer from "./Footer";
 import List from "./List";
 import SideBarTrainer from "./SideBarTrainer";
@@ -7,13 +6,6 @@ import ClientPlan from "./ClientPlan";
 import React, { useEffect, useState } from "react";
 
 function TrainerPage() {
-  const selectStats = [
-    "statystyka1",
-    "statystyka2",
-    "statystyka3",
-    "statystyka4",
-    "statystyka5",
-  ];
   const trainerId = 1; // change later for real
   const selectClients = ["klient1", "klient2", "klient3", "klient4", "klient5"];
   const [clients_data, setClientsData] = useState([]);
@@ -48,13 +40,6 @@ function TrainerPage() {
           selectItems={[]}
           scrollId="clientList"
           items={clients_data}
-        />
-        <BarChart
-          header="Statystyki klientów"
-          firstSelectTitle="Wybierz klienta"
-          firstSelect={selectClients}
-          stats={selectStats}
-          scrollId="statsClient"
         />
         <ClientPlan selectItems={selectClients2} scrollId="clientPlan" />
         <Footer />

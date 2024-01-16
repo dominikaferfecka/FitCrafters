@@ -1,7 +1,7 @@
 import { Container } from "react-bootstrap";
 import React, { useEffect, useState } from "react";
 import List from "./List";
-
+import BarChart from "./BarChart";
 
 function ClientPlan(props) {
   const clientId = 1; // change later for real
@@ -20,6 +20,14 @@ function ClientPlan(props) {
     "ćwiczenieD",
     "ćwiczenieE",
   ];
+  const selectStats = [
+    "Spalone kalorie",
+    "Długość treningów",
+    "Ilość treningów z danej kategorii",
+    "Ilość treningów z danego planu treningowego",
+    "Ilość treningów z danym trenerem",
+  ];
+
   const [selectedTrainingPlanId, setSelectedTrainingPlanId] = useState("");
 
   const listItems = columns.map((col, index) => (
@@ -196,7 +204,15 @@ function ClientPlan(props) {
           </div>
         </div>
       </form>
-      <h5 className="text-center m-4">Dodaj ćwiczenie</h5>
+      <BarChart
+          header="Statystyki treningów"
+          firstSelectTitle=""
+          firstSelect={[]}
+          stats={selectStats}
+          scrollId="statsTraining"
+          clientId={clientIdTrainer}
+        />
+      {/* <h5 className="text-center m-4">Dodaj ćwiczenie</h5>
       <form>
         <div class="row flex-d justify-content-center" id="formClientPlan">
           <div class="row col-md-10 justify-content-center">
@@ -247,8 +263,9 @@ function ClientPlan(props) {
             </button>
           </div>
         </div>
-      </form>
+      </form> */}
     </Container>
+    
   );
 }
 

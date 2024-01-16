@@ -14,6 +14,7 @@ import json
 from django.utils import timezone
 from dateutil import parser
 import pytz
+from django.utils.dateparse import parse_datetime
 tz = pytz.timezone('Europe/Warsaw')
 
 class AuthAPIView(APIView):
@@ -722,6 +723,134 @@ class DataBaseAPIView(APIView):
         except Exception as e:
             # Return an error message if an exception occurs
             return Response({"message": str(e)}, status=500)
+        
+
+    # Statistics
+
+    @api_view(['GET'])
+    def getClientTrainingStatsCalories(request, client_id):
+        start_date_str = request.query_params.get('startDate', None)
+        end_date_str = request.query_params.get('endDate', None)
+
+        start_date = parse_datetime(start_date_str) if start_date_str else None
+        end_date = parse_datetime(end_date_str) if end_date_str else None
+
+        # get trainings in date time range
+        trainings = Trainings.objects.filter(client_id=client_id, start_time__gte=start_date, end_time__lte=end_date).order_by('start_time')
+
+        # prepare data for statistics
+        labels = []
+        data = []
+
+        for training in trainings:
+            does_exist = TrainingsExercises.objects.filter(training=training)
+            if does_exist:
+                total_calories = sum(exercise.calories for exercise in does_exist)
+                labels.append(training.start_time.strftime('%Y-%m-%d'))
+                data.append(total_calories)
+
+        return Response({'labels': labels, 'data': data})
+    
+    @api_view(['GET'])
+    def getClientTrainingStatsDuration(request, client_id):
+        start_date_str = request.query_params.get('startDate', None)
+        end_date_str = request.query_params.get('endDate', None)
+
+        start_date = parse_datetime(start_date_str) if start_date_str else None
+        end_date = parse_datetime(end_date_str) if end_date_str else None
+
+        # get trainings in date time range
+        trainings = Trainings.objects.filter(client_id=client_id, start_time__gte=start_date, end_time__lte=end_date).order_by('start_time')
+
+        # prepare data for statistics
+        labels = []
+        data = []
+
+        for training in trainings:
+            does_exist = TrainingsExercises.objects.filter(training=training)
+            if does_exist:
+                total_duration = sum((exercise.end_time - exercise.start_time).seconds for exercise in does_exist)
+                labels.append(training.start_time.strftime('%Y-%m-%d'))
+                data.append(total_duration)
+
+        return Response({'labels': labels, 'data': data})
+
+
+    from django.db.models import Count
+
+    @api_view(['GET'])
+    def getClientStatsPlansCategoryCount(request, client_id):
+        start_date_str = request.query_params.get('startDate', None)
+        end_date_str = request.query_params.get('endDate', None)
+
+        start_date = parse_datetime(start_date_str) if start_date_str else None
+        end_date = parse_datetime(end_date_str) if end_date_str else None
+
+        # get trainings in date time range
+        trainings = Trainings.objects.filter(client_id=client_id, start_time__gte=start_date, end_time__lte=end_date).order_by('start_time')
+
+        # count trainings for each category of training plans
+        training_counts = Trainings.objects.filter(
+            client_id=client_id,
+            start_time__gte=start_date,
+            end_time__lte=end_date
+        ).values('training_plan__category').annotate(count=Count('training_plan__category'))
+
+        # prepare data for statistics
+        labels = [count['training_plan__category'] for count in training_counts]
+        data = [count['count'] for count in training_counts]
+
+        return Response({'labels': labels, 'data': data})
+
+    @api_view(['GET'])
+    def getClientStatsPlansNameCount(request, client_id):
+        start_date_str = request.query_params.get('startDate', None)
+        end_date_str = request.query_params.get('endDate', None)
+
+        start_date = parse_datetime(start_date_str) if start_date_str else None
+        end_date = parse_datetime(end_date_str) if end_date_str else None
+
+        # get trainings in date time range
+        trainings = Trainings.objects.filter(client_id=client_id, start_time__gte=start_date, end_time__lte=end_date).order_by('start_time')
+
+        # count trainings for each training plan (name)
+        training_counts = Trainings.objects.filter(
+            client_id=client_id,
+            start_time__gte=start_date,
+            end_time__lte=end_date
+        ).values('training_plan__name').annotate(count=Count('training_plan__name'))
+
+        # prepare data for statistics
+        labels = [count['training_plan__name'] for count in training_counts]
+        data = [count['count'] for count in training_counts]
+
+        return Response({'labels': labels, 'data': data})
+
+    @api_view(['GET'])
+    def getClientStatsTrainerCount(request, client_id):
+        start_date_str = request.query_params.get('startDate', None)
+        end_date_str = request.query_params.get('endDate', None)
+
+        start_date = parse_datetime(start_date_str) if start_date_str else None
+        end_date = parse_datetime(end_date_str) if end_date_str else None
+
+        # get trainings in date time range
+        trainings = Trainings.objects.filter(client_id=client_id, start_time__gte=start_date, end_time__lte=end_date).order_by('start_time')
+
+        # count trainings for each trainer)
+        training_counts = Trainings.objects.filter(
+            client_id=client_id,
+            start_time__gte=start_date,
+            end_time__lte=end_date
+        ).values('trainer__name', 'trainer__surname').annotate(count=Count('trainer'))
+
+        # prepare data for statistics
+        labels = [f"{count['trainer__name']} {count['trainer__surname']}" for count in training_counts]
+        data = [count['count'] for count in training_counts]
+
+        return Response({'labels': labels, 'data': data})
+
+
 
 def index(request):
     manager = Managers.objects.first()

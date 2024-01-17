@@ -56,7 +56,7 @@ function SideBarTrainer({ onLogout, trainerId }) {
           </div>
         </div>
       </div>
-      <CalendarModal onClose={handleCloseModal} trainerId={trainerId} />
+      <CalendarModal trainerId={trainerId} />
     </>
   );
 }

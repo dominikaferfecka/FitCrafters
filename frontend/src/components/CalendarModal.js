@@ -37,11 +37,8 @@ const CustomToolbar = (toolbar) => {
   );
 };
 
-function CalendarModal({onClose, trainerId}) {
+function CalendarModal({trainerId}) {
 
-  const closeModal = () => {
-    onClose(); // Call the onClose prop function to update the state in the parent component
-  };
   console.log(trainerId);
 
   const [trainings_data, setTrainingsData] = useState([]);
@@ -116,7 +113,7 @@ function CalendarModal({onClose, trainerId}) {
             <TrainingCalendarForm title="Usuń trening z klientem" button_name="Usuń" mappedItems={mappedTrainings} />
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close" onClick={closeModal}>Zamknij</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Zamknij</button>
             </div>
           </div>
         </div>

@@ -55,7 +55,7 @@ function TrainerPage({ onLogout }) {
   return (
     <>
       <div style={{ width: "250px", float: "left" }}>
-        <SideBarTrainer onLogout={onLogout} trainerId={trainerId} />
+        <SideBarTrainer onLogout={onLogout} trainerId={trainer_data.trainer_id} />
       </div>
       <div style={{ marginLeft: "230px" }}>
         <UserHeader roleTitle="trenera" name={trainer_data.name} />

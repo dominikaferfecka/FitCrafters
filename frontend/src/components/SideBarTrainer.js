@@ -1,11 +1,11 @@
 import CalendarModal from "./CalendarModal";
 import { useNavigate } from "react-router-dom";
 
-function SideBarTrainer({ onLogout, trainerId }) {
+function SideBarTrainer(props) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    onLogout();
+    props.onLogout();
     navigate("/");
   };
   return (
@@ -56,7 +56,7 @@ function SideBarTrainer({ onLogout, trainerId }) {
           </div>
         </div>
       </div>
-      <CalendarModal trainerId={trainerId} />
+      {props.trainerId && <CalendarModal trainerId={props.trainerId} />}
     </>
   );
 }

@@ -55,7 +55,10 @@ function TrainerPage({ onLogout }) {
   return (
     <>
       <div style={{ width: "250px", float: "left" }}>
-        <SideBarTrainer onLogout={onLogout} trainerId={trainer_data.trainer_id} />
+        <SideBarTrainer
+          onLogout={onLogout}
+          trainerId={trainer_data.trainer_id}
+        />
       </div>
       <div style={{ marginLeft: "230px" }}>
         <UserHeader roleTitle="trenera" name={trainer_data.name} />
@@ -65,7 +68,11 @@ function TrainerPage({ onLogout }) {
           scrollId="clientList"
           items={clients_data}
         />
-        <ClientPlan selectItems={selectClients2} scrollId="clientPlan" trainer_data={trainer_data}/>
+        <ClientPlan
+          selectItems={selectClients2}
+          scrollId="clientPlan"
+          trainer_data={trainer_data}
+        />
         <Footer />
       </div>
     </>

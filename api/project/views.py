@@ -753,14 +753,10 @@ class DataBaseAPIView(APIView):
             trainer_id = form_data.get("trainerId")
             print(f"AAA: {selected_plan_id}")
 
-            # time_with_seconds = f"{time}:00"
-            # datetime_str = f"{date} {time_with_seconds}"
-            # training_datetime = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
-            # start_time = timezone.make_aware(training_datetime)
             time_with_seconds = f"{time}"
             datetime_str = f"{date} {time_with_seconds}"
             training_datetime = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
-            start_time = timezone.make_aware(training_datetime)
+            start_time = timezone.make_aware(training_datetime, tz)
 
             training = Trainings.objects.get(start_time=start_time, client_id=client_id_trainer, trainer = trainer_id)
             #training = Trainings.objects.get(start_time=start_time, client_id=client_id_trainer)

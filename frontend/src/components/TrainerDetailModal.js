@@ -173,6 +173,8 @@ function TrainerDetailModal(props) {
             // if status is success clear form
             if (result.status === "success") {
               console.log(result);
+              setTrainerPass("");
+              setTrainerRepeatPass("");
               //   alert about successfull changes
               alert(
                 "Dokonano następujących zmian w wybranym trenerze:\n" +

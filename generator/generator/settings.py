@@ -137,6 +137,6 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_BEAT_SCHEDULE = {
     'check-training-start': {
         'task': 'generator.tasks.check_training_start',
-        'schedule': 3,  # Every 5 minutes (300 seconds)
+        'schedule': 300,  # Every 5 minutes (300 seconds)
     },
 }

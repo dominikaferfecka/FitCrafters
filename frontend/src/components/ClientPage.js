@@ -29,7 +29,7 @@ function ClientPage({ onLogout }) {
       .catch((error) => {
         console.error("Błąd przy pobieraniu danych:", error);
       });
-  }, [clientData, token]);
+  }, [token]);
 
   useEffect(() => {
     if (clientData) {

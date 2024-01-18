@@ -50,7 +50,7 @@ class AuthAPIView(APIView):
                     # save client to db
                     client.save()
                     # create token for client
-                    client_token, client_token_created = Tokens.objects.create(client=client, manager=None, trainer=None)
+                    client_token, client_token_created = Tokens.objects.get_or_create(client=client, manager=None, trainer=None)
                 return Response({"token": client_token.key, "client": serializer.data}, status=201)
             else:
                 return Response(serializer.errors, status=400)
@@ -525,7 +525,8 @@ class DataBaseAPIView(APIView):
             trainer.email = trainer_email
             trainer.hour_salary = trainer_salary
             trainer.gym = Gyms.objects.get(gym_id = gym_selected)
-            trainer.hash_pass = trainer_pass
+            if trainer_pass:
+                trainer.hash_pass = make_password(trainer_pass)
             trainer.info = trainer_info
 
             # save trainer with modified data
@@ -727,7 +728,8 @@ class DataBaseAPIView(APIView):
             client.surname = surname
             client.phone_number = phone_number
             client.email = email
-            client.hash_pass = hash_pass
+            if hash_pass:
+                client.hash_pass = make_password(hash_pass)
             client.age = age
             client.weight = weight
             client.height = height

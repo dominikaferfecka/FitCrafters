@@ -12,7 +12,7 @@ from django.contrib.auth.hashers import make_password
 
 # Get all managers
 # For changing other users passwords, change table
-users = Managers.objects.all()
+users = Clients.objects.all()
 
 for user in users:
     # Create password Name123

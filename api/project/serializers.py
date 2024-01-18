@@ -98,6 +98,20 @@ class ExercisesTrainingPlansSerializer(serializers.ModelSerializer):
         fields = ('exercise', 'category', 'repeats', 'time', 'load', 'equipment')
 
 
+# class TrainingsSerializer(serializers.ModelSerializer):
+#     training_plan = TrainingPlansSerializer()
+#     trainer = TrainersSerializer()
+#     client = ClientsSerializer()
+#     exercises = serializers.SerializerMethodField()
+#     class Meta:
+#         model = Trainings
+#         fields = ('training_id', 'start_time', 'end_time', 'client', 'trainer', 'training_plan', 'exercises')
+
+#     def get_exercises(self, obj):
+#         exercises = TrainingsExercises.objects.filter(training=obj.training_id)
+#         serializer = TrainingsExercisesSerializer(exercises, many=True)
+#         return serializer.data
+
 # class ClientTrainingsWithTrainingPlan(serializers.ModelSerializer):
 #     training_plan = TrainingPlansSerializer()
 

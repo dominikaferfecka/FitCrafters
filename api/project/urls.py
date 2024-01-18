@@ -55,6 +55,14 @@ urlpatterns = [
     path('training-stats-trainer/<int:client_id>/', DataBaseAPIView.getClientStatsTrainerCount, name='training-stats-trainer'),
     path("get-trainer_trainings/", DataBaseAPIView.getTrainerTrainings, name="getTrainerTrainings"),
     path("delete_training/", DataBaseAPIView.deleteTraining, name="deleteTraining"),
-    path("get-training-plans-info/", DataBaseAPIView.getDetailedTrainingPlans, name="detailed-training-plans")
+    path("get-training-plans-info/", DataBaseAPIView.getDetailedTrainingPlans, name="detailed-training-plans"),
+    path("gym-stats-days-trainings-count/<int:gym_id>/", DataBaseAPIView.getStatsDayCountForGym, name="getStatsDayCountForGym"),
+    path("gym-stats-trainers-trainings-count/<int:gym_id>/", DataBaseAPIView.getStatsTrainerCountForGym, name="getStatsTrainerCountForGym"),
+    path("gym-stats-trainers-count/", DataBaseAPIView.getTrainersCount, name="getTrainersCount"),
+    path("gym-stats-equipment-count/", DataBaseAPIView.getEquipmentCount, name="getEquipmentCount"),
+    path("gym-stats-trainings-count/", DataBaseAPIView.getTrainingsCount, name="getTrainingsCount"),
+
+
+
     #path('signToTrainer/', DataBaseAPIView.as_view({'post': 'signToTrainer'}), name='sign_to_trainer')
 ]

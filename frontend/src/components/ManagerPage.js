@@ -9,13 +9,7 @@ import UserHeader from "./UserHeader";
 import React, { useEffect, useState } from "react";
 
 function ManagerPage() {
-  const selectStats = [
-    "statystyka1",
-    "statystyka2",
-    "statystyka3",
-    "statystyka4",
-    "statystyka5",
-  ];
+  const selectStats = [];
 
   const [gym_data, setgymData] = useState([]);
 
@@ -24,6 +18,7 @@ function ManagerPage() {
   const [trainers_data, setgymTrainersData] = useState([]);
 
   const [manager_data, setManagerData] = useState({});
+
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/manager-name-endpoint/")

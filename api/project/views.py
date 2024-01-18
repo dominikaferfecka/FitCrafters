@@ -15,6 +15,8 @@ from django.utils import timezone
 from dateutil import parser
 import pytz
 from django.utils.dateparse import parse_datetime
+from django.db.models.functions import TruncDate
+
 tz = pytz.timezone('Europe/Warsaw')
 
 class AuthAPIView(APIView):
@@ -918,8 +920,100 @@ class DataBaseAPIView(APIView):
         training_plans = ExercisesTrainingPlans.objects.filter(training_plan=v_training_plan_id).select_related('exercise')
         data = ExercisesTrainingPlansSerializer(training_plans, many=True).data
         return JsonResponse(data, safe=False)
+    
+    @api_view(['GET'])
+    def getStatsDayCountForGym(request, gym_id):
+        """
+        params: request [json]
+        return: number of visits in gym[JSONResoponse]
+        method extracts received data and returns number of visits in gym"""
+        start_date_str = request.query_params.get('startDate', None)
+        end_date_str = request.query_params.get('endDate', None)
+
+        start_date = parse_datetime(start_date_str) if start_date_str else None
+        end_date = parse_datetime(end_date_str) if end_date_str else None
 
 
+        # get trainings in date time range
+        v_gym = Gyms.objects.get(gym_id=gym_id)
+        trainers = Trainers.objects.filter(gym=v_gym)
+
+        # count trainings for each trainer)
+        training_counts = Trainings.objects.filter(
+            trainer__in=trainers,
+            start_time__gte=start_date,
+            end_time__lte=end_date
+        ).annotate(
+                start_date_only=TruncDate('start_time')
+                ).values('start_date_only').annotate(count=Count('start_date_only'))
+
+        # prepare data for statistics
+        labels = [f"{count['start_date_only']}" for count in training_counts]
+        data = [count['count'] for count in training_counts]
+
+        return Response({'labels': labels, 'data': data})
+
+
+    @api_view(['GET'])
+    def getStatsTrainerCountForGym(request, gym_id):
+        start_date_str = request.query_params.get('startDate', None)
+        end_date_str = request.query_params.get('endDate', None)
+
+        start_date = parse_datetime(start_date_str) if start_date_str else None
+        end_date = parse_datetime(end_date_str) if end_date_str else None
+
+
+        # get trainings in date time range
+        v_gym = Gyms.objects.get(gym_id=gym_id)
+        trainers = Trainers.objects.filter(gym=v_gym)
+
+        # count trainings for each trainer)
+        training_counts = Trainings.objects.filter(
+            trainer__in=trainers,
+            start_time__gte=start_date,
+            end_time__lte=end_date
+        ).values('trainer__name', 'trainer__surname').annotate(count=Count('trainer'))
+
+        # prepare data for statistics
+        labels = [f"{count['trainer__name']} {count['trainer__surname']}" for count in training_counts]
+        data = [count['count'] for count in training_counts]
+
+        return Response({'labels': labels, 'data': data})
+    
+    @api_view(['GET'])
+    def getTrainersCount(request):
+        # count trainings for each gym
+        trainers_counts = Trainers.objects.all().select_related('gym').values('gym__city').annotate(count=Count('gym'))
+
+        # prepare data for statistics
+        labels = [f"{count['gym__city']}" for count in trainers_counts]
+        data = [count['count'] for count in trainers_counts]
+
+        return Response({'labels': labels, 'data': data})
+    
+    @api_view(['GET'])
+    def getEquipmentCount(request):
+        equipment_counts = GymsEquipmentType.objects.all().select_related('gym').values('gym__city').annotate(count=Count('gym'))
+
+        # prepare data for statistics
+        labels = [f"{count['gym__city']}" for count in equipment_counts]
+        data = [count['count'] for count in equipment_counts]
+
+        return Response({'labels': labels, 'data': data})
+    
+    @api_view(['GET'])
+    def getTrainingsCount(request):
+        # count trainings for each trainer)
+        client_counts = []
+        gyms = Gyms.objects.all()
+        for gym in gyms:
+           training_count_in_gym = Trainings.objects.filter(trainer__gym=gym).count()
+           client_counts.append(training_count_in_gym)
+        # prepare data for statistics
+        labels = [f"{gym.city}" for gym in gyms]
+        data = [count for count in client_counts]
+
+        return Response({'labels': labels, 'data': data})
 
 def index(request):
     manager = Managers.objects.first()

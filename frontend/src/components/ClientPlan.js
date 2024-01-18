@@ -54,7 +54,7 @@ function ClientPlan(props) {
     </option>
   ));
 
-  const [clientIdTrainer, setClientIdTrainer] = useState("");
+  const [clientIdTrainer, setClientIdTrainer] = useState("0");
 
   const handleSelectChange = (event) => {
     setClientIdTrainer(event.target.value);

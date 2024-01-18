@@ -6,6 +6,7 @@ import "react-date-range/dist/theme/default.css";
 import { addDays } from "date-fns";
 
 function BarChart(props) {
+  console.log(props.clientId);
 
   const selectStatsOneGym = [
     "Ilość treningów trenerów",
@@ -358,11 +359,13 @@ function BarChart(props) {
           alignItems: "center",
         }}
       >
-        {!isAllGyms && (
-        <><DateRangeSelector onDateChange={handleDateChange} /><select className="form-select col m-3" aria-label="Select" onChange={(e) => setGymId(e.target.value)}>
+        {(!isAllGyms || props.clientId) &&(
+        <><DateRangeSelector onDateChange={handleDateChange} /> </>)}
+        {(!isAllGyms && !props.clientId) &&(
+        <select className="form-select col m-3" aria-label="Select" onChange={(e) => setGymId(e.target.value)}>
             <option value="0">{props.firstSelectTitle}</option>
             {mappedSelectGyms}
-          </select></>
+          </select>
         )}
 
         <select

@@ -80,6 +80,7 @@ function ManagerPage() {
     (element) => element.city + ", " + element.street
   );
   const selectEquipment = equipment_data.map((element) => element.name);
+  console.log(selectGyms);
 
   return (
     <>

@@ -6,6 +6,9 @@ import MenuBar from "./components/MenuBar";
 import FrontPage from "./components/FrontPage";
 import LogIn from "./components/LogIn";
 import Register from "./components/Register";
+import ClientPage from "./components/ClientPage";
+import SideBarClient from "./components/SideBarClient";
+import ClientInfo from "./components/ClientInfo";
 
 // MENU BAR
 describe('MenuBar.js', () => {
@@ -172,6 +175,151 @@ describe('Register.js', () => {
   test('Check if the cancel button is in the document', () => {
     const cancelButton = screen.getByText(/Anuluj/i);
     expect(cancelButton).toBeInTheDocument();
+  });
+
+});
+
+// ClientPage.js
+
+describe('ClientPage.js', () => {
+
+  beforeEach(() => {
+    render(
+      <Router>
+        <ClientPage />
+      </Router>
+    );
+  });
+
+  test('Check if welcome text is visible', () => {
+    const nameText = screen.getByText(/Witaj/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if user header is visible', () => {
+    const nameText = screen.getByText(/Panel użytkownika/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if history training is visible', () => {
+    const nameText = screen.getByText(/Sprawdź ćwiczenia/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if training statistics is visible', () => {
+    const nameText = screen.getByText(/Statystyki treningów/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if training plan component is visible', () => {
+    const nameText = screen.getByText(/Szczegóły/i);
+    expect(nameText).toBeInTheDocument();
+  });
+});
+
+
+//SideBarClient
+describe('SideBarClient.js', () => {
+
+  beforeEach(() => {
+    render(
+      <Router>
+        <SideBarClient />
+      </Router>
+    );
+  });
+
+  test('Check if client panel button is visible', () => {
+    const nameText = screen.getByText(/Panel klient/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if History Training button is visible', () => {
+    const nameText = screen.getByText(/Historia treningów/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if statistics training button is visible', () => {
+    const nameText = screen.getByText(/Statystyki treningów/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if training plan button is visible', () => {
+    const nameText = screen.getByText(/Plany ćwiczeń/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if trainers button is visible', () => {
+    const nameText = screen.getByText(/Trenerzy/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if modify button is visible', () => {
+    const nameText = screen.getByText(/Modyfikuj swoje dane/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if Sign out button is visible', () => {
+    const nameText = screen.getByText(/Wyloguj się/i);
+    expect(nameText).toBeInTheDocument();
+  });
+});
+
+
+//ClientInfo
+describe('ClientInfo.js', () => {
+
+  beforeEach(() => {
+    render(
+      <Router>
+        <ClientInfo />
+      </Router>
+    );
+  });
+
+  test('Check if name field is visible', () => {
+    const nameText = screen.getByText(/Imię/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if surname field is visible', () => {
+    const nameText = screen.getByText(/Nazwisko/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if phone number field is visible', () => {
+    const nameText = screen.getByText(/Numer telefonu/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if email field is visible', () => {
+    const nameText = screen.getByText(/Adres Email/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if new password field is visible', () => {
+    const nameText = screen.getByText(/Podaj nowe hasło/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if new password again field is visible', () => {
+    const nameText = screen.getByText(/Powtórz nowe hasło/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if age field is visible', () => {
+    const nameText = screen.getByText(/Wiek/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if weight field is visible', () => {
+    const nameText = screen.getByText(/Waga/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if height field is visible', () => {
+    const nameText = screen.getByText(/Wzrost/i);
+    expect(nameText).toBeInTheDocument();
   });
 
 });

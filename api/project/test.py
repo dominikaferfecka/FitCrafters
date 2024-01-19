@@ -1,16 +1,207 @@
-from django.test import TestCase, Client
+from django.test import TestCase
 from django.urls import reverse
-from unittest.mock import patch
 from datetime import datetime
+from .serializers import ManagerSerializer
 from .models import Gyms, Managers, EquipmentType, GymsEquipmentType, Trainers, Trainings, Gyms, Clients, TrainingPlans, TrainingsExercises, Exercises
 import json
-from unittest import expectedFailure
-from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.hashers import make_password, check_password
 from rest_framework import status
+from django.utils import timezone
+import pytz
+tz = pytz.timezone('Europe/Warsaw')
 
 class BasicTest(TestCase):
     def test_basic(self):
         self.assertTrue(True)
+
+
+class ClientSignupTestCase(TestCase):
+    def setup(self):
+        self.client_existing = Clients.objects.create(
+            client_id=1,
+            name="Anna", 
+            surname="Kowalska", 
+            phone_number="987654321", 
+            email="anna.kowalska@fitcrafters.com", 
+            hash_pass="haslo",
+            age=25, 
+            weight=70, 
+            height=180
+        )
+
+    def test_signup_successful(self):
+        data = {
+            "name": "Jan",
+            "surname": "Kowalski",
+            "phone_number": "123456789",
+            "email": "jan.kowalski@gmail.com",
+            "age": 25,
+            "weight": 70,
+            "height": 180,
+            "hash_pass": "pass123",
+        }
+
+        response = self.client.post(reverse("signup"), json.dumps(data), content_type="application/json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIn("token", response.data)
+        self.assertIn("client", response.data)
+
+    def test_signup_invalid_data(self):
+        invalid_data = {
+            "name": "Jan",
+            "phone_number": "123456789",
+            "email": "jan.kowalski@gmail.com",
+            "age": 25,
+            "weight": 70,
+            "height": 180,
+            "hash_pass": "pass123",
+        }
+
+        response = self.client.post(reverse("signup"), json.dumps(invalid_data), content_type="application/json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_signup_exception(self):
+        # prepare data with duplicate of phone_number which is in database
+        data = {
+            "name": "Jan",
+            "surname": "Kowalski",
+            "phone_number": "987654321",
+            "email": "jan.kowalski@gmail.com",
+            "age": 25,
+            "weight": 70,
+            "height": 180,
+            "hash_pass": "pass123",
+        }
+
+        with self.assertRaises(Exception):
+            self.client.post(reverse("signup"), json.dumps(data), content_type="application/json")
+
+class LoginViewTests(TestCase):
+    def setUp(self):
+        # create a test user for each role
+        self.client_user = Clients.objects.create(
+            client_id=1,
+            name="Anna", 
+            surname="Kowalska", 
+            phone_number="987654321", 
+            email="anna.kowalska@fitcrafters.com", 
+            hash_pass=make_password("haslo"),
+            age=25, 
+            weight=70, 
+            height=180
+        )
+
+        self.manager_user = Managers.objects.create(
+            manager_id = 1,
+            name="name1",
+            surname="surname2",
+            phone_number="123456789",
+            email="tomasz.jemiolka@fitcrafters.com",
+            hash_pass=make_password("password"),
+        )
+
+        self.gym = Gyms.objects.create(
+            gym_id = 1,
+            city = "Warsaw",
+            postal_code = "00-987",
+            street = "Matejki",
+            street_number = 133,
+            building_number = 89,
+            manager = self.manager_user,
+            phone_number = "987654321",
+        )
+
+        self.trainer_user = Trainers.objects.create(
+            trainer_id=1, 
+            name="Andrzej", 
+            surname="Nowak", 
+            phone_number = "987654321", 
+            email = "andrzej.nowak@gmail.com",
+            hash_pass = make_password("password"),
+            gym = self.gym)
+
+    def test_login_client_success(self):
+        data = {'email': 'anna.kowalska@fitcrafters.com', 'hash_pass': 'haslo', 'user': 'klient'}
+        response = self.client.post('/login/', json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('token_key', response.data)
+        self.assertIn('token_client_id', response.data)
+        self.assertIn('user', response.data)
+        self.assertIn('role', response.data)
+        self.assertEqual(response.data['role'], 'klient')
+
+    def test_login_manager_success(self):
+        data = {'email': "tomasz.jemiolka@fitcrafters.com", 'hash_pass': 'password', 'user': 'menadżer'}
+        response = self.client.post('/login/', json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('token_key', response.data)
+        self.assertIn('token_manager_id', response.data)
+        self.assertIn('user', response.data)
+        self.assertIn('role', response.data)
+        self.assertEqual(response.data['role'], 'menadżer')
+
+    def test_login_trainer_success(self):
+        data = {'email': "andrzej.nowak@gmail.com", 'hash_pass': 'password', 'user': 'trener'}
+        response = self.client.post('/login/', json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('token_key', response.data)
+        self.assertIn('token_trainer_id', response.data)
+        self.assertIn('user', response.data)
+        self.assertIn('role', response.data)
+        self.assertEqual(response.data['role'], 'trener')
+
+    def test_login_invalid_credentials(self):
+        data = {'email': 'anna.kowalska@fitcrafters.com', 'hash_pass': 'wrong_password', 'user': 'klient'}
+        response = self.client.post('/login/', json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertIn('detail', response.data)
+        self.assertEqual(response.data['detail'], 'Invalid credentials.')
+
+    def test_login_user_not_found(self):
+        data = {'email': 'nonexistent@example.com', 'hash_pass': 'password123', 'user': 'klient'}
+        response = self.client.post('/login/', json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn('detail', response.data)
+        self.assertEqual(response.data['detail'], 'User not found.')
+
+    def test_login_trainer_user_not_found(self):
+        data = {'email': 'nonexistent@example.com', 'hash_pass': 'password123', 'user': 'trener'}
+        response = self.client.post('/login/', json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn('detail', response.data)
+        self.assertEqual(response.data['detail'], 'User not found.')
+
+    def test_login_manager_user_not_found(self):
+        data = {'email': 'nonexistent@example.com', 'hash_pass': 'password123', 'user': 'menadżer'}
+        response = self.client.post('/login/', json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn('detail', response.data)
+        self.assertEqual(response.data['detail'], 'User not found.')
+
+
+class GetManagerNameViewTest(TestCase):
+    def setUp(self):
+        self.manager = Managers.objects.create(
+            manager_id = 1,
+            name="name1",
+            surname="surname2",
+            phone_number="123456789",
+            email="tomasz.jemiolka@fitcrafters.com",
+            hash_pass=make_password("password"),
+        )
+
+    def test_get_manager_name(self):
+        # Wykonujemy zapytanie GET na naszym widoku
+        response = self.client.get(reverse('get_manager_name'))
+
+        # Sprawdzamy, czy status odpowiedzi jest 200 OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Sprawdzamy, czy dane w odpowiedzi są poprawne
+        expected_data = ManagerSerializer(self.manager).data
+        self.assertEqual(response, expected_data)
 
 
 # test getequipment and gettrainer
@@ -804,11 +995,13 @@ class ClientTrainingsFutureTestCase(TestCase):
         trainer = Trainers.objects.create(trainer_id=1, name="Andrzej", surname="Nowak", phone_number = "987654321", gym = gym)
         training_plan = TrainingPlans.objects.create(training_plan_id=1, name="Plan Cardio", category="Cardio", time=30)
         client = Clients.objects.create(client_id=1, name="Anna", surname="Kowalska", phone_number="123456789", email="anna.kowalska@fitcrafters.com", age=25, weight=70, height=180)
-        training = Trainings.objects.create(training_id=1, training_plan=training_plan, trainer=trainer, client=client, start_time = "2025-01-06 16:46:54")
+        start_datetime = datetime.strptime("2025-01-06 15:46", '%Y-%m-%d %H:%M')
+        start_datetime = timezone.make_aware(start_datetime, tz)
+        training = Trainings.objects.create(training_id=1, training_plan=training_plan, trainer=trainer, client=client, start_time = start_datetime) # clean write to db without tz => -1 hour
 
     def test_get_client_trainings_future(self):
         
-        url = reverse("client_trainings_future", args=[1])
+        url = reverse("client_trainings_plans", args=[1])
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -816,12 +1009,13 @@ class ClientTrainingsFutureTestCase(TestCase):
         expected_data = [
             {
                 'training_id': 1,
+                'training_plan_id': 1,
                 'training_plan_name': 'Plan Cardio',
                 'training_plan_category': 'Cardio',
                 'training_plan_time': 30,
                 'trainer_name': 'Andrzej',
                 'trainer_surname': 'Nowak',
-                'start_time': '06-01-2025 16:46:54',
+                'start_time': '2025-01-06 15:46',
                 'end_time': None,
             }
         ]
@@ -885,11 +1079,13 @@ class GetTrainingExercisesTestCase(TestCase):
         exercise = Exercises.objects.create(
             exercise_id=1, category="Cardio", name="Bieżnia", equipment= equipment_type
         )
+        start_datetime = datetime.strptime("2024-01-06 16:46", '%Y-%m-%d %H:%M')
+        start_datetime = timezone.make_aware(start_datetime, tz)
 
         TrainingsExercises.objects.create(
             training=training,
             exercise_id=1,
-            start_time="2024-01-06 16:46:54",
+            start_time=start_datetime,
             end_time=None,
             repeats=10,
             time=15,
@@ -906,7 +1102,7 @@ class GetTrainingExercisesTestCase(TestCase):
         expected_data = [
         {
             'exercise': {'exercise_id': 1, 'category': 'Cardio', 'name': 'Bieżnia', 'equipment': 1},
-            'start_time': '06-01-2024 16:46:54',
+            'start_time': '2024-06-01 15:46',
             'end_time': None,
             'repeats': 10,
             'time': 15,

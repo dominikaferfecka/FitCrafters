@@ -22,9 +22,15 @@ tz = pytz.timezone('Europe/Warsaw')
 class AuthAPIView(APIView):
     @api_view(['POST'])
     def signup(request):
+        """
+        params: request [json]
+        return: status of operation (and data if status correct) [JSONResoponse]
+        method creates new client and token
+        """
         try:
+            # load data
             data = request.data
-            # get next id (or 1 if Clients is empty)
+            # get client_id - next one or 1 if there is no clients
             try:
                 client_id = Clients.objects.order_by('-client_id').first().client_id + 1
             except Exception:
@@ -55,10 +61,17 @@ class AuthAPIView(APIView):
             else:
                 return Response(serializer.errors, status=400)
         except Exception as e:
+            print(str(e))
             return Response({"message": str(e)}, status=500)
 
     @api_view(['POST'])
     def login(request):
+        """
+        params: request [json]
+        return: status of operation (and data if status correct) [JSONResoponse]
+        method checks user's credentials and permissions and if they are correct
+        it navigates to certain UserPage
+        """
         try:
             # get data to log in
             email = request.data.get('email')
@@ -107,12 +120,22 @@ class AuthAPIView(APIView):
 class DataBaseAPIView(APIView):
     @api_view(['GET'])
     def getManagerName(request):
+        """
+        params: request [json]
+        return: data of Manager object[JSONResoponse]
+        method returns manager's data 
+        """
         manager= Managers.objects.first()
         data= ManagerSerializer(manager).data
         return JsonResponse(data)
     
     @api_view(['GET'])
     def getManagerGyms(request):
+        """
+        params: request [json]
+        return: data of multiple gyms [JSONResoponse]
+        method returnes all gyms that are maintained by given manager
+        """
         v_manager_id = request.GET['manager_id']
         gyms = Gyms.objects.filter(manager_id=v_manager_id)
         data = GymSerializer(gyms, many=True).data
@@ -120,10 +143,16 @@ class DataBaseAPIView(APIView):
     
     @api_view(['GET'])
     def getEquipment(request):
+        """
+        params: request [json]
+        return: data of EquipmentType object [JSONResoponse]
+        method returnes EquipmentType objects - if gym was given it filters it through that gym
+        """
         if request.method == "POST":
             data = json.loads(request.body.decode("utf-8"))
         else:
             data = request.GET
+        # if param had gym, filter GymsEquipmentType
         if(data.get("gym")):
             v_gym_id = data.get("gym")
             v_equipment = GymsEquipmentType.objects.filter(gym=v_gym_id).values_list("equipment", flat=True)
@@ -132,6 +161,7 @@ class DataBaseAPIView(APIView):
             data = EquipmentSerializer(equipment, many=True).data
             for quantity, equipment in zip(quantities, data):
                 equipment["quantity"] = str(quantity["count"])
+        # return all EquipmentType
         else:
             equipment = EquipmentType.objects.all()
             data = EquipmentAllSerializer(equipment, many=True).data
@@ -139,20 +169,28 @@ class DataBaseAPIView(APIView):
     
     @csrf_exempt
     def getTrainer(request):
+        """
+        params: request [json]
+        return: data of Trainers object [JSONResoponse]
+        if method is given gym, it returnes all Trainers that are connected to this gym
+        if method is given token, it returnes Trainer that has this token in database
+        """
         if request.method == "POST":
             data = json.loads(request.body.decode("utf-8"))
         else:
             data = request.GET
+        # if param is gym, filter Trainers by gym
         if data.get("gym"):
             v_gym_id = data.get("gym")
             trainers = Trainers.objects.filter(gym=v_gym_id)
+        # if param is token, return Trainer with this token
         elif data.get("token"):
             token = data.get("token")
             trainer_id = Tokens.objects.get(key=token).trainer_id
             trainers = Trainers.objects.get(trainer_id = trainer_id)
             data = TrainersSerializer(trainers).data
             return JsonResponse(data)
-
+        # if there are no params, return all trainers
         else:
             trainers = Trainers.objects.all()
         data = TrainersSerializer(trainers, many=True).data
@@ -160,63 +198,61 @@ class DataBaseAPIView(APIView):
     
     @api_view(['GET'])
     def getTrainerClients(request, trainer_id):
+        """
+        params: request [json], trainer_id [int]
+        return: data of Clients object [JSONResoponse]
+        method returns all clients that have trainings with given trainer
+        """
+        # get trainings by given trainer_id
         trainings = Trainings.objects.filter(trainer_id=trainer_id)
+        # get client_id from given trainings, distinct
         client_ids = trainings.values_list('client_id', flat=True).distinct()
-
         clients = Clients.objects.filter(client_id__in=client_ids)
         data = ClientsSerializer(clients, many=True).data
-
         return JsonResponse(data, safe=False)
     
-    # Trainings History 
-    # @api_view(['GET'])
-    # def getClientTrainings(request, client_id):
-    #     trainings = Trainings.objects.filter(client_id=client_id).select_related('training_plan', 'trainer')
-    #     serializer = ClientTrainingsSerializer(trainings, many=True)
-
-    #     # Uwzględnij strefę czasową przed wysłaniem odpowiedzi
-    #     data_with_localtime = []
-    #     for training_data in serializer.data:
-    #         training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
-    #         if training_data['end_time']:
-    #             training_data['end_time'] = parser.parse(training_data['end_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
-    #         print(training_data)
-    #         data_with_localtime.append(training_data)
-
-    #     return Response(data_with_localtime)
-    
-
     #history
     @api_view(['GET'])
     def getClientTrainings(request, client_id):
+        """
+        params: request [json], client_id [int]
+        return: data of Trainings object [JSONResoponse]
+        method returns all done trainings by given client
+        """
+        # get all trainings connected to given clienet
         trainings = Trainings.objects.filter(client_id=client_id).select_related('training_plan', 'trainer')
         done_trainings = []
+        # check which of them where made
         for training in trainings:
             doesExist = TrainingsExercises.objects.filter(training = training)
             if doesExist:
                 done_trainings.append(training)
         serializer = ClientTrainingsSerializer(done_trainings, many=True)
 
-        # Uwzględnij strefę czasową przed wysłaniem odpowiedzi
+        # add timezone to time
         data_with_localtime = []
         for training_data in serializer.data:
             training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
             if training_data['end_time']:
                 training_data['end_time'] = parser.parse(training_data['end_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
             data_with_localtime.append(training_data)
-
+        # return History Trainings
         return Response(data_with_localtime)
     
     #new
     @api_view(['GET'])
     def getClientTrainingsFuture(request, client_id):
+        """
+        params: request [json], client_id [int]
+        return: data of Trainings object [JSONResoponse]
+        method returns all not done trainings by given client
+        """
         trainer_id = request.GET.get('trainer_id', None)
-
         trainings = Trainings.objects.filter(client_id=client_id).select_related('training_plan', 'trainer')
-
         if trainer_id:
             trainings = trainings.filter(trainer_id=trainer_id)
 
+        # filter not done trainings
         new_trainings = []
         for training in trainings:
             doesExist = TrainingsExercises.objects.filter(training=training)
@@ -224,13 +260,12 @@ class DataBaseAPIView(APIView):
                 new_trainings.append(training)
 
         serializer = ClientTrainingsSerializer(new_trainings, many=True)
-
+        # fix timezone time
         data_with_localtime = []
         for training_data in serializer.data:
             training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
             if training_data['end_time']:
                 training_data['end_time'] = parser.parse(training_data['end_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
-            # print("NEW" + training_data)
             data_with_localtime.append(training_data)
 
         return Response(data_with_localtime)
@@ -239,39 +274,37 @@ class DataBaseAPIView(APIView):
 
     @api_view(['GET'])
     def getClient(request, token):
+        """
+        params: request [json], token [str]
+        return: data of Clients object [JSONResoponse]
+        method returns Client who connects to given token
+        """
         client_id = Tokens.objects.get(key = token).client_id
-        print(client_id)
         client = Clients.objects.get(client_id = client_id)
         data= ClientsSerializer(client).data
         return JsonResponse(data)
-    
-    # @api_view(['GET'])
-    # def getTrainingExercises(request, training_id):
-    #     try:
-    #         training = Trainings.objects.get(training_id=training_id)
-    #     except Trainings.DoesNotExist:
-    #         return JsonResponse({'error': 'Training not found'}, status=404)
-
-    #     exercises = TrainingsExercises.objects.filter(training=training)
-    #     data = TrainingsExercisesSerializer(exercises, many=True).data
-
-    #     return JsonResponse(data, safe=False)
 
     @api_view(['GET'])
     def getTrainingExercises(request, training_id):
+        """
+        params: request [json], training_id [int]
+        return: data of TrainingsExercises object [JSONResoponse]
+        method returns all not done trainings by given client
+        """
         try:
             training = Trainings.objects.get(training_id=training_id)
         except Trainings.DoesNotExist:
             return JsonResponse({'error': 'Training not found'}, status=404)
 
+        # get TrainingsExercises from given training
         exercises = TrainingsExercises.objects.filter(training=training)
         data = TrainingsExercisesSerializer(exercises, many=True).data
+        # fix timezone in start_time and end_time
         data_with_localtime = []
         for training_data in data:
             training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
             if training_data['end_time']:
                 training_data['end_time'] = parser.parse(training_data['end_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
-            # print("NEW" + training_data)
             data_with_localtime.append(training_data)
 
         return JsonResponse(data_with_localtime, safe=False)
@@ -279,63 +312,67 @@ class DataBaseAPIView(APIView):
 
     @api_view(['GET'])
     def getGymsEquipment(request, gym_id, equipment_id):
+        """
+        params: request [json], gym_id [int], equipment_id [int]
+        return: data of GymsEquipmentType object [JSONResoponse]
+        method returns GymsEquipmentType objects which connect to given gym and equipment_type
+        """
+        # check if gym_id was given
         if gym_id == "":
             return JsonResponse({"message": "choose gym"})
+        # find GymsEquipmentType or raise exception
         try:
             gyms_equipments = GymsEquipmentType.objects.filter(gym_id=gym_id, equipment_id=equipment_id)
         except GymsEquipmentType.DoesNotExist:
             return JsonResponse({'error': 'Equipment on this gym not found'}, status=404)
+        # return data
         data = GymsEquipmentTypeSerializer(gyms_equipments, many=True).data
         return JsonResponse(data, safe=False)
-    # @api_view(['GET'])
-    # def getClientsTrainingsWithTrainingPlan(request, client_id):
-    #     try:
-    #         trainings = Trainings.objects.filter(client_id=client_id)
-    #         serializer = ClientTrainingsWithTrainingPlan(trainings, many=True)
-    #         return Response(serializer.data)
-    #     except Clients.DoesNotExist:
-    #         return Response({'error': 'Client not found'}, status=404)
 
     @api_view(['GET'])
     def getTrainingPlans(request):
+        """
+        params: request [json]
+        return: data of TrainingsPlans object [JSONResoponse]
+        method returns all training plans
+        """
         training_plans = TrainingPlans.objects.all()
         data = TrainingPlansSerializer(training_plans, many=True).data
         return JsonResponse(data, safe=False)
     
-
-
     @csrf_exempt
     def signToTrainer(request):
+        """
+        params: request [json]
+        return: status of operation [JSONResoponse]
+        method signs up client to given trainer for given time and date
+        """
         data = json.loads(request.body)
-
+        # unpack data
         date = data.get('date')
         time = data.get('time')
         trainer_id = data.get('trainer_id')
         client_id = data.get('client_id')
-        
+        # fix timezone
         start_datetime = datetime.strptime(date + ' ' + time, '%Y-%m-%d %H:%M')
         start_datetime = timezone.make_aware(start_datetime, tz)
-        print(start_datetime)
         end_datetime = start_datetime + timedelta(hours=1)
-
+        # check for conflicting trainings in trainer
         conflicting_trainings = Trainings.objects.filter(
         trainer_id=trainer_id,
         start_time__lt=end_datetime,
         end_time__gt=start_datetime
         )
-
+        # if there is conflict raise exception
         if conflicting_trainings.exists():
             return JsonResponse({'status': 'error', 'message': 'Wybrany trener już ma zaplanowany trening na wtedy'})
-
-        print("do zapisania")
-        print(start_datetime)
+        # save training to db
         training = Trainings(
             start_time=start_datetime,
             end_time=end_datetime,
             trainer=Trainers.objects.get(trainer_id=trainer_id),
             client_id=client_id
         )
-        
         training.save()
 
         return JsonResponse({'status': 'success'})
@@ -745,6 +782,11 @@ class DataBaseAPIView(APIView):
 
     @api_view(['POST'])
     def updateTrainingPlan(request):
+        """
+        params: request [json]
+        return: status of operation [JSONResoponse]
+        method updates training plan in given training
+        """
         try:
             # Load data
             form_data = request.data
@@ -783,6 +825,11 @@ class DataBaseAPIView(APIView):
 
     @api_view(['GET'])
     def getClientTrainingStatsCalories(request, client_id):
+        """
+        params: request [json], client_id [int]
+        return: labels, data [json]
+        method gets stats about calories from given client
+        """
         start_date_str = request.query_params.get('startDate', None)
         end_date_str = request.query_params.get('endDate', None)
 
@@ -807,6 +854,11 @@ class DataBaseAPIView(APIView):
     
     @api_view(['GET'])
     def getClientTrainingStatsDuration(request, client_id):
+        """
+        params: request [json], client_id [int]
+        return: labels, data [json]
+        method gets stats about duration of trainings from given client
+        """
         start_date_str = request.query_params.get('startDate', None)
         end_date_str = request.query_params.get('endDate', None)
 
@@ -834,6 +886,11 @@ class DataBaseAPIView(APIView):
 
     @api_view(['GET'])
     def getClientStatsPlansCategoryCount(request, client_id):
+        """
+        params: request [json], client_id [int]
+        return: labels, data [json]
+        method gets stats about category of trainings from given client
+        """
         start_date_str = request.query_params.get('startDate', None)
         end_date_str = request.query_params.get('endDate', None)
 
@@ -858,6 +915,11 @@ class DataBaseAPIView(APIView):
 
     @api_view(['GET'])
     def getClientStatsPlansNameCount(request, client_id):
+        """
+        params: request [json], client_id [int]
+        return: labels, data [json]
+        method gets stats about names of trainings from given client
+        """
         start_date_str = request.query_params.get('startDate', None)
         end_date_str = request.query_params.get('endDate', None)
 
@@ -882,6 +944,11 @@ class DataBaseAPIView(APIView):
 
     @api_view(['GET'])
     def getClientStatsTrainerCount(request, client_id):
+        """
+        params: request [json], client_id [int]
+        return: labels, data [json]
+        method gets stats about trainers of trainings from given client
+        """
         start_date_str = request.query_params.get('startDate', None)
         end_date_str = request.query_params.get('endDate', None)
 
@@ -958,6 +1025,11 @@ class DataBaseAPIView(APIView):
 
     @api_view(['GET'])
     def getStatsTrainerCountForGym(request, gym_id):
+        """
+        params: request [json], gym_id [int]
+        return: labels, data [json]
+        method gets count of trainers in given gym
+        """
         start_date_str = request.query_params.get('startDate', None)
         end_date_str = request.query_params.get('endDate', None)
 
@@ -984,6 +1056,11 @@ class DataBaseAPIView(APIView):
     
     @api_view(['GET'])
     def getTrainersCount(request):
+        """
+        params: request [json]
+        return: labels, data [json]
+        method gets stats about trainers in all gyms
+        """
         # count trainings for each gym
         trainers_counts = Trainers.objects.all().select_related('gym').values('gym__city').annotate(count=Count('gym'))
 
@@ -995,6 +1072,11 @@ class DataBaseAPIView(APIView):
     
     @api_view(['GET'])
     def getEquipmentCount(request):
+        """
+        params: request [json]
+        return: labels, data [json]
+        method gets stats about count of equipment in every gym
+        """
         equipment_counts = GymsEquipmentType.objects.all().select_related('gym').values('gym__city').annotate(count=Count('gym'))
 
         # prepare data for statistics
@@ -1005,6 +1087,11 @@ class DataBaseAPIView(APIView):
     
     @api_view(['GET'])
     def getTrainingsCount(request):
+        """
+        params: request [json]
+        return: labels, data [json]
+        method gets stats about count of trainings in every gym
+        """
         # count trainings for each trainer)
         client_counts = []
         gyms = Gyms.objects.all()
@@ -1016,19 +1103,3 @@ class DataBaseAPIView(APIView):
         data = [count for count in client_counts]
 
         return Response({'labels': labels, 'data': data})
-
-def index(request):
-    manager = Managers.objects.first()
-
-    if manager:
-        manager_name = manager.name + ' ' + manager.surname 
-    else:
-        manager_name = "Brak danych o managerze"
-
-    data = {
-        'manager_name': manager_name,
-    }
-
-    return JsonResponse(data)
-
-

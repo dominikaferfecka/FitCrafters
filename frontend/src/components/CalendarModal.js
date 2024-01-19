@@ -36,7 +36,7 @@ const CustomToolbar = (toolbar) => {
   );
 };
 
-function CalendarModal({ onClose, trainerId }) {
+function CalendarModal({ onClose, trainerId}) {
   const closeModal = () => {
     onClose(); // Call the onClose prop function to update the state in the parent component
   };
@@ -47,21 +47,26 @@ function CalendarModal({ onClose, trainerId }) {
   const [trainers_clients_data, setTrainersClientsData] = useState([]);
 
   useEffect(() => {
-    fetch(
-      `http://127.0.0.1:8000/get-trainer_trainings/?trainer_id=${trainerId}`
-    )
-      .then((response) => response.json())
-      .then((trainings_data) => {
-        setTrainingsData(trainings_data);
-      })
-      .catch((error) => {
-        console.log(trainings_data);
-        console.error("Błąd przy pobieraniu danych:", error);
-      });
+    if (trainerId != null && trainerId != undefined)
+    {
+      fetch(
+        `http://127.0.0.1:8000/get-trainer_trainings/?trainer_id=${trainerId}`
+      )
+        .then((response) => response.json())
+        .then((trainings_data) => {
+          setTrainingsData(trainings_data);
+        })
+        .catch((error) => {
+          console.log(trainings_data);
+          console.error("Błąd przy pobieraniu danych:", error);
+        });
+    }
   }, [trainerId]);
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/trainer_clients/${trainerId}/`)
+    if (trainerId != null && trainerId != undefined)
+    {
+      fetch(`http://127.0.0.1:8000/trainer_clients/${trainerId}/`)
       .then((response) => response.json())
       .then((trainers_clients_data) => {
         setTrainersClientsData(trainers_clients_data);
@@ -69,6 +74,7 @@ function CalendarModal({ onClose, trainerId }) {
       .catch((error) => {
         console.error("Błąd przy pobieraniu danych:", error);
       });
+    }
   }, [trainerId]);
 
   //prepare events

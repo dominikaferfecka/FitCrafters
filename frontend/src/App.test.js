@@ -1,8 +1,6 @@
 import "@testing-library/jest-dom";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { BrowserRouter as Router } from "react-router-dom";
-import { MemoryRouter } from "react-router-dom";
-import App from './App'
 
 import MenuBar from "./components/MenuBar";
 import FrontPage from "./components/FrontPage";
@@ -22,7 +20,21 @@ import ManagerPage from "./components/ManagerPage";
 import TrainingPlanDetailModal from "./components/TrainingPlanDetailModal";
 import TrainerInfo from './components/TrainerInfo';
 import TrainerSignUpModal from './components/TrainerSignUpModal';
-import TrainingCalendarForm from './components/TrainingCalendarForm';
+import Footer from './components/Footer';
+import CarouselFrontPage from './components/CarouselFrontPage';
+import DateRangeSelector from './components/DateRangeSelector';
+import QuoteCard from './components/QuoteCard';
+import TextField from './components/TextField';
+import UserHeader from './components/UserHeader';
+
+import CalendarModal from './components/CalendarModal';
+import EquipmentDetailModal from "./components/EquipmentDetailModal";
+import EquipmentForm from "./components/EquipmentForm";
+import GymDetailModal from "./components/GymDetailModal";
+import GymForm from "./components/GymForm";
+import TrainerForm from "./components/TrainerForm";
+import TrainerDetailModal from "./components/TrainerDetailModal";
+
 
 // MENU BAR
 describe("MenuBar.js", () => {
@@ -687,23 +699,25 @@ describe('TrainerSignUpModal.js', () => {
 
 });
 
-// describe('TrainingCalendarForm.js', () => {
+describe('CalendarModal.js', () => {
 
 
-//   beforeEach(() => {
-//     render(
-//       <Router>
-//         <TrainingCalendarForm />
-//       </Router>
-//     );
-//   });
+  beforeEach(() => {
+    render(
+      <Router>
+        <CalendarModal test={1}/>
+      </Router>
+    );
+  });
 
-//   test('Check if select statistic button is visible', () => {
+  test('Check if select statistic button is visible', () => {
   
-//     const buttonElement = screen.getByLabelText(/Usuń trening/i);
-//     expect(buttonElement).toBeInTheDocument();
-//   });
+    const buttonElement = screen.getByText(/Twój Kalendarz/i);
+    expect(buttonElement).toBeInTheDocument();
+    const trainingElement = screen.getByText(/Wybierz trening/i);
+    expect(trainingElement).toBeInTheDocument();
+  });
 
-// });
+});
 
 

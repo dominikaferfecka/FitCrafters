@@ -28,7 +28,7 @@ function List(props) {
   const [trainingPlanId, setTrainingPlanId] = useState(null);
 
   useEffect(() => {
-    props.scrollId === "equipmentList" &&
+    if (selectedGym && props.scrollId === "equipmentList") {
       fetch(`http://127.0.0.1:8000/equipment-endpoint/?gym=${selectedGym}`)
         .then((response) => response.json())
         .then((equipment_data) => {
@@ -37,10 +37,11 @@ function List(props) {
         .catch((error) => {
           console.error("Błąd przy pobieraniu danych:", error);
         });
+    }
   }, [selectedGym, props.scrollId]);
 
   useEffect(() => {
-    props.scrollId === "trainerList" &&
+    if (selectedGym && props.scrollId === "trainerList") {
       fetch(`http://127.0.0.1:8000/trainer-endpoint/?gym=${selectedGym}`)
         .then((response) => response.json())
         .then((trainers_data) => {
@@ -49,23 +50,27 @@ function List(props) {
         .catch((error) => {
           console.error("Błąd przy pobieraniu danych:", error);
         });
+    }
   }, [selectedGym, props.scrollId]);
 
   useEffect(() => {
-    fetch(
-      "http://127.0.0.1:8000/client_trainings_plans/" +
-        String(props.clientIdTrainer) +
-        "/?trainer_id=" +
-        String(props.trainerId)
-    )
-      .then((response) => response.json())
-      .then((clients_plan_trainer) => {
-        setClientsPlanTrainer(clients_plan_trainer);
-      })
-      .catch((error) => {
-        console.error("Błąd przy pobieraniu danych:", error);
-      });
-  }, [props.clientIdTrainer]);
+    if (selectedGym && props.clientIdTrainer && props.trainerId) {
+      fetch(
+        "http://127.0.0.1:8000/client_trainings_plans/" +
+          String(props.clientIdTrainer) +
+          "/?trainer_id=" + String(props.trainerId)
+      )
+        .then((response) => response.json())
+        .then((clients_plan_trainer) => {
+          setClientsPlanTrainer(clients_plan_trainer);
+        })
+        .catch((error) => {
+          console.error("Błąd przy pobieraniu danych:", error);
+        });
+    } else {
+      console.warn("props.trainerId or props.clientIdTrainer is not defined");
+    }
+  }, [props.clientIdTrainer, props.trainerId]);
 
   var columns = ["#", "First", "Last", "Handle"];
 

@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { BrowserRouter as Router } from "react-router-dom";
+import { MemoryRouter } from "react-router-dom";
 import App from './App'
 
 import MenuBar from "./components/MenuBar";
@@ -9,6 +10,14 @@ import Register from "./components/Register";
 import ClientPage from "./components/ClientPage";
 import SideBarClient from "./components/SideBarClient";
 import ClientInfo from "./components/ClientInfo";
+import ClientPlan from "./components/ClientPlan";
+import List from './components/List';
+import TrainerPage from "./components/TrainerPage";
+import SideBarTrainer from "./components/SideBarTrainer";
+import SideBarManager from "./components/SideBarManager";
+import BarChart from './components/BarChart';
+import TrainingDetailModal from './components/TrainingDetailModal';
+import ManagerPage from "./components/ManagerPage";
 
 // MENU BAR
 describe('MenuBar.js', () => {
@@ -322,4 +331,273 @@ describe('ClientInfo.js', () => {
     expect(nameText).toBeInTheDocument();
   });
 
+  test('Check if modify button is rendered', () => {
+    const modifyButton = screen.getByText(/Modyfikuj dane/i);
+    expect(modifyButton).toBeInTheDocument();
+  });
+
 });
+
+//ClientPlan
+
+describe('ClientPlan Component', () => {
+  // test props
+  const mockProps = {
+    trainer_data: { trainer_id: 1 },
+    selectItems: [{ clientId: 1, name: 'Tomasz', surname: 'Marchewka' }], 
+    scrollId: 'clientPlan',
+  };
+
+  beforeEach(() => {
+    render(
+      <Router>
+        <ClientPlan {...mockProps} />
+      </Router>
+    );
+  });
+
+  test('Check if the component renders properly', () => {
+    expect(screen.getByText(/Plan ćwiczeń klienta/i)).toBeInTheDocument();
+  });
+
+  test('Check if select options are rendered', () => {
+    const selectElement = screen.getByText(/Wybierz klienta/i);
+    expect(selectElement).toBeInTheDocument();
+
+    // Select a client from the options
+    fireEvent.change(selectElement, { target: { value: '1' } });
+  });
+
+  test('Check if training plan form works', async () => {
+    const dateInput = screen.getByLabelText(/Data/i);
+    const timeInput = screen.getByLabelText(/Godzina/i);
+    const addButton = screen.getByRole('button', { name: /Dodaj/i });
+
+    fireEvent.change(dateInput, { target: { value: '2024-01-20' } });
+    fireEvent.change(timeInput, { target: { value: '10:30' } });
+
+    jest.spyOn(global, 'fetch').mockResolvedValueOnce({
+      json: jest.fn().mockResolvedValueOnce({ status: 'success' }),
+    });
+  });
+});
+
+//SideBarTrainer
+describe('SideBarTrainer.js', () => {
+
+  beforeEach(() => {
+    render(
+      <Router>
+        <SideBarTrainer />
+      </Router>
+    );
+  });
+
+  test('Check if trainer panel button is visible', () => {
+    const nameText = screen.getByText(/Panel trenera/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if client list button is visible', () => {
+    const nameText = screen.getByText(/Lista klientów/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if statistics client button is visible', () => {
+    const nameText = screen.getByText(/Statystyki klientów/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if clients trainings plan button is visible', () => {
+    const nameText = screen.getByText(/Plany ćwiczeń klienta/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if calendar button is visible', () => {
+    const nameText = screen.getByText(/Kalendarz/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if Sign out button is visible', () => {
+    const nameText = screen.getByText(/Wyloguj się/i);
+    expect(nameText).toBeInTheDocument();
+  });
+});
+
+// // TrainerPage.js
+
+// describe('TrainerPage.js', () => {
+
+//   beforeEach(() => {
+//     render(
+//       <Router>
+//         <TrainerPage />
+//       </Router>
+//     );
+//   });
+
+//   test('Check if welcome text is visible', () => {
+//     const nameText = screen.getByText(/Witaj/i);
+//     expect(nameText).toBeInTheDocument();
+//   });
+
+//   test('Check if trainer header is visible', () => {
+//     const nameText = screen.getByText(/Panel trenera/i);
+//     expect(nameText).toBeInTheDocument();
+//   });
+
+//   test('Check if clients list is visible', () => {
+//     const nameText = screen.getByText(/Klienci/i);
+//     expect(nameText).toBeInTheDocument();
+//   });
+
+//   test('Check if clients training plan is visible', () => {
+//     const nameText = screen.getByText(/Plan ćwiczeń klienta/i);
+//     expect(nameText).toBeInTheDocument();
+//   });
+
+//   test('Check if training plan component is visible', () => {
+//     const nameText = screen.getByText(/Plan treningów/i);
+//     expect(nameText).toBeInTheDocument();
+//   });
+// });
+
+
+//BarChart
+
+describe('BarChart Component', () => {
+
+  beforeEach(() => {
+    render(
+      <Router>
+        <BarChart />
+      </Router>
+    );
+  });
+
+  test('renders BarChart component', () => {
+    const headerElement = screen.getByText(/Wybierz statystykę/i);
+    expect(headerElement).toBeInTheDocument();
+  });
+
+  test('toggles stats when button is clicked', () => {
+    const toggleButton = screen.getByRole('button', { name: /Pokaż statystyki dla jednej siłowni/i });
+    expect(toggleButton).toBeInTheDocument();
+  });
+});
+
+
+//SideBarManager
+describe('SideBarManager.js', () => {
+
+  beforeEach(() => {
+    render(
+      <Router>
+        <SideBarManager />
+      </Router>
+    );
+  });
+
+  test('Check if manager panel button is visible', () => {
+    const nameText = screen.getByText(/Panel menadżera/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if gym list button is visible', () => {
+    const nameText = screen.getByText(/Lista siłowni/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if equipment list button is visible', () => {
+    const nameText = screen.getByText(/Lista sprzętu/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if trainer list button is visible', () => {
+    const nameText = screen.getByText(/Lista trenerów/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if trainer button is visible', () => {
+    const nameText = screen.getByText(/Trenerzy/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if gym button is visible', () => {
+    const nameText = screen.getByText(/Siłownie/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if Sign out button is visible', () => {
+    const nameText = screen.getByText(/Wyloguj się/i);
+    expect(nameText).toBeInTheDocument();
+  });
+});
+
+
+// //TrainingDetail
+// describe('TrainingDetailModal Component', () => {
+//   beforeEach(() => {
+//     // Przekazanie props do komponentu
+//     const props = {
+//       trainingDetails: {
+//         training_id: 1,
+//         // inne właściwości treningu
+//       },
+//     };
+
+//     render(
+//       <Router>
+//         <TrainingDetailModal {...props} />
+//       </Router>
+//     );
+//   });
+
+//   test('renders TrainingDetailModal component with initial state', () => {
+  
+//     const titleElement = screen.getByText(/Szczegóły treningu/i);
+//     expect(titleElement).toBeInTheDocument();
+
+//     const closeButton = screen.getByRole('button', { name: /Close/i });
+//     expect(closeButton).toBeInTheDocument();
+
+//     const emptyStateElement = screen.getByText(/Brak szczegółów treningu/i);
+//     expect(emptyStateElement).toBeInTheDocument();
+//   });
+// });
+
+// describe('ManagerPage.js', () => {
+
+//   beforeEach(() => {
+//     render(
+//       <Router>
+//         <ManagerPage test="test"/>
+//       </Router>
+//     );
+//   });
+
+//   test('Check if welcome text is visible', () => {
+//     const nameText = screen.getByText(/Witaj/i);
+//     expect(nameText).toBeInTheDocument();
+//   });
+
+//   test('Check if manager header is visible', () => {
+//     const nameText = screen.getByText(/Panel menadżera/i);
+//     expect(nameText).toBeInTheDocument();
+//   });
+
+//   test('Check if gym list is visible', () => {
+//     const nameText = screen.getByText(/Lista siłowni/i);
+//     expect(nameText).toBeInTheDocument();
+//   });
+
+//   test('Check if gym statistics is visible', () => {
+//     const nameText = screen.getByText(/Statystyki siłowni/i);
+//     expect(nameText).toBeInTheDocument();
+//   });
+
+//   // test('Check if training plan component is visible', () => {
+//   //   const nameText = screen.getByText(/Szczegóły/i);
+//   //   expect(nameText).toBeInTheDocument();
+//   // });
+// });

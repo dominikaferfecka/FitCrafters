@@ -8,7 +8,7 @@ import TrainerForm from "./TrainerForm";
 import UserHeader from "./UserHeader";
 import React, { useEffect, useState } from "react";
 
-function ManagerPage() {
+function ManagerPage({ test }) {
   const selectStats = [];
 
   const [gym_data, setgymData] = useState([]);
@@ -21,16 +21,21 @@ function ManagerPage() {
 
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/manager-name-endpoint/")
-      .then((response) => response.json())
-      .then((manager_data) => {
-        setManagerData(manager_data);
-        console.log(manager_data);
-      })
-      .catch((error) => {
-        console.log(manager_data);
+    const fetchData = async () => {
+      try {
+        // Sprawdź, czy aplikacja działa w trybie testowym
+        if (test !== 'test') {
+          const response = await fetch("http://127.0.0.1:8000/manager-name-endpoint/");
+          const manager_data = await response.json();
+          setManagerData(manager_data);
+          console.log(manager_data);
+        }
+      } catch (error) {
         console.error("Błąd przy pobieraniu danych:", error);
-      });
+      }
+    };
+  
+    fetchData();
   }, []);
 
   // console.log(manager_data);

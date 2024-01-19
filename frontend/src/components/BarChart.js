@@ -22,8 +22,8 @@ function BarChart(props) {
   const clientId = props.clientId;
   const [isAllGyms, setIsAllGyms] = useState(true);
   const [gymId, setGymId] = useState(null);
-  const [selectedStat, setSelectedStat] = useState(props.stats[0]);
-  const [stat, setStat] = useState(props.stats);
+  const [selectedStat, setSelectedStat] = useState((props.stats && props.stats.length > 0) ? props.stats[0] : null);
+  const [stat, setStat] = useState(props.stats || []);
   const [statistics, setStatistics] = useState("");
   const [caloriesData, setCaloriesData] = useState([]);
   const [gymStatsData, setGymStatsData] = useState([]);
@@ -38,7 +38,7 @@ function BarChart(props) {
     setStat(isAllGyms ? selectStatsOneGym : selectStatsAllGyms);
   };
 
-  const mappedSelectGyms = props.firstSelect.map((item, index) => (
+  const mappedSelectGyms = props.firstSelect && props.firstSelect.map((item, index) => (
     <option key={index} value={index + 1}>
       {item}
     </option>

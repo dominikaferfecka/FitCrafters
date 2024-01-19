@@ -6,8 +6,8 @@ import BarChart from "./BarChart";
 function ClientPlan(props) {
   // const clientId = 1; // change later for real
   const trainerId = props.trainer_data.trainer_id; // change later for real
-  const [clients_plan_trainer, setClientsPlanTrainer] = useState(null);
-  const [training_plans, setTrainingPlans] = useState(null);
+  const [clients_plan_trainer, setClientsPlanTrainer] = useState([]);
+  const [training_plans, setTrainingPlans] = useState([]);
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
 

@@ -25,7 +25,7 @@ urlpatterns = [
     path('', index),
     path('login/', AuthAPIView.login),
     path('signup/', AuthAPIView.signup, name="signup"),
-    path('manager-name-endpoint/', DataBaseAPIView.getManagerName ),
+    path('manager-name-endpoint/', DataBaseAPIView.getManagerName, name="get_manager_name" ),
     path('gyms-endpoint/', DataBaseAPIView.getManagerGyms ),
     path('equipment-endpoint/', DataBaseAPIView.getEquipment, name="get_equipment" ),
     path('trainer-endpoint/', DataBaseAPIView.getTrainer ),

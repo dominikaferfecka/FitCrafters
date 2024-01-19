@@ -55,6 +55,7 @@ class AuthAPIView(APIView):
             else:
                 return Response(serializer.errors, status=400)
         except Exception as e:
+            print(str(e))
             return Response({"message": str(e)}, status=500)
 
     @api_view(['POST'])

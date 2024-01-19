@@ -1,12 +1,8 @@
 import "@testing-library/jest-dom";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { BrowserRouter as Router } from "react-router-dom";
-<<<<<<< HEAD
 import { MemoryRouter } from "react-router-dom";
 import App from './App'
-=======
-import App from "./App";
->>>>>>> fe8e80f1d446591a3d0469a873b625d6c9308a49
 
 import MenuBar from "./components/MenuBar";
 import FrontPage from "./components/FrontPage";
@@ -24,6 +20,9 @@ import BarChart from './components/BarChart';
 import TrainingDetailModal from './components/TrainingDetailModal';
 import ManagerPage from "./components/ManagerPage";
 import TrainingPlanDetailModal from "./components/TrainingPlanDetailModal";
+import TrainerInfo from './components/TrainerInfo';
+import TrainerSignUpModal from './components/TrainerSignUpModal';
+import TrainingCalendarForm from './components/TrainingCalendarForm';
 
 // MENU BAR
 describe("MenuBar.js", () => {
@@ -104,12 +103,7 @@ describe("LogIn.js", () => {
   test("Check if login title is visible", () => {
     const loginText = screen.getByText(/Zaloguj się jako/i);
     expect(loginText).toBeInTheDocument();
-  });
-
-  // test('Check if username text is visible', () => {
-  //   const usernameText = screen.getByText(/Nazwa użytkownika/i);
-  //   expect(usernameText).toBeInTheDocument();
-  // });
+  });;
 
   test("Check if password is visible", () => {
     const passwordText = screen.getByText(
@@ -426,43 +420,38 @@ describe('SideBarTrainer.js', () => {
   });
 });
 
-// // TrainerPage.js
+// TrainerPage.js
 
-// describe('TrainerPage.js', () => {
+describe('TrainerPage.js', () => {
 
-//   beforeEach(() => {
-//     render(
-//       <Router>
-//         <TrainerPage />
-//       </Router>
-//     );
-//   });
+  beforeEach(() => {
+    render(
+      <Router>
+        <TrainerPage test={1}/>
+      </Router>
+    );
+  });
 
-//   test('Check if welcome text is visible', () => {
-//     const nameText = screen.getByText(/Witaj/i);
-//     expect(nameText).toBeInTheDocument();
-//   });
+  test('Check if welcome text is visible', () => {
+    const nameText = screen.getByText(/Witaj/i);
+    expect(nameText).toBeInTheDocument();
+  });
 
-//   test('Check if trainer header is visible', () => {
-//     const nameText = screen.getByText(/Panel trenera/i);
-//     expect(nameText).toBeInTheDocument();
-//   });
+  test('Check if clients list is visible', () => {
+    const nameText = screen.getByText(/Klienci/i);
+    expect(nameText).toBeInTheDocument();
+  });
 
-//   test('Check if clients list is visible', () => {
-//     const nameText = screen.getByText(/Klienci/i);
-//     expect(nameText).toBeInTheDocument();
-//   });
+  test('Check if clients training plan is visible', () => {
+    const nameText = screen.getByText(/Plan ćwiczeń klienta/i);
+    expect(nameText).toBeInTheDocument();
+  });
 
-//   test('Check if clients training plan is visible', () => {
-//     const nameText = screen.getByText(/Plan ćwiczeń klienta/i);
-//     expect(nameText).toBeInTheDocument();
-//   });
-
-//   test('Check if training plan component is visible', () => {
-//     const nameText = screen.getByText(/Plan treningów/i);
-//     expect(nameText).toBeInTheDocument();
-//   });
-// });
+  test('Check if add training plan component is visible', () => {
+    const nameText = screen.getByText(/Dodaj plan treningowy/i);
+    expect(nameText).toBeInTheDocument();
+  });
+});
 
 
 //BarChart
@@ -555,7 +544,7 @@ describe('SideBarManager.js', () => {
 
 //     render(
 //       <Router>
-//         <TrainingDetailModal />
+//         <TrainingDetailModal test={1}/>
 //       </Router>
 //     );
 //   });
@@ -624,22 +613,97 @@ describe('ManagerPage.js', () => {
   // });
 });
 
-// describe("TrainingPlanDetailModal Component", () => {
-//   const mockTrainingPlanId = 123; // Replace with a valid training plan ID
 
-//   test("renders TrainingPlanDetailModal component with initial state", async () => {
-//     render(<TrainingPlanDetailModal trainingPlanId={mockTrainingPlanId} />);
 
-//     // Wait for the component to fetch data (assuming fetching happens in useEffect)
-//     await waitFor(() => {
-//       expect(screen.getByText(/Szczegóły planu treningowego/i)).toBeInTheDocument();
-//     });
+describe('TrainingPlanDetailModal.js', () => {
 
-//     // You can add more assertions based on your component's content
-//     expect(screen.getByText(/Ćwiczenie/i)).toBeInTheDocument();
-//     expect(screen.getByText(/Kategoria/i)).toBeInTheDocument();
-//     // Add more assertions as needed
+  beforeEach(() => {
+    render(
+      <Router>
+        <TrainingPlanDetailModal test={1}/>
+      </Router>
+    );
+  });
+
+  test('Check if select statistic button is visible', () => {
+    expect(screen.getByText('Szczegóły planu treningowego')).toBeInTheDocument();
+    expect(screen.getByText('Ćwiczenie')).toBeInTheDocument();
+    expect(screen.getByText('Kategoria')).toBeInTheDocument();
+    expect(screen.getByText('Powtórzenia')).toBeInTheDocument();
+    expect(screen.getByText('Czas')).toBeInTheDocument();
+    expect(screen.getByText('Obciążenie')).toBeInTheDocument();
+    expect(screen.getByText('Sprzęt')).toBeInTheDocument();
+  });
+
+});
+
+
+describe('TrainingInfo.js', () => {
+
+  beforeEach(() => {
+    render(
+      <Router>
+        <TrainerInfo />
+      </Router>
+    );
+  });
+
+  test('Check if select statistic button is visible', () => {
+    const selectElement = screen.getByLabelText('Select');
+
+    expect(screen.getByText('Informacja o trenerach')).toBeInTheDocument();
+    expect(selectElement).toBeInTheDocument();
+    expect(selectElement).toHaveValue('0');
+    expect(screen.getByText('Jan Kowalski')).toBeInTheDocument();
+    expect(screen.getByText('Wybierz trenera')).toBeInTheDocument();
+  });
+
+});
+
+
+describe('TrainerSignUpModal.js', () => {
+
+  const trainerProps = {
+    trainer: { trainer_id: 1, name: 'Jan', surname: 'Kowalski' },
+    client_id: 1,
+  };
+
+  beforeEach(() => {
+    render(
+      <Router>
+        <TrainerSignUpModal {...trainerProps}/>
+      </Router>
+    );
+  });
+
+  test('Check if select statistic button is visible', () => {
+
+    expect(screen.getByText('Zapisz się do Jan Kowalski')).toBeInTheDocument();
+    expect(screen.getByText('Data')).toBeInTheDocument();
+    expect(screen.getByText('Godzina')).toBeInTheDocument();
+    expect(screen.getByText('Zapisz się')).toBeInTheDocument();
+    expect(screen.getByText('Anuluj')).toBeInTheDocument();
+  });
+
+});
+
+// describe('TrainingCalendarForm.js', () => {
+
+
+//   beforeEach(() => {
+//     render(
+//       <Router>
+//         <TrainingCalendarForm />
+//       </Router>
+//     );
 //   });
 
-//   // Add more tests as needed for specific functionalities of the component
+//   test('Check if select statistic button is visible', () => {
+  
+//     const buttonElement = screen.getByLabelText(/Usuń trening/i);
+//     expect(buttonElement).toBeInTheDocument();
+//   });
+
 // });
+
+

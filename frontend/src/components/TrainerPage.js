@@ -5,44 +5,50 @@ import UserHeader from "./UserHeader";
 import ClientPlan from "./ClientPlan";
 import React, { useEffect, useState } from "react";
 
-function TrainerPage({ onLogout }) {
+function TrainerPage({ onLogout, test }) {
   const [clients_data, setClientsData] = useState([]);
   const [trainer_data, setTrainerData] = useState([]);
   const [token] = useState(localStorage.getItem("token"));
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/trainer-endpoint/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        token: token,
-      }),
-    })
-      .then((response) => response.json())
-      .then((trainer_data) => {
-        setTrainerData(trainer_data);
-        console.log(trainer_data);
+    if (!test)
+    {
+      fetch("http://127.0.0.1:8000/trainer-endpoint/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token: token,
+        }),
       })
-      .catch((error) => {
-        console.log(trainer_data);
-        console.error("Błąd przy pobieraniu danych:", error);
-      });
+        .then((response) => response.json())
+        .then((trainer_data) => {
+          setTrainerData(trainer_data);
+          console.log(trainer_data);
+        })
+        .catch((error) => {
+          console.log(trainer_data);
+          console.error("Błąd przy pobieraniu danych:", error);
+        });
+    }
   }, [trainer_data, token]);
 
   useEffect(() => {
-    fetch(
-      "http://127.0.0.1:8000/trainer_clients/" + String(trainer_data.trainer_id)
-    )
-      .then((response) => response.json())
-      .then((clients_data) => {
-        setClientsData(clients_data);
-        console.log(clients_data);
-      })
-      .catch((error) => {
-        console.log(clients_data);
-        console.error("Błąd przy pobieraniu danych:", error);
-      });
+    if(!test)
+    {
+      fetch(
+        "http://127.0.0.1:8000/trainer_clients/" + String(trainer_data.trainer_id)
+      )
+        .then((response) => response.json())
+        .then((clients_data) => {
+          setClientsData(clients_data);
+          console.log(clients_data);
+        })
+        .catch((error) => {
+          console.log(clients_data);
+          console.error("Błąd przy pobieraniu danych:", error);
+        });
+    }
   }, [clients_data, trainer_data]);
 
   const selectClients2 = clients_data.map((element) => ({
@@ -72,6 +78,7 @@ function TrainerPage({ onLogout }) {
           selectItems={selectClients2}
           scrollId="clientPlan"
           trainer_data={trainer_data}
+          test={test}
         />
         <Footer />
       </div>

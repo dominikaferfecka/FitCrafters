@@ -87,7 +87,9 @@ function ClientPlan(props) {
   // }, []);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/training-plans/")
+    if (!props.test)
+    {
+      fetch("http://127.0.0.1:8000/training-plans/")
       .then((response) => response.json())
       .then((training_plans) => {
         setTrainingPlans(training_plans);
@@ -97,7 +99,8 @@ function ClientPlan(props) {
         console.log(training_plans);
         console.error("Błąd przy pobieraniu danych:", error);
       });
-  }, []);
+    }
+  }, [props.test]);
 
   const handleAddTrainingPlan = () => {
     // Make a POST request to update the training plan

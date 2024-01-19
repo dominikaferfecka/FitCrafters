@@ -18,6 +18,7 @@ import SideBarManager from "./components/SideBarManager";
 import BarChart from './components/BarChart';
 import TrainingDetailModal from './components/TrainingDetailModal';
 import ManagerPage from "./components/ManagerPage";
+import TrainingPlanDetailModal from "./components/TrainingPlanDetailModal";
 
 // MENU BAR
 describe('MenuBar.js', () => {
@@ -504,27 +505,39 @@ describe('SideBarManager.js', () => {
   });
 
   test('Check if gym list button is visible', () => {
-    const nameText = screen.getByText(/Lista siłowni/i);
+    const nameText = screen.getByText(/Sprawdź listę siłowni/i);
     expect(nameText).toBeInTheDocument();
   });
 
   test('Check if equipment list button is visible', () => {
-    const nameText = screen.getByText(/Lista sprzętu/i);
+    const nameText = screen.getByText(/Sprawdź listę sprzętu/i);
     expect(nameText).toBeInTheDocument();
   });
 
   test('Check if trainer list button is visible', () => {
-    const nameText = screen.getByText(/Lista trenerów/i);
+    const nameText = screen.getByText(/Sprawdź listę trenerów/i);
     expect(nameText).toBeInTheDocument();
   });
 
+  test('Check if statistics list button is visible', () => {
+    const nameText = screen.getByText(/Sprawdź statystyki/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+
   test('Check if trainer button is visible', () => {
-    const nameText = screen.getByText(/Trenerzy/i);
+    const nameText = screen.getByText(/Modyfikuj trenerów/i);
     expect(nameText).toBeInTheDocument();
   });
 
   test('Check if gym button is visible', () => {
-    const nameText = screen.getByText(/Siłownie/i);
+    const nameText = screen.getByText(/Modyfikuj sprzęt/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+
+  test('Check if gym button is visible', () => {
+    const nameText = screen.getByText(/Modyfikuj siłownie/i);
     expect(nameText).toBeInTheDocument();
   });
 
@@ -538,17 +551,10 @@ describe('SideBarManager.js', () => {
 // //TrainingDetail
 // describe('TrainingDetailModal Component', () => {
 //   beforeEach(() => {
-//     // Przekazanie props do komponentu
-//     const props = {
-//       trainingDetails: {
-//         training_id: 1,
-//         // inne właściwości treningu
-//       },
-//     };
 
 //     render(
 //       <Router>
-//         <TrainingDetailModal {...props} />
+//         <TrainingDetailModal />
 //       </Router>
 //     );
 //   });
@@ -566,38 +572,73 @@ describe('SideBarManager.js', () => {
 //   });
 // });
 
-// describe('ManagerPage.js', () => {
+describe('ManagerPage.js', () => {
 
-//   beforeEach(() => {
-//     render(
-//       <Router>
-//         <ManagerPage test="test"/>
-//       </Router>
-//     );
+  beforeEach(() => {
+    render(
+      <Router>
+        <ManagerPage test="test"/>
+      </Router>
+    );
+  });
+
+  test('Check if welcome text is visible', () => {
+    const nameText = screen.getByText(/Witaj/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if gym list is visible', () => {
+    const nameText = screen.getByText(/Lista siłowni/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if trainers list is visible', () => {
+    const nameText = screen.getByText(/Lista trenerów/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if equipment list is visible', () => {
+    const nameText = screen.getByText(/Lista sprzętu/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if gym statistics is visible', () => {
+    const nameText = screen.getByText(/Statystyki siłowni/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if gym statistics button is visible', () => {
+    const nameText = screen.getByText(/Pokaż statystyki dla jednej siłowni/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  test('Check if select statistic button is visible', () => {
+    const nameText = screen.getByText(/Wybierz statystykę/i);
+    expect(nameText).toBeInTheDocument();
+  });
+
+  // test('Check if training plan component is visible', () => {
+  //   const nameText = screen.getByText(/Szczegóły/i);
+  //   expect(nameText).toBeInTheDocument();
+  // });
+});
+
+// describe("TrainingPlanDetailModal Component", () => {
+//   const mockTrainingPlanId = 123; // Replace with a valid training plan ID
+
+//   test("renders TrainingPlanDetailModal component with initial state", async () => {
+//     render(<TrainingPlanDetailModal trainingPlanId={mockTrainingPlanId} />);
+
+//     // Wait for the component to fetch data (assuming fetching happens in useEffect)
+//     await waitFor(() => {
+//       expect(screen.getByText(/Szczegóły planu treningowego/i)).toBeInTheDocument();
+//     });
+
+//     // You can add more assertions based on your component's content
+//     expect(screen.getByText(/Ćwiczenie/i)).toBeInTheDocument();
+//     expect(screen.getByText(/Kategoria/i)).toBeInTheDocument();
+//     // Add more assertions as needed
 //   });
 
-//   test('Check if welcome text is visible', () => {
-//     const nameText = screen.getByText(/Witaj/i);
-//     expect(nameText).toBeInTheDocument();
-//   });
-
-//   test('Check if manager header is visible', () => {
-//     const nameText = screen.getByText(/Panel menadżera/i);
-//     expect(nameText).toBeInTheDocument();
-//   });
-
-//   test('Check if gym list is visible', () => {
-//     const nameText = screen.getByText(/Lista siłowni/i);
-//     expect(nameText).toBeInTheDocument();
-//   });
-
-//   test('Check if gym statistics is visible', () => {
-//     const nameText = screen.getByText(/Statystyki siłowni/i);
-//     expect(nameText).toBeInTheDocument();
-//   });
-
-//   // test('Check if training plan component is visible', () => {
-//   //   const nameText = screen.getByText(/Szczegóły/i);
-//   //   expect(nameText).toBeInTheDocument();
-//   // });
+//   // Add more tests as needed for specific functionalities of the component
 // });

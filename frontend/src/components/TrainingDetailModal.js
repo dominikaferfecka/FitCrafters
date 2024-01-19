@@ -16,7 +16,7 @@ function TrainingDetailModal(props) {
   }, [props.trainingDetails]);
 
   useEffect(() => {
-    if (trainingId !== null) {
+    if (trainingId !== null && trainingId !== undefined) {
       fetch("http://127.0.0.1:8000/training_exercises/" + String(trainingId))
         .then((response) => response.json())
         .then((exercises_data) => {

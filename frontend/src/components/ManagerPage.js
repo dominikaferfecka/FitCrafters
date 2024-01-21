@@ -19,13 +19,14 @@ function ManagerPage({ test }) {
 
   const [manager_data, setManagerData] = useState({});
 
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Sprawdź, czy aplikacja działa w trybie testowym
-        if (test !== 'test') {
-          const response = await fetch("http://127.0.0.1:8000/manager-name-endpoint/");
+        if (test !== "test") {
+          const response = await fetch(
+            "http://127.0.0.1:8000/manager-name-endpoint/"
+          );
           const manager_data = await response.json();
           setManagerData(manager_data);
           console.log(manager_data);
@@ -34,9 +35,9 @@ function ManagerPage({ test }) {
         console.error("Błąd przy pobieraniu danych:", error);
       }
     };
-  
+
     fetchData();
-  }, []);
+  }, [test]);
 
   // console.log(manager_data);
   useEffect(() => {
@@ -56,7 +57,7 @@ function ManagerPage({ test }) {
   }, [manager_data]);
 
   useEffect(() => {
-    if (test !== 'test') {
+    if (test !== "test") {
       fetch("http://127.0.0.1:8000/equipment-endpoint/")
         .then((response) => response.json())
         .then((equipment_data) => {
@@ -65,7 +66,7 @@ function ManagerPage({ test }) {
         })
         .catch((error) => {
           console.error("Błąd przy pobieraniu danych:", error);
-  
+
           // Check if equipment_data is truthy before logging
           if (equipment_data) {
             console.log(equipment_data);
@@ -75,7 +76,7 @@ function ManagerPage({ test }) {
   }, []);
 
   useEffect(() => {
-    if (test !== 'test') {
+    if (test !== "test") {
       fetch("http://127.0.0.1:8000/trainer-endpoint/")
         .then((response) => response.json())
         .then((trainers_data) => {
@@ -84,15 +85,14 @@ function ManagerPage({ test }) {
         })
         .catch((error) => {
           console.error("Błąd przy pobieraniu danych:", error);
-  
+
           // Check if trainers_data is truthy before logging
           if (trainers_data) {
             console.log(trainers_data);
           }
         });
     }
-  }, []);
-  
+  }, [trainers_data, test]);
 
   const selectGyms = gym_data.map(
     (element) => element.city + ", " + element.street

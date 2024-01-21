@@ -50,7 +50,6 @@ function TrainingDetailModal(props) {
             ></button>
           </div>
           <div class="modal-body">
-
             <div className="table-responsive">
               <table className="table table-bordered table-hover">
                 <thead>

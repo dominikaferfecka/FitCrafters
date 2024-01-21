@@ -2,7 +2,6 @@ import background from "../img/userBackground.jpg";
 import React, { useEffect, useState } from "react";
 
 function UserHeader(props) {
-  const [fetched_data, setData] = useState({});
   const [name, setName] = useState("");
 
   useEffect(() => {
@@ -10,18 +9,6 @@ function UserHeader(props) {
       setName(props.name || "");
     }
   }, [props.name]);
-
-  // useEffect(() => {
-  //   fetch("http://127.0.0.1:8000/manager-name-endpoint/")
-  //     .then((response) => response.json())
-  //     .then((fetched_data) => {
-  //       setData(fetched_data);
-  //     })
-  //     .catch((error) => {
-  //       console.log(fetched_data);
-  //       console.error("Błąd przy pobieraniu danych:", error);
-  //     });
-  // }, [fetched_data]);
 
   return (
     <header>

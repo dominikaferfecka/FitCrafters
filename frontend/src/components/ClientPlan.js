@@ -6,20 +6,11 @@ import BarChart from "./BarChart";
 function ClientPlan(props) {
   // const clientId = 1; // change later for real
   const trainerId = props.trainer_data.trainer_id; // change later for real
-  const [clients_plan_trainer, setClientsPlanTrainer] = useState([]);
+  const [clients_plan_trainer] = useState([]);
   const [training_plans, setTrainingPlans] = useState([]);
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
 
-  const columns = ["#", "First", "Last", "Handle"];
-  const plans = ["planA", "planB", "planC", "planD", "planE"];
-  const exercises = [
-    "ćwiczenieA",
-    "ćwiczenieB",
-    "ćwiczenieC",
-    "ćwiczenieD",
-    "ćwiczenieE",
-  ];
   const selectStats = [
     "Spalone kalorie",
     "Długość treningów",
@@ -30,12 +21,6 @@ function ClientPlan(props) {
 
   const [selectedTrainingPlanId, setSelectedTrainingPlanId] = useState("");
 
-  const listItems = columns.map((col, index) => (
-    <th key={index} scope="col">
-      {col}
-    </th>
-  ));
-
   const mappedSelectItems = props.selectItems.map((item, index) => (
     <option key={index} value={item.clientId}>
       {item.name} {item.surname}
@@ -45,12 +30,6 @@ function ClientPlan(props) {
   const mappedSelectPlans = (training_plans || []).map((item, index) => (
     <option key={index} value={item.training_plan_id}>
       {`${item.category} - ${item.name}`}
-    </option>
-  ));
-
-  const mappedSelectExercises = exercises.map((item, index) => (
-    <option key={index} value={index + 1}>
-      {item}
     </option>
   ));
 
@@ -73,34 +52,20 @@ function ClientPlan(props) {
     setTime(event.target.value);
   };
 
-  // useEffect(() => {
-  //   fetch("http://127.0.0.1:8000/client_trainings_plans/a" + String(3))
-  //     .then((response) => response.json())
-  //     .then((clients_plan_trainer) => {
-  //       setClientsPlanTrainer(clients_plan_trainer);
-  //       console.log("CLIENTS PLAN AA: " + clients_plan_trainer);
-  //     })
-  //     .catch((error) => {
-  //       console.log(clients_plan_trainer);
-  //       console.error("Błąd przy pobieraniu danych:", error);
-  //     });
-  // }, []);
-
   useEffect(() => {
-    if (!props.test)
-    {
+    if (!props.test) {
       fetch("http://127.0.0.1:8000/training-plans/")
-      .then((response) => response.json())
-      .then((training_plans) => {
-        setTrainingPlans(training_plans);
-        console.log("PLANY TRENINGOWE: " + training_plans);
-      })
-      .catch((error) => {
-        console.log(training_plans);
-        console.error("Błąd przy pobieraniu danych:", error);
-      });
+        .then((response) => response.json())
+        .then((training_plans) => {
+          setTrainingPlans(training_plans);
+          console.log("PLANY TRENINGOWE: " + training_plans);
+        })
+        .catch((error) => {
+          console.log(training_plans);
+          console.error("Błąd przy pobieraniu danych:", error);
+        });
     }
-  }, [props.test]);
+  }, [props.test, training_plans]);
 
   const handleAddTrainingPlan = () => {
     // Make a POST request to update the training plan
@@ -222,58 +187,6 @@ function ClientPlan(props) {
         scrollId="statsTraining"
         clientId={clientIdTrainer}
       />
-      {/* <h5 className="text-center m-4">Dodaj ćwiczenie</h5>
-      <form>
-        <div class="row flex-d justify-content-center" id="formClientPlan">
-          <div class="row col-md-10 justify-content-center">
-            <div class="mb-3 col-md-6">
-              <label for="exampleInputEmail1" class="form-label">
-                Data
-              </label>
-              <input
-                type="date"
-                class="form-control"
-                id="exampleInputEmail1"
-                aria-describedby="emailHelp"
-              />
-            </div>
-            <div class="mb-3 col-md-6">
-              <label for="exampleInputPassword1" class="form-label">
-                Ćwiczenie
-              </label>
-              <select class="form-select" aria-label="Default select example">
-                <option selected>Wybierz ćwiczenie</option>
-                {mappedSelectExercises}
-              </select>
-            </div>
-            <div class="row col-md-12">
-              <div class="mb-3 col-md-4">
-                <label for="reps" class="form-label">
-                  Powtórzenia
-                </label>
-                <input type="text" class="form-control" id="reps" />
-              </div>
-              <div class="mb-3 col-md-4">
-                <label for="time" class="form-label">
-                  Czas
-                </label>
-                <input type="text" class="form-control" id="time" />
-              </div>
-              <div class="mb-3 col-md-4">
-                <label for="load" class="form-label">
-                  Obciążenie
-                </label>
-                <input type="text" class="form-control" id="load" />
-              </div>
-            </div>
-          </div>
-          <div class="col-md-1 d-flex align-items-center">
-            <button class="btn btn-success" type="button">
-              Dodaj
-            </button>
-          </div>
-        </div>
-      </form> */}
     </Container>
   );
 }

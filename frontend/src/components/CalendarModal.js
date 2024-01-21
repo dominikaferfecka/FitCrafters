@@ -36,19 +36,13 @@ const CustomToolbar = (toolbar) => {
   );
 };
 
-function CalendarModal({ onClose, trainerId}) {
-  const closeModal = () => {
-    onClose(); // Call the onClose prop function to update the state in the parent component
-  };
+function CalendarModal({ trainerId }) {
   console.log(trainerId);
 
   const [trainings_data, setTrainingsData] = useState([]);
 
-  const [trainers_clients_data, setTrainersClientsData] = useState([]);
-
   useEffect(() => {
-    if (trainerId != null && trainerId != undefined)
-    {
+    if (trainerId !== null && trainerId !== undefined) {
       fetch(
         `http://127.0.0.1:8000/get-trainer_trainings/?trainer_id=${trainerId}`
       )
@@ -60,20 +54,6 @@ function CalendarModal({ onClose, trainerId}) {
           console.log(trainings_data);
           console.error("Błąd przy pobieraniu danych:", error);
         });
-    }
-  }, [trainerId]);
-
-  useEffect(() => {
-    if (trainerId != null && trainerId != undefined)
-    {
-      fetch(`http://127.0.0.1:8000/trainer_clients/${trainerId}/`)
-      .then((response) => response.json())
-      .then((trainers_clients_data) => {
-        setTrainersClientsData(trainers_clients_data);
-      })
-      .catch((error) => {
-        console.error("Błąd przy pobieraniu danych:", error);
-      });
     }
   }, [trainerId]);
 
@@ -141,7 +121,6 @@ function CalendarModal({ onClose, trainerId}) {
               min={minTime}
               max={maxTime}
               events={mappedEvents}
-              // style={{ height: 600, width: 800 }}
               startAccessor="start"
               endAccessor="end"
             />

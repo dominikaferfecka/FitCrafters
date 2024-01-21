@@ -10,8 +10,7 @@ function TrainerPage({ onLogout, test }) {
   const [trainer_data, setTrainerData] = useState([]);
   const [token] = useState(localStorage.getItem("token"));
   useEffect(() => {
-    if (!test)
-    {
+    if (!test) {
       fetch("http://127.0.0.1:8000/trainer-endpoint/", {
         method: "POST",
         headers: {
@@ -34,10 +33,10 @@ function TrainerPage({ onLogout, test }) {
   }, [trainer_data, token]);
 
   useEffect(() => {
-    if(!test)
-    {
+    if (!test) {
       fetch(
-        "http://127.0.0.1:8000/trainer_clients/" + String(trainer_data.trainer_id)
+        "http://127.0.0.1:8000/trainer_clients/" +
+          String(trainer_data.trainer_id)
       )
         .then((response) => response.json())
         .then((clients_data) => {

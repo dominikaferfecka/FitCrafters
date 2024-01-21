@@ -15,8 +15,6 @@ function List(props) {
 
   const [selectedGymDetails, setSelectedGymDetails] = useState(null);
 
-  const [clients_plan, setClientsPlan] = useState(null);
-
   const [clients_plan_trainer, setClientsPlanTrainer] = useState(null);
 
   const [selectedTrainer, setSelectedTrainer] = useState(0);
@@ -58,7 +56,8 @@ function List(props) {
       fetch(
         "http://127.0.0.1:8000/client_trainings_plans/" +
           String(props.clientIdTrainer) +
-          "/?trainer_id=" + String(props.trainerId)
+          "/?trainer_id=" +
+          String(props.trainerId)
       )
         .then((response) => response.json())
         .then((clients_plan_trainer) => {
@@ -165,7 +164,6 @@ function List(props) {
   };
 
   const handleClientPlanClick = (clientPlan) => {
-    setClientsPlan(clientPlan);
     setTrainingPlanId(clientPlan.training_plan_id);
   };
 

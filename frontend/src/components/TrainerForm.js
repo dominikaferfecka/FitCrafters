@@ -48,7 +48,7 @@ function TrainerForm(props) {
   };
 
   // method to handle post
-  const handleAddGymOnSubmit = async (e) => {
+  const handleAddTrainerOnSubmit = async (e) => {
     /*
     params: e [event]
     method prepares data to send to django server
@@ -118,7 +118,7 @@ function TrainerForm(props) {
       <form
         class="row  m-auto mb-5 g-3 needs-validation"
         novalidate
-        onSubmit={handleAddGymOnSubmit}
+        onSubmit={handleAddTrainerOnSubmit}
       >
         <div class="col-md-12">
           <label for="validationCustom01" class="form-label">

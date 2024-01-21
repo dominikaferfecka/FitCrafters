@@ -1,0 +1,8 @@
+[MASTER]
+init-hook='import sys; sys.path.append(".")'
+
+[TYPECHECK]
+generated-members=objects,DoesNotExist
+
+[REPORTS]
+msg-template={path}:{line}: [{msg_id}({symbol}), {obj}] {msg}

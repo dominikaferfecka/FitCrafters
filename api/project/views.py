@@ -117,7 +117,7 @@ class AuthAPIView(APIView):
             return Response({"message": str(e)}, status=500)
         
 
-class DataBaseAPIView(APIView):
+class ManagerAPIView(APIView):
     @api_view(['GET'])
     def getManagerName(request):
         """
@@ -167,215 +167,6 @@ class DataBaseAPIView(APIView):
             data = EquipmentAllSerializer(equipment, many=True).data
         return JsonResponse(data, safe=False)
     
-    @csrf_exempt
-    def getTrainer(request):
-        """
-        params: request [json]
-        return: data of Trainers object [JSONResoponse]
-        if method is given gym, it returnes all Trainers that are connected to this gym
-        if method is given token, it returnes Trainer that has this token in database
-        """
-        if request.method == "POST":
-            data = json.loads(request.body.decode("utf-8"))
-        else:
-            data = request.GET
-        # if param is gym, filter Trainers by gym
-        if data.get("gym"):
-            v_gym_id = data.get("gym")
-            trainers = Trainers.objects.filter(gym=v_gym_id)
-        # if param is token, return Trainer with this token
-        elif data.get("token"):
-            token = data.get("token")
-            trainer_id = Tokens.objects.get(key=token).trainer_id
-            trainers = Trainers.objects.get(trainer_id = trainer_id)
-            data = TrainersSerializer(trainers).data
-            return JsonResponse(data)
-        # if there are no params, return all trainers
-        else:
-            trainers = Trainers.objects.all()
-        data = TrainersSerializer(trainers, many=True).data
-        return JsonResponse(data, safe=False)
-    
-    @api_view(['GET'])
-    def getTrainerClients(request, trainer_id):
-        """
-        params: request [json], trainer_id [int]
-        return: data of Clients object [JSONResoponse]
-        method returns all clients that have trainings with given trainer
-        """
-        # get trainings by given trainer_id
-        trainings = Trainings.objects.filter(trainer_id=trainer_id)
-        # get client_id from given trainings, distinct
-        client_ids = trainings.values_list('client_id', flat=True).distinct()
-        clients = Clients.objects.filter(client_id__in=client_ids)
-        data = ClientsSerializer(clients, many=True).data
-        return JsonResponse(data, safe=False)
-    
-    #history
-    @api_view(['GET'])
-    def getClientTrainings(request, client_id):
-        """
-        params: request [json], client_id [int]
-        return: data of Trainings object [JSONResoponse]
-        method returns all done trainings by given client
-        """
-        # get all trainings connected to given clienet
-        trainings = Trainings.objects.filter(client_id=client_id).select_related('training_plan', 'trainer')
-        done_trainings = []
-        # check which of them where made
-        for training in trainings:
-            doesExist = TrainingsExercises.objects.filter(training = training)
-            if doesExist:
-                done_trainings.append(training)
-        serializer = ClientTrainingsSerializer(done_trainings, many=True)
-
-        # add timezone to time
-        data_with_localtime = []
-        for training_data in serializer.data:
-            training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
-            if training_data['end_time']:
-                training_data['end_time'] = parser.parse(training_data['end_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
-            data_with_localtime.append(training_data)
-        # return History Trainings
-        return Response(data_with_localtime)
-    
-    #new
-    @api_view(['GET'])
-    def getClientTrainingsFuture(request, client_id):
-        """
-        params: request [json], client_id [int]
-        return: data of Trainings object [JSONResoponse]
-        method returns all not done trainings by given client
-        """
-        trainer_id = request.GET.get('trainer_id', None)
-        trainings = Trainings.objects.filter(client_id=client_id).select_related('training_plan', 'trainer')
-        if trainer_id:
-            trainings = trainings.filter(trainer_id=trainer_id)
-
-        # filter not done trainings
-        new_trainings = []
-        for training in trainings:
-            doesExist = TrainingsExercises.objects.filter(training=training)
-            if not doesExist:
-                new_trainings.append(training)
-
-        serializer = ClientTrainingsSerializer(new_trainings, many=True)
-        # fix timezone time
-        data_with_localtime = []
-        for training_data in serializer.data:
-            training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
-            if training_data['end_time']:
-                training_data['end_time'] = parser.parse(training_data['end_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
-            data_with_localtime.append(training_data)
-
-        return Response(data_with_localtime)
-
-
-
-    @api_view(['GET'])
-    def getClient(request, token):
-        """
-        params: request [json], token [str]
-        return: data of Clients object [JSONResoponse]
-        method returns Client who connects to given token
-        """
-        client_id = Tokens.objects.get(key = token).client_id
-        client = Clients.objects.get(client_id = client_id)
-        data= ClientsSerializer(client).data
-        return JsonResponse(data)
-
-    @api_view(['GET'])
-    def getTrainingExercises(request, training_id):
-        """
-        params: request [json], training_id [int]
-        return: data of TrainingsExercises object [JSONResoponse]
-        method returns all not done trainings by given client
-        """
-        try:
-            training = Trainings.objects.get(training_id=training_id)
-        except Trainings.DoesNotExist:
-            return JsonResponse({'error': 'Training not found'}, status=404)
-
-        # get TrainingsExercises from given training
-        exercises = TrainingsExercises.objects.filter(training=training)
-        data = TrainingsExercisesSerializer(exercises, many=True).data
-        # fix timezone in start_time and end_time
-        data_with_localtime = []
-        for training_data in data:
-            training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
-            if training_data['end_time']:
-                training_data['end_time'] = parser.parse(training_data['end_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
-            data_with_localtime.append(training_data)
-
-        return JsonResponse(data_with_localtime, safe=False)
-    
-
-    @api_view(['GET'])
-    def getGymsEquipment(request, gym_id, equipment_id):
-        """
-        params: request [json], gym_id [int], equipment_id [int]
-        return: data of GymsEquipmentType object [JSONResoponse]
-        method returns GymsEquipmentType objects which connect to given gym and equipment_type
-        """
-        # check if gym_id was given
-        if gym_id == "":
-            return JsonResponse({"message": "choose gym"})
-        # find GymsEquipmentType or raise exception
-        try:
-            gyms_equipments = GymsEquipmentType.objects.filter(gym_id=gym_id, equipment_id=equipment_id)
-        except GymsEquipmentType.DoesNotExist:
-            return JsonResponse({'error': 'Equipment on this gym not found'}, status=404)
-        # return data
-        data = GymsEquipmentTypeSerializer(gyms_equipments, many=True).data
-        return JsonResponse(data, safe=False)
-
-    @api_view(['GET'])
-    def getTrainingPlans(request):
-        """
-        params: request [json]
-        return: data of TrainingsPlans object [JSONResoponse]
-        method returns all training plans
-        """
-        training_plans = TrainingPlans.objects.all()
-        data = TrainingPlansSerializer(training_plans, many=True).data
-        return JsonResponse(data, safe=False)
-    
-    @csrf_exempt
-    def signToTrainer(request):
-        """
-        params: request [json]
-        return: status of operation [JSONResoponse]
-        method signs up client to given trainer for given time and date
-        """
-        data = json.loads(request.body)
-        # unpack data
-        date = data.get('date')
-        time = data.get('time')
-        trainer_id = data.get('trainer_id')
-        client_id = data.get('client_id')
-        # fix timezone
-        start_datetime = datetime.strptime(date + ' ' + time, '%Y-%m-%d %H:%M')
-        start_datetime = timezone.make_aware(start_datetime, tz)
-        end_datetime = start_datetime + timedelta(hours=1)
-        # check for conflicting trainings in trainer
-        conflicting_trainings = Trainings.objects.filter(
-        trainer_id=trainer_id,
-        start_time__lt=end_datetime,
-        end_time__gt=start_datetime
-        )
-        # if there is conflict raise exception
-        if conflicting_trainings.exists():
-            return JsonResponse({'status': 'error', 'message': 'Wybrany trener już ma zaplanowany trening na wtedy'})
-        # save training to db
-        training = Trainings(
-            start_time=start_datetime,
-            end_time=end_datetime,
-            trainer=Trainers.objects.get(trainer_id=trainer_id),
-            client_id=client_id
-        )
-        training.save()
-
-        return JsonResponse({'status': 'success'})
 
     @csrf_exempt
     def addGym(request):
@@ -634,52 +425,7 @@ class DataBaseAPIView(APIView):
             return JsonResponse({"status": "success"})
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
-        
-                
-    @csrf_exempt
-    def getTrainerTrainings(request):
-        """
-        params: request [json]
-        return: info about trainer's trainings  [JSONResoponse]
-        method extracts received data and returns info about trainer's trainings"""
-        # load data
-        if request.method == "POST":
-            v_trainer_data = json.loads(request.body.decode("utf-8"))
-        else:
-            v_trainer_data = request.GET
-        
-        v_trainer_id = v_trainer_data.get("trainer_id")
-        # extract data
-        try:
-            # create GymsEquipmentType object to save
-            trainings = Trainings.objects.filter(trainer_id=v_trainer_id).select_related('client')
-            serializer = TrainerTrainingsSerializer(trainings, many=True)
-            # return success
-            return JsonResponse(serializer.data, safe=False)
-        except Exception as e:
-            return JsonResponse({"message": str(e)}, status=500)
-        
-    
-    @csrf_exempt
-    def deleteTraining(request):
-        """
-        params: request [json]
-        return: status of operation [JSONResoponse]
-        method delete trainings with given training_id"""
-        # load data
-        if request.method == "POST":
-            v_training_data = json.loads(request.body.decode("utf-8"))
-        else:
-            v_training_data = request.GET
-        
-        v_training_id = v_training_data.get("training_id")
-        # extract data
-        try:
-            trainings = Trainings.objects.filter(training_id=v_training_id).delete()
-            # return success
-            return JsonResponse({"status": "success"})
-        except Exception as e:
-            return JsonResponse({"message": str(e)}, status=500)
+
     @csrf_exempt
     def modifyEquipment(request):
         """
@@ -737,6 +483,326 @@ class DataBaseAPIView(APIView):
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
 
+    @api_view(['GET'])
+    def getGymsEquipment(request, gym_id, equipment_id):
+        """
+        params: request [json], gym_id [int], equipment_id [int]
+        return: data of GymsEquipmentType object [JSONResoponse]
+        method returns GymsEquipmentType objects which connect to given gym and equipment_type
+        """
+        # check if gym_id was given
+        if gym_id == "":
+            return JsonResponse({"message": "choose gym"})
+        # find GymsEquipmentType or raise exception
+        try:
+            gyms_equipments = GymsEquipmentType.objects.filter(gym_id=gym_id, equipment_id=equipment_id)
+        except GymsEquipmentType.DoesNotExist:
+            return JsonResponse({'error': 'Equipment on this gym not found'}, status=404)
+        # return data
+        data = GymsEquipmentTypeSerializer(gyms_equipments, many=True).data
+        return JsonResponse(data, safe=False)
+    
+class ClientManagerAPIView(APIView):
+    @csrf_exempt
+    def getTrainer(request):
+        """
+        params: request [json]
+        return: data of Trainers object [JSONResoponse]
+        if method is given gym, it returnes all Trainers that are connected to this gym
+        if method is given token, it returnes Trainer that has this token in database
+        """
+        if request.method == "POST":
+            data = json.loads(request.body.decode("utf-8"))
+        else:
+            data = request.GET
+        # if param is gym, filter Trainers by gym
+        if data.get("gym"):
+            v_gym_id = data.get("gym")
+            trainers = Trainers.objects.filter(gym=v_gym_id)
+        # if param is token, return Trainer with this token
+        elif data.get("token"):
+            token = data.get("token")
+            trainer_id = Tokens.objects.get(key=token).trainer_id
+            trainers = Trainers.objects.get(trainer_id = trainer_id)
+            data = TrainersSerializer(trainers).data
+            return JsonResponse(data)
+        # if there are no params, return all trainers
+        else:
+            trainers = Trainers.objects.all()
+        data = TrainersSerializer(trainers, many=True).data
+        return JsonResponse(data, safe=False)
+
+
+class TrainerAPIView(APIView):
+    @api_view(['GET'])
+    def getTrainerClients(request, trainer_id):
+        """
+        params: request [json], trainer_id [int]
+        return: data of Clients object [JSONResoponse]
+        method returns all clients that have trainings with given trainer
+        """
+        # get trainings by given trainer_id
+        trainings = Trainings.objects.filter(trainer_id=trainer_id)
+        # get client_id from given trainings, distinct
+        client_ids = trainings.values_list('client_id', flat=True).distinct()
+        clients = Clients.objects.filter(client_id__in=client_ids)
+        data = ClientsSerializer(clients, many=True).data
+        return JsonResponse(data, safe=False)
+
+    @api_view(['GET'])
+    def getTrainingPlans(request):
+        """
+        params: request [json]
+        return: data of TrainingsPlans object [JSONResoponse]
+        method returns all training plans
+        """
+        training_plans = TrainingPlans.objects.all()
+        data = TrainingPlansSerializer(training_plans, many=True).data
+        return JsonResponse(data, safe=False)
+
+                
+    @csrf_exempt
+    def getTrainerTrainings(request):
+        """
+        params: request [json]
+        return: info about trainer's trainings  [JSONResoponse]
+        method extracts received data and returns info about trainer's trainings
+        """
+        # load data
+        if request.method == "POST":
+            v_trainer_data = json.loads(request.body.decode("utf-8"))
+        else:
+            v_trainer_data = request.GET
+        
+        v_trainer_id = v_trainer_data.get("trainer_id")
+        # extract data
+        try:
+            # create GymsEquipmentType object to save
+            trainings = Trainings.objects.filter(trainer_id=v_trainer_id).select_related('client')
+            serializer = TrainerTrainingsSerializer(trainings, many=True)
+            # return success
+            return JsonResponse(serializer.data, safe=False)
+        except Exception as e:
+            return JsonResponse({"message": str(e)}, status=500)
+        
+    
+    @csrf_exempt
+    def deleteTraining(request):
+        """
+        params: request [json]
+        return: status of operation [JSONResoponse]
+        method delete trainings with given training_id"""
+        # load data
+        if request.method == "POST":
+            v_training_data = json.loads(request.body.decode("utf-8"))
+        else:
+            v_training_data = request.GET
+        
+        v_training_id = v_training_data.get("training_id")
+        # extract data
+        try:
+            trainings = Trainings.objects.filter(training_id=v_training_id).delete()
+            # return success
+            return JsonResponse({"status": "success"})
+        except Exception as e:
+            return JsonResponse({"message": str(e)}, status=500)
+
+    @api_view(['POST'])
+    def updateTrainingPlan(request):
+        """
+        params: request [json]
+        return: status of operation [JSONResoponse]
+        method updates training plan in given training
+        """
+        try:
+            # Load data
+            form_data = request.data
+
+            # extract data
+            date = form_data.get("date")
+            time = form_data.get("time")
+            selected_plan_id = form_data.get("selectedTrainingPlanId")
+            client_id_trainer = form_data.get("clientIdTrainer")
+            trainer_id = form_data.get("trainerId")
+            print(f"AAA: {selected_plan_id}")
+
+            time_with_seconds = f"{time}"
+            datetime_str = f"{date} {time_with_seconds}"
+            training_datetime = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
+            start_time = timezone.make_aware(training_datetime, tz)
+
+            training = Trainings.objects.get(start_time=start_time, client_id=client_id_trainer, trainer = trainer_id)
+            #training = Trainings.objects.get(start_time=start_time, client_id=client_id_trainer)
+
+            with transaction.atomic():
+                training_plan = TrainingPlans.objects.get(training_plan_id=selected_plan_id)
+
+                training.training_plan = training_plan
+                training.save()
+
+            # Return a success message
+            return Response({"status": "success"})
+
+        except Exception as e:
+            # Return an error message if an exception occurs
+            return Response({"message": str(e)}, status=500)
+
+class ClientTrainerAPIView(APIView): 
+    #history
+    @api_view(['GET'])
+    def getClientTrainings(request, client_id):
+        """
+        params: request [json], client_id [int]
+        return: data of Trainings object [JSONResoponse]
+        method returns all done trainings by given client
+        """
+        # get all trainings connected to given clienet
+        trainings = Trainings.objects.filter(client_id=client_id).select_related('training_plan', 'trainer')
+        done_trainings = []
+        # check which of them where made
+        for training in trainings:
+            doesExist = TrainingsExercises.objects.filter(training = training)
+            if doesExist:
+                done_trainings.append(training)
+        serializer = ClientTrainingsSerializer(done_trainings, many=True)
+
+        # add timezone to time
+        data_with_localtime = []
+        for training_data in serializer.data:
+            training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
+            if training_data['end_time']:
+                training_data['end_time'] = parser.parse(training_data['end_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
+            data_with_localtime.append(training_data)
+        # return History Trainings
+        return Response(data_with_localtime)
+    
+    #new
+    @api_view(['GET'])
+    def getClientTrainingsFuture(request, client_id):
+        """
+        params: request [json], client_id [int]
+        return: data of Trainings object [JSONResoponse]
+        method returns all not done trainings by given client
+        """
+        trainer_id = request.GET.get('trainer_id', None)
+        trainings = Trainings.objects.filter(client_id=client_id).select_related('training_plan', 'trainer')
+        if trainer_id:
+            trainings = trainings.filter(trainer_id=trainer_id)
+
+        # filter not done trainings
+        new_trainings = []
+        for training in trainings:
+            doesExist = TrainingsExercises.objects.filter(training=training)
+            if not doesExist:
+                new_trainings.append(training)
+
+        serializer = ClientTrainingsSerializer(new_trainings, many=True)
+        # fix timezone time
+        data_with_localtime = []
+        for training_data in serializer.data:
+            training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
+            if training_data['end_time']:
+                training_data['end_time'] = parser.parse(training_data['end_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
+            data_with_localtime.append(training_data)
+
+        return Response(data_with_localtime)
+
+    @api_view(['GET'])
+    def getTrainingExercises(request, training_id):
+        """
+        params: request [json], training_id [int]
+        return: data of TrainingsExercises object [JSONResoponse]
+        method returns all not done trainings by given client
+        """
+        try:
+            training = Trainings.objects.get(training_id=training_id)
+        except Trainings.DoesNotExist:
+            return JsonResponse({'error': 'Training not found'}, status=404)
+
+        # get TrainingsExercises from given training
+        exercises = TrainingsExercises.objects.filter(training=training)
+        data = TrainingsExercisesSerializer(exercises, many=True).data
+        # fix timezone in start_time and end_time
+        data_with_localtime = []
+        for training_data in data:
+            training_data['start_time'] = parser.parse(training_data['start_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
+            if training_data['end_time']:
+                training_data['end_time'] = parser.parse(training_data['end_time']).astimezone(tz).strftime('%Y-%m-%d %H:%M')
+            data_with_localtime.append(training_data)
+
+        return JsonResponse(data_with_localtime, safe=False)
+
+    @api_view(['GET'])
+    def getDetailedTrainingPlans(request):
+        """
+        params: request [json]
+        return: detailed info about training plan[JSONResoponse]
+        method extracts received data and returns detailed info about training plan"""
+        # load data
+        if request.method == "POST":
+            v_training_plan_data = json.loads(request.body.decode("utf-8"))
+        else:
+            v_training_plan_data = request.GET
+        
+        v_training_plan_id = v_training_plan_data.get("training_plan_id")
+        # extract data
+
+        training_plans = ExercisesTrainingPlans.objects.filter(training_plan=v_training_plan_id).select_related('exercise')
+        data = ExercisesTrainingPlansSerializer(training_plans, many=True).data
+        return JsonResponse(data, safe=False)
+
+
+class ClientAPIView(APIView):
+    @api_view(['GET'])
+    def getClient(request, token):
+        """
+        params: request [json], token [str]
+        return: data of Clients object [JSONResoponse]
+        method returns Client who connects to given token
+        """
+        client_id = Tokens.objects.get(key = token).client_id
+        client = Clients.objects.get(client_id = client_id)
+        data= ClientsSerializer(client).data
+        return JsonResponse(data)
+    
+    @csrf_exempt
+    def signToTrainer(request):
+        """
+        params: request [json]
+        return: status of operation [JSONResoponse]
+        method signs up client to given trainer for given time and date
+        """
+        data = json.loads(request.body)
+        # unpack data
+        date = data.get('date')
+        time = data.get('time')
+        trainer_id = data.get('trainer_id')
+        client_id = data.get('client_id')
+        # fix timezone
+        start_datetime = datetime.strptime(date + ' ' + time, '%Y-%m-%d %H:%M')
+        start_datetime = timezone.make_aware(start_datetime, tz)
+        end_datetime = start_datetime + timedelta(hours=1)
+        # check for conflicting trainings in trainer
+        conflicting_trainings = Trainings.objects.filter(
+        trainer_id=trainer_id,
+        start_time__lt=end_datetime,
+        end_time__gt=start_datetime
+        )
+        # if there is conflict raise exception
+        if conflicting_trainings.exists():
+            return JsonResponse({'status': 'error', 'message': 'Wybrany trener już ma zaplanowany trening na wtedy'})
+        # save training to db
+        training = Trainings(
+            start_time=start_datetime,
+            end_time=end_datetime,
+            trainer=Trainers.objects.get(trainer_id=trainer_id),
+            client_id=client_id
+        )
+        training.save()
+
+        return JsonResponse({'status': 'success'})
+
+
     @csrf_exempt
     def modifyClient(request):
         """
@@ -778,51 +844,10 @@ class DataBaseAPIView(APIView):
             return JsonResponse({"status": "clientDeleted"}, status=501)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
-
-
-    @api_view(['POST'])
-    def updateTrainingPlan(request):
-        """
-        params: request [json]
-        return: status of operation [JSONResoponse]
-        method updates training plan in given training
-        """
-        try:
-            # Load data
-            form_data = request.data
-
-            # extract data
-            date = form_data.get("date")
-            time = form_data.get("time")
-            selected_plan_id = form_data.get("selectedTrainingPlanId")
-            client_id_trainer = form_data.get("clientIdTrainer")
-            trainer_id = form_data.get("trainerId")
-            print(f"AAA: {selected_plan_id}")
-
-            time_with_seconds = f"{time}"
-            datetime_str = f"{date} {time_with_seconds}"
-            training_datetime = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
-            start_time = timezone.make_aware(training_datetime, tz)
-
-            training = Trainings.objects.get(start_time=start_time, client_id=client_id_trainer, trainer = trainer_id)
-            #training = Trainings.objects.get(start_time=start_time, client_id=client_id_trainer)
-
-            with transaction.atomic():
-                training_plan = TrainingPlans.objects.get(training_plan_id=selected_plan_id)
-
-                training.training_plan = training_plan
-                training.save()
-
-            # Return a success message
-            return Response({"status": "success"})
-
-        except Exception as e:
-            # Return an error message if an exception occurs
-            return Response({"message": str(e)}, status=500)
         
 
     # Statistics
-
+class ClientStatsAPIView(APIView):
     @api_view(['GET'])
     def getClientTrainingStatsCalories(request, client_id):
         """
@@ -971,25 +996,8 @@ class DataBaseAPIView(APIView):
 
         return Response({'labels': labels, 'data': data})
     
-    @api_view(['GET'])
-    def getDetailedTrainingPlans(request):
-        """
-        params: request [json]
-        return: detailed info about training plan[JSONResoponse]
-        method extracts received data and returns detailed info about training plan"""
-        # load data
-        if request.method == "POST":
-            v_training_plan_data = json.loads(request.body.decode("utf-8"))
-        else:
-            v_training_plan_data = request.GET
-        
-        v_training_plan_id = v_training_plan_data.get("training_plan_id")
-        # extract data
 
-        training_plans = ExercisesTrainingPlans.objects.filter(training_plan=v_training_plan_id).select_related('exercise')
-        data = ExercisesTrainingPlansSerializer(training_plans, many=True).data
-        return JsonResponse(data, safe=False)
-    
+class ManagerStatsAPIView(APIView):
     @api_view(['GET'])
     def getStatsDayCountForGym(request, gym_id):
         """

@@ -16,7 +16,7 @@ function TrainingDetailModal(props) {
   }, [props.trainingDetails]);
 
   useEffect(() => {
-    if (trainingId !== null) {
+    if (trainingId !== null && trainingId !== undefined) {
       fetch("http://127.0.0.1:8000/training_exercises/" + String(trainingId))
         .then((response) => response.json())
         .then((exercises_data) => {
@@ -50,24 +50,7 @@ function TrainingDetailModal(props) {
             ></button>
           </div>
           <div class="modal-body">
-            {/* <h5>Lista elementów:</h5>
-            <ul>
-            <li>{trainingId}</li>
-            {exercisesDetails.map((exercise, index) => (
-                                <li key={index}>
-                                    <strong>Exercise:</strong> {exercise.exercise.name}, 
-                                    <strong> Category:</strong> {exercise.exercise.category}, 
-                                    <strong> Equipment:</strong> {exercise.exercise.equipment},
-                                    <strong> Equipment:</strong> {exercise.equipment_name},
-                                    <strong> Start Time:</strong> {exercise.start_time},
-                                    <strong> End Time:</strong> {exercise.end_time},
-                                    <strong> Repeats:</strong> {exercise.repeats},
-                                    <strong> Time:</strong> {exercise.time},
-                                    <strong> Load:</strong> {exercise.load},
-                                    <strong> Calories:</strong> {exercise.calories}
-                                </li>
-                            ))}
-        </ul> */}
+
             <div className="table-responsive">
               <table className="table table-bordered table-hover">
                 <thead>

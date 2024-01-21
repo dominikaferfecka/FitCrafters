@@ -8,7 +8,7 @@ import TrainerForm from "./TrainerForm";
 import UserHeader from "./UserHeader";
 import React, { useEffect, useState } from "react";
 
-function ManagerPage() {
+function ManagerPage({ test }) {
   const selectStats = [];
 
   const [gym_data, setgymData] = useState([]);
@@ -21,60 +21,78 @@ function ManagerPage() {
 
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/manager-name-endpoint/")
-      .then((response) => response.json())
-      .then((manager_data) => {
-        setManagerData(manager_data);
-        console.log(manager_data);
-      })
-      .catch((error) => {
-        console.log(manager_data);
+    const fetchData = async () => {
+      try {
+        // Sprawdź, czy aplikacja działa w trybie testowym
+        if (test !== 'test') {
+          const response = await fetch("http://127.0.0.1:8000/manager-name-endpoint/");
+          const manager_data = await response.json();
+          setManagerData(manager_data);
+          console.log(manager_data);
+        }
+      } catch (error) {
         console.error("Błąd przy pobieraniu danych:", error);
-      });
+      }
+    };
+  
+    fetchData();
   }, []);
 
   // console.log(manager_data);
   useEffect(() => {
-    fetch(
-      "http://127.0.0.1:8000/gyms-endpoint/?manager_id=" +
-        String(manager_data.manager_id)
-    )
-      .then((response) => response.json())
-      .then((gym_data) => {
-        setgymData(gym_data);
-        // console.log(gym_data);
-      })
-      .catch((error) => {
-        console.log(gym_data);
-        console.error("Błąd przy pobieraniu danych:", error);
-      });
+    // Check if manager_data is truthy before making the API call
+    if (manager_data && manager_data.manager_id) {
+      fetch(
+        `http://127.0.0.1:8000/gyms-endpoint/?manager_id=${manager_data.manager_id}`
+      )
+        .then((response) => response.json())
+        .then((gym_data) => {
+          setgymData(gym_data);
+        })
+        .catch((error) => {
+          console.error("Błąd przy pobieraniu danych:", error);
+        });
+    }
   }, [manager_data]);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/equipment-endpoint/")
-      .then((response) => response.json())
-      .then((equipment_data) => {
-        setEquipmentData(equipment_data);
-        console.log(equipment_data);
-      })
-      .catch((error) => {
-        console.log(equipment_data);
-        console.error("Błąd przy pobieraniu danych:", error);
-      });
+    if (test !== 'test') {
+      fetch("http://127.0.0.1:8000/equipment-endpoint/")
+        .then((response) => response.json())
+        .then((equipment_data) => {
+          setEquipmentData(equipment_data);
+          console.log(equipment_data);
+        })
+        .catch((error) => {
+          console.error("Błąd przy pobieraniu danych:", error);
+  
+          // Check if equipment_data is truthy before logging
+          if (equipment_data) {
+            console.log(equipment_data);
+          }
+        });
+    }
   }, []);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/trainer-endpoint/")
-      .then((response) => response.json())
-      .then((trainers_data) => {
-        setgymTrainersData(trainers_data);
-        console.log(trainers_data);
-      })
-      .catch((error) => {
-        console.log(trainers_data);
-        console.error("Błąd przy pobieraniu danych:", error);
-      });
+    if (test !== 'test') {
+      fetch("http://127.0.0.1:8000/trainer-endpoint/")
+        .then((response) => response.json())
+        .then((trainers_data) => {
+          setgymTrainersData(trainers_data);
+          console.log(trainers_data);
+        })
+        .catch((error) => {
+          console.error("Błąd przy pobieraniu danych:", error);
+  
+          // Check if trainers_data is truthy before logging
+          if (trainers_data) {
+            console.log(trainers_data);
+          }
+        });
+    }
   }, []);
+  
 
   const selectGyms = gym_data.map(
     (element) => element.city + ", " + element.street

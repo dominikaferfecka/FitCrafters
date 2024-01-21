@@ -1,23 +1,26 @@
 import { useState, useEffect } from "react";
 
 
-function TrainingPlanDetailModal({trainingPlanId}) {
+function TrainingPlanDetailModal({trainingPlanId, test}) {
     const [exercises_training_plans, setExercisesTrainingPlans] = useState([]);
 
     console.log("TrainingPlanDetailModal: " + trainingPlanId);
 
     //TO DO - change trainer_id to props.trainerId
     useEffect(() => {
-        fetch("http://127.0.0.1:8000/get-training-plans-info/?training_plan_id=" + String(trainingPlanId))
-        .then((response) => response.json())
-        .then((exercises_training_plans) => {
-        setExercisesTrainingPlans(exercises_training_plans);
-        console.log(exercises_training_plans);
-        })
-        .catch((error) => {
-        console.log(exercises_training_plans);
-        console.error("Błąd przy pobieraniu danych:", error);
-        });
+        if(!test)
+        {
+          fetch("http://127.0.0.1:8000/get-training-plans-info/?training_plan_id=" + String(trainingPlanId))
+          .then((response) => response.json())
+          .then((exercises_training_plans) => {
+          setExercisesTrainingPlans(exercises_training_plans);
+          console.log(exercises_training_plans);
+          })
+          .catch((error) => {
+          console.log(exercises_training_plans);
+          console.error("Błąd przy pobieraniu danych:", error);
+          });
+        }
     }, [trainingPlanId]);
 
   

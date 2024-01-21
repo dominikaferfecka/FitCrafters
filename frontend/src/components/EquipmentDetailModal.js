@@ -4,7 +4,7 @@ function EquipmentDetailModal(props) {
   // create state variables for all fields in form
   const [selectedGym, setSelectedGym] = useState("");
   const [equipmentId, setEquipmentId] = useState("");
-  const [equipmentData, setEquipmentData] = useState(null);
+  const [equipmentData, setEquipmentData] = useState([]);
   const [selectedEquipment, setSelectedEquipment] = useState(null);
   const [serialNumbers, setSerialNumbers] = useState([]);
   const [selectedSerialNumber, setSelectedSerialNumber] = useState("");
@@ -58,33 +58,35 @@ function EquipmentDetailModal(props) {
   };
 
   useEffect(() => {
-    fetch(
-      `http://127.0.0.1:8000/get_gyms_equipment/` +
-        props.selectedGym +
-        "/" +
-        String(equipmentId)
-    )
-      .then((response) => response.json())
-      .then((equipmentData) => {
-        setEquipmentData(equipmentData);
-        let serial_numbers = [];
-        for (let i = 0; i < equipmentData.length; i++) {
-          serial_numbers.push(equipmentData[i].serial_number);
-        }
-        setSerialNumbers(serial_numbers);
-        setSelectedAvailable(1);
-        console.log(equipmentData);
-        console.log(selectedGym);
-        console.log(serial_numbers);
-      })
-      .catch((error) => {
-        console.log(equipmentData);
-        console.error("Błąd przy pobieraniu danych:", error);
-      })
-      .finally(() => {
-        setRefreshData(false);
-      });
-    console.log(selectedGym);
+    if (props.selectedGym && equipmentId !== undefined) {
+      fetch(
+        `http://127.0.0.1:8000/get_gyms_equipment/` +
+          props.selectedGym +
+          "/" +
+          String(equipmentId)
+      )
+        .then((response) => response.json())
+        .then((equipmentData) => {
+          setEquipmentData(equipmentData);
+          let serial_numbers = [];
+          for (let i = 0; i < equipmentData.length; i++) {
+            serial_numbers.push(equipmentData[i].serial_number);
+          }
+          setSerialNumbers(serial_numbers);
+          setSelectedAvailable(1);
+          console.log(equipmentData);
+          console.log(selectedGym);
+          console.log(serial_numbers);
+        })
+        .catch((error) => {
+          console.log(equipmentData);
+          console.error("Błąd przy pobieraniu danych:", error);
+        })
+        .finally(() => {
+          setRefreshData(false);
+        });
+      console.log(selectedGym);
+    }
   }, [props.selectedGym, equipmentId, refreshData]);
 
   const handleDeleteEquipment = (e) => {
